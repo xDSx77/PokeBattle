@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".PokedexDetailsFragment">
+
+    <ImageView
+        android:id="@+id/PokemonImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="32dp"
+        android:src="@android:drawable/ic_menu_gallery"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/PokemonNameTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="75dp"
+        android:text="Pokemon Name"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="@+id/PokemonImageView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/PokemonImageView" />
+
+    <TextView
+        android:id="@+id/HeightTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="50dp"
+        android:text="Height:"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/PokemonImageView" />
+
+    <TextView
+        android:id="@+id/HeightValueTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="N.A."
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="@+id/HeightTextView"
+        app:layout_constraintStart_toEndOf="@+id/HeightTextView"
+        app:layout_constraintTop_toTopOf="@+id/HeightTextView" />
+
+    <TextView
+        android:id="@+id/SpeedTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="Speed:"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/HeightTextView" />
+
+    <TextView
+        android:id="@+id/SpeedValueTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="N.A."
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="@+id/SpeedTextView"
+        app:layout_constraintStart_toEndOf="@+id/SpeedTextView"
+        app:layout_constraintTop_toTopOf="@+id/SpeedTextView" />
+
+    <TextView
+        android:id="@+id/AttackTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="Attack:"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/SpeedTextView" />
+
+    <TextView
+        android:id="@+id/AttackValueTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="N.A."
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="@+id/AttackTextView"
+        app:layout_constraintStart_toEndOf="@+id/AttackTextView"
+        app:layout_constraintTop_toTopOf="@+id/AttackTextView" />
+
+    <TextView
+        android:id="@+id/SpecialAttackTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="Special Attack:"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/AttackTextView" />
+
+    <TextView
+        android:id="@+id/SpecialAttackValueTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="N.A."
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="@+id/SpecialAttackTextView"
+        app:layout_constraintStart_toEndOf="@+id/SpecialAttackTextView"
+        app:layout_constraintTop_toTopOf="@+id/SpecialAttackTextView" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/Vertical50"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.5" />
+
+    <TextView
+        android:id="@+id/WeightTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="Weight:"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="@+id/Vertical50"
+        app:layout_constraintTop_toTopOf="@+id/HeightTextView" />
+
+    <TextView
+        android:id="@+id/WeightValueTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="N.A."
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="@+id/WeightTextView"
+        app:layout_constraintStart_toEndOf="@+id/WeightTextView"
+        app:layout_constraintTop_toTopOf="@+id/WeightTextView" />
+
+    <TextView
+        android:id="@+id/HPTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="HP:"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="@+id/Vertical50"
+        app:layout_constraintTop_toBottomOf="@+id/WeightTextView" />
+
+    <TextView
+        android:id="@+id/HPValueTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="N.A."
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="@+id/HPTextView"
+        app:layout_constraintStart_toEndOf="@+id/HPTextView"
+        app:layout_constraintTop_toTopOf="@+id/HPTextView" />
+
+    <TextView
+        android:id="@+id/DefenseTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="Defense:"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="@+id/Vertical50"
+        app:layout_constraintTop_toBottomOf="@+id/HPTextView" />
+
+    <TextView
+        android:id="@+id/DefenseValueTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="N.A."
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="@+id/DefenseTextView"
+        app:layout_constraintStart_toEndOf="@+id/DefenseTextView"
+        app:layout_constraintTop_toTopOf="@+id/DefenseTextView"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/SpecialDefenseTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="Special Defense:"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="@+id/Vertical50"
+        app:layout_constraintTop_toBottomOf="@+id/DefenseTextView" />
+
+    <TextView
+        android:id="@+id/SpecialDefenseValueTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="N.A."
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="@+id/SpecialDefenseTextView"
+        app:layout_constraintStart_toEndOf="@+id/SpecialDefenseTextView"
+        app:layout_constraintTop_toTopOf="@+id/SpecialDefenseTextView" />
+
+    <TextView
+        android:id="@+id/TypesTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="32dp"
+        android:text="Types:"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/SpecialAttackTextView" />
+
+    <ImageView
+        android:id="@+id/TypeImageView"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="32dp"
+        android:src="@android:drawable/presence_audio_online"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/TypesTextView" />
+
+    <ImageView
+        android:id="@+id/Type1ImageView"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="32dp"
+        android:src="@android:drawable/presence_audio_away"
+        android:visibility="gone"
+        app:layout_constraintEnd_toStartOf="@+id/Vertical50"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/TypesTextView" />
+
+    <ImageView
+        android:id="@+id/Type2ImageView"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="32dp"
+        android:src="@android:drawable/presence_audio_busy"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/Vertical50"
+        app:layout_constraintTop_toBottomOf="@+id/TypesTextView" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

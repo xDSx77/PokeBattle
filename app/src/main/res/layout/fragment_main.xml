@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainFragment">
+
+    <TextView
+        android:id="@+id/TitleTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="PokeBattle"
+        android:textColor="#FF0000"
+        android:textSize="40sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/DescriptionTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:text="Welcome Trainer! You have a team of three pokemons and you will fight 3 wild pokemons in a row. But before the battle starts, you only know your first opponent. And remember, most Pokemons have strengths and weaknesses. Good luck!"
+        android:textAlignment="viewStart"
+        android:textSize="16sp"
+        android:textStyle="bold|italic"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/TitleTextView" />
+
+    <TextView
+        android:id="@+id/SignatureTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="24dp"
+        android:text="An application made by:"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/DescriptionTextView" />
+
+    <TextView
+        android:id="@+id/Dev1NameTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:text="James RICHET"
+        app:layout_constraintStart_toEndOf="@+id/SignatureTextView"
+        app:layout_constraintTop_toTopOf="@+id/SignatureTextView" />
+
+    <TextView
+        android:id="@+id/Dev2NameTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Ingo BRAEKMAN"
+        app:layout_constraintStart_toStartOf="@+id/Dev1NameTextView"
+        app:layout_constraintTop_toBottomOf="@+id/Dev1NameTextView" />
+
+    <TextView
+        android:id="@+id/Dev3NameTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Bastien SEIRA"
+        app:layout_constraintStart_toStartOf="@+id/Dev2NameTextView"
+        app:layout_constraintTop_toBottomOf="@+id/Dev2NameTextView" />
+
+    <TextView
+        android:id="@+id/Dev4NameTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Allan CANTIN"
+        app:layout_constraintStart_toStartOf="@+id/Dev3NameTextView"
+        app:layout_constraintTop_toBottomOf="@+id/Dev3NameTextView" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.5" />
+
+    <Button
+        android:id="@+id/BattleButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="200dp"
+        android:text="Battle"
+        app:layout_constraintEnd_toStartOf="@+id/guideline"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/SignatureTextView" />
+
+    <Button
+        android:id="@+id/PokedexButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Pokedex"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/guideline"
+        app:layout_constraintTop_toTopOf="@+id/BattleButton" />
+
+    <TextView
+        android:id="@+id/LocationTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="24dp"
+        android:text="Made at"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/guideline" />
+
+    <ImageView
+        android:id="@+id/EpitaImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:src="@drawable/ic_launcher_foreground"
+        app:layout_constraintBottom_toBottomOf="@+id/LocationTextView"
+        app:layout_constraintStart_toEndOf="@+id/LocationTextView"
+        app:layout_constraintTop_toTopOf="@+id/LocationTextView" />
+</androidx.constraintlayout.widget.ConstraintLayout>
