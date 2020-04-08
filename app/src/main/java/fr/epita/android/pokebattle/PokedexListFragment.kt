@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -27,7 +28,7 @@ class PokedexListFragment : Fragment() {
     private lateinit var viewAdapter: RecyclerView.Adapter<*>
     private lateinit var viewManager: RecyclerView.LayoutManager
 
-    var pokedexEntries : ArrayList<PokedexEntry> = ArrayList();
+    var pokedexEntries : ArrayList<PokedexEntry> = ArrayList()
 
     // Use GSON library to create our JSON parser
     val jsonConverter = GsonConverterFactory.create(GsonBuilder().create())
@@ -51,20 +52,24 @@ class PokedexListFragment : Fragment() {
         }
 
         override fun onResponse(
-            call: Call<List<PokedexEntry>>, response:
-            Response<List<PokedexEntry>>
-        ) {
+            call: Call<List<PokedexEntry>>,
+            response: Response<List<PokedexEntry>>) {
             Log.w("WebServices", "SurLeWeb API call success")
             if (response.code() == 200) {
                 // We got our data !
                 val pokedexEntriesResponse : List<PokedexEntry> = response.body()!!;
                 for (pokedexEntry in pokedexEntriesResponse) {
-                    pokedexEntries.add(pokedexEntry);
+                    pokedexEntries.add(pokedexEntry)
                 }
-                pokedexEntries.sort();
+                pokedexEntries.sort()
+
+                val entryClickListener = View.OnClickListener {
+                    val position = it.tag as Int
+                    (activity as MainActivity).PokedexDetails(pokedexEntries[position].id)
+                }
 
                 viewManager = LinearLayoutManager(context)
-                viewAdapter = PokedexEntryAdapter(pokedexEntries);
+                viewAdapter = PokedexEntryAdapter(pokedexEntries, entryClickListener)
                 recyclerView = PokedexListView.apply {
                     // use this setting to improve performance if you know that changes
                     // in content do not change the layout size of the RecyclerView
@@ -90,11 +95,6 @@ class PokedexListFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        service.pokemonList().enqueue(pokemonListCallback);
-
-        TestTextView.setOnClickListener {
-            (activity as MainActivity).PokedexDetails(null/*TODO: Id of the selected pokemon*/)
-        }
-
+        service.pokemonList().enqueue(pokemonListCallback)
     }
 }

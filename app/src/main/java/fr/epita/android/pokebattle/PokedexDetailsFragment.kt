@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 
 class PokedexDetailsFragment : Fragment() {
 
@@ -18,9 +19,7 @@ class PokedexDetailsFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val id : Int? = savedInstanceState?.let {
-            it.getInt("pokemonId")
-        }
+        val id : Int? = arguments!!.getInt("pokemonId")
         if (id != null) {
             //TODO: set the fields in the pokedex details layout
             // Set "TypeImageView" if the pokemon has just 1 type and hide "Type1ImageView" and "Type2ImageView"
