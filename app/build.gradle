@@ -36,4 +36,11 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
+    // Import retrofit lib in our project
+    implementation 'com.squareup.retrofit2:retrofit:2.5.0'
+    // Also add a retrofit plugin to handle json responses
+    implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
+    // Include the dependency in your app module build.gradle file
+    implementation 'com.github.bumptech.glide:glide:4.11.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
 }
