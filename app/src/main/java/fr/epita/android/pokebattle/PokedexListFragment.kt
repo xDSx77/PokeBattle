@@ -58,6 +58,7 @@ class PokedexListFragment : Fragment() {
             if (response.code() == 200) {
                 // We got our data !
                 val pokedexEntriesResponse : List<PokedexEntry> = response.body()!!;
+                pokedexEntries.clear();
                 for (pokedexEntry in pokedexEntriesResponse) {
                     pokedexEntries.add(pokedexEntry)
                 }

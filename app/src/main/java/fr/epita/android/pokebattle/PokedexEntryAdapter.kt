@@ -3,6 +3,7 @@ package fr.epita.android.pokebattle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import fr.epita.android.pokebattle.webservices.PokedexEntry
 import kotlinx.android.synthetic.main.pokedex_entry.view.*
@@ -28,7 +29,11 @@ class PokedexEntryAdapter(private val pokedexEntries : List<PokedexEntry>,
         holder.view.tag = position
         holder.view.name_textView.text = pokedexEntry.name.substring(0, 1).toUpperCase(Locale.getDefault()).plus(pokedexEntry.name.substring(1))
         holder.view.type1_imageView.setImageResource(pokedexEntry.types[0].toRDrawable())
-        if (pokedexEntry.types.size > 1)
+        if (pokedexEntry.types.size > 1) {
+            holder.view.type2_imageView.isVisible = true;
             holder.view.type2_imageView.setImageResource(pokedexEntry.types[1].toRDrawable())
+        }
+        else
+            holder.view.type2_imageView.isVisible = false;
     }
 }
