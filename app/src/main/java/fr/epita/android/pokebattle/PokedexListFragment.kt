@@ -1,20 +1,15 @@
 package fr.epita.android.pokebattle
 
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.fragment_pokedex_list.*
 import com.google.gson.GsonBuilder
-import fr.epita.android.pokebattle.webservices.PokeAPIInterface
 import fr.epita.android.pokebattle.webservices.PokedexEntry
 import fr.epita.android.pokebattle.webservices.SurLeWebAPIInterface
 import retrofit2.Call
@@ -36,13 +31,13 @@ class PokedexListFragment : Fragment() {
     // Create a Retrofit client object targeting the provided URL
     // and add a JSON converter (because we are expecting json responses)
     val retrofit = Retrofit.Builder()
-        .baseUrl( SurLeWebAPIInterface.Constants.url)
+        .baseUrl(SurLeWebAPIInterface.Constants.url)
         .addConverterFactory(jsonConverter)
         .build()
 
     // Use the client to create a service:
     // an object implementing the interface to the WebService
-    val service: SurLeWebAPIInterface = retrofit.create(
+    val service : SurLeWebAPIInterface = retrofit.create(
         SurLeWebAPIInterface::class.java)
 
     val pokemonListCallback: Callback<List<PokedexEntry>> = object : Callback<List<PokedexEntry>> {

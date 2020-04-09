@@ -30,10 +30,10 @@ class PokedexEntryAdapter(private val pokedexEntries : List<PokedexEntry>,
         holder.view.name_textView.text = pokedexEntry.name.substring(0, 1).toUpperCase(Locale.getDefault()).plus(pokedexEntry.name.substring(1))
         holder.view.type1_imageView.setImageResource(pokedexEntry.types[0].toRDrawable())
         if (pokedexEntry.types.size > 1) {
-            holder.view.type2_imageView.isVisible = true;
+            holder.view.type2_imageView.isVisible = true
             holder.view.type2_imageView.setImageResource(pokedexEntry.types[1].toRDrawable())
         }
         else
-            holder.view.type2_imageView.isVisible = false;
+            holder.view.type2_imageView.isVisible = false
     }
 }
