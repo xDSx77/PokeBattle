@@ -43,4 +43,17 @@ class MainActivity : AppCompatActivity() {
             .addToBackStack(null)
             .commit()
     }
+
+    fun TypeHelp(typeName : String?) {
+        val bundle = Bundle()
+        if (typeName != null)
+            bundle.putString("typeName", typeName);
+        val typeHelpFragment = TypeHelpFragment()
+        typeHelpFragment.arguments = bundle
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.mainContainer, typeHelpFragment)
+            .addToBackStack(null)
+            .commit()
+    }
 }
