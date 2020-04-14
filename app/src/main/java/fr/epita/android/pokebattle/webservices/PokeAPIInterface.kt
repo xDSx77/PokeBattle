@@ -1,9 +1,9 @@
 package fr.epita.android.pokebattle.webservices
 
+import fr.epita.android.pokebattle.webservices.pokemon.type.Type
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Path
-import retrofit2.http.Query
 
 interface PokeAPIInterface {
     object Constants {
@@ -14,4 +14,9 @@ interface PokeAPIInterface {
     @GET("pokemon/{id}")
     fun getPokemon(@Path("id") id : Int) : Call<Pokemon>
 
+    @GET("type/{name}")
+    fun getTypeByName(@Path("name") name : String) : Call<Type>
+
+    @GET("type/{id}")
+    fun getTypeById(@Path("id") id : Int) : Call<Type>
 }
