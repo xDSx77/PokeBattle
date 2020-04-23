@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".BattleFragment">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/opponentPokemonImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:src="@drawable/ic_launcher_background"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/battlingPokemonImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:src="@drawable/ic_launcher_background"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/opponentPokemonImage" />
+
+        <ImageView
+            android:id="@+id/pokemon1Image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginBottom="16dp"
+            android:src="@drawable/ic_launcher_background"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <ImageView
+            android:id="@+id/pokemon3Image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:src="@drawable/ic_launcher_background"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <ImageView
+            android:id="@+id/pokemon2Image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:src="@drawable/ic_launcher_background"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/pokemon3Image"
+            app:layout_constraintStart_toEndOf="@+id/pokemon1Image" />
+
+        <TextView
+            android:id="@+id/move1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="80dp"
+            android:layout_marginTop="52dp"
+            android:text="TextView"
+            android:visibility="invisible"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/battlingPokemonImage"
+            tools:visibility="invisible" />
+
+        <TextView
+            android:id="@+id/move2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="92dp"
+            android:text="TextView"
+            android:visibility="invisible"
+            app:layout_constraintStart_toEndOf="@+id/move1"
+            app:layout_constraintTop_toTopOf="@+id/move1"
+            tools:visibility="invisible" />
+
+        <TextView
+            android:id="@+id/move3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="80dp"
+            android:layout_marginTop="20dp"
+            android:text="TextView"
+            android:visibility="invisible"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/move1"
+            tools:visibility="invisible" />
+
+        <TextView
+            android:id="@+id/move4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="92dp"
+            android:text="TextView"
+            android:visibility="invisible"
+            app:layout_constraintStart_toEndOf="@+id/move3"
+            app:layout_constraintTop_toTopOf="@+id/move3"
+            tools:visibility="invisible" />
+
+        <ImageView
+            android:id="@+id/move1Type"
+            android:layout_width="27dp"
+            android:layout_height="27dp"
+            android:src="@drawable/ic_launcher_background"
+            android:visibility="invisible"
+            app:layout_constraintEnd_toStartOf="@+id/move1"
+            app:layout_constraintTop_toTopOf="@+id/move1"
+            tools:visibility="invisible" />
+
+        <ImageView
+            android:id="@+id/move2Type"
+            android:layout_width="27dp"
+            android:layout_height="27dp"
+            android:src="@drawable/ic_launcher_background"
+            android:visibility="invisible"
+            app:layout_constraintEnd_toStartOf="@+id/move2"
+            app:layout_constraintTop_toTopOf="@+id/move2"
+            tools:visibility="invisible" />
+
+        <ImageView
+            android:id="@+id/move3Type"
+            android:layout_width="27dp"
+            android:layout_height="27dp"
+            android:src="@drawable/ic_launcher_background"
+            android:visibility="invisible"
+            app:layout_constraintEnd_toStartOf="@+id/move3"
+            app:layout_constraintTop_toTopOf="@+id/move3"
+            tools:visibility="invisible" />
+
+        <ImageView
+            android:id="@+id/move4Type"
+            android:layout_width="27dp"
+            android:layout_height="27dp"
+            android:src="@drawable/ic_launcher_background"
+            android:visibility="invisible"
+            app:layout_constraintEnd_toStartOf="@+id/move4"
+            app:layout_constraintTop_toTopOf="@+id/move4"
+            tools:visibility="invisible" />
+
+        <ProgressBar
+            android:id="@+id/pokemonHealth"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="@+id/battlingPokemonImage"
+            app:layout_constraintStart_toStartOf="@+id/battlingPokemonImage"
+            app:layout_constraintTop_toBottomOf="@+id/battlingPokemonImage" />
+
+        <ProgressBar
+            android:id="@+id/opponentHealth"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="@+id/opponentPokemonImage"
+            app:layout_constraintStart_toStartOf="@+id/opponentPokemonImage"
+            app:layout_constraintTop_toBottomOf="@+id/opponentPokemonImage" />
+
+        <TextView
+            android:id="@+id/messageText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="TextView"
+            android:visibility="invisible"
+            app:layout_constraintEnd_toStartOf="@+id/move4Type"
+            app:layout_constraintStart_toEndOf="@+id/move3"
+            app:layout_constraintTop_toBottomOf="@+id/move1"
+            tools:visibility="invisible" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</FrameLayout>

@@ -25,9 +25,11 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.*
+import kotlin.random.Random
 
 class BattleLobbyFragment : Fragment() {
 
+    private lateinit var opponentPokemon : Pokemon;
     private var pokemonSlots: ArrayList<Pokemon?>  = arrayListOf(null, null, null);
     private var selectedPokemon : Pokemon? = null;
     private val pokedexEntries : ArrayList<PokedexEntry> = ArrayList()
@@ -65,20 +67,56 @@ class BattleLobbyFragment : Fragment() {
 
                 pokedexEntries.sort()
 
+                val opponentEntry = pokedexEntries.random();
+
+                val pokeAPIretrofit = Retrofit.Builder()
+                    .baseUrl(PokeAPIInterface.Constants.url)
+                    .addConverterFactory(jsonConverter)
+                    .build()
+
+                val pokeAPIservice: PokeAPIInterface =
+                    pokeAPIretrofit.create(PokeAPIInterface::class.java)
+
+                val pokemonCallback: Callback<Pokemon> = object : Callback<Pokemon> {
+                    override fun onFailure(call: Call<Pokemon>, t: Throwable) {
+                        // Code here what happens if calling the WebService fails
+                        Log.w("WebServices", "PokeAPI call failed" + t.message)
+                    }
+
+                    override fun onResponse(call: Call<Pokemon>, response: Response<Pokemon>) {
+                        Log.w("WebServices", "PokeAPI call success")
+                        if (response.code() == 200) {
+                            opponentPokemon = response.body()!!;
+
+                            textView2.text = opponentEntry.name;
+                            Glide
+                                .with(this@BattleLobbyFragment)
+                                .load(opponentPokemon.sprites.front_default)
+                                .into(battle_lobby_nextOpponent_imageView);
+                            battle_lobby_nextOpponentTypeType1_imageView.setImageResource(opponentEntry.types[0].toRDrawable());
+                            battle_lobby_nextOpponentTypeType1_imageView.setOnClickListener {
+                                (activity as MainActivity).TypeHelp(opponentEntry.types[0].name);
+                            }
+                            if (opponentEntry.types.size > 1) {
+                                battle_lobby_nextOpponentType2_imageView.isVisible = true;
+                                battle_lobby_nextOpponentType2_imageView.setImageResource(opponentEntry.types[1].toRDrawable());
+                                battle_lobby_nextOpponentType2_imageView.setOnClickListener {
+                                    (activity as MainActivity).TypeHelp(opponentEntry.types[1].name);
+                                }
+                            } else {
+                                battle_lobby_nextOpponentType2_imageView.isVisible = false;
+                            }
+                        }
+                    }
+                }
+                pokeAPIservice.getPokemon(opponentEntry.id).enqueue(pokemonCallback);
+
                 val entryClickListener = View.OnClickListener {
                     val position = it.tag as Int
 
-                    var entry = pokedexEntries[position];
+                    val entry = pokedexEntries[position];
 
-                    val pokeAPIretrofit = Retrofit.Builder()
-                        .baseUrl(PokeAPIInterface.Constants.url)
-                        .addConverterFactory(jsonConverter)
-                        .build()
-
-                    val pokeAPIservice: PokeAPIInterface =
-                        pokeAPIretrofit.create(PokeAPIInterface::class.java)
-
-                    val pokemonCallback: Callback<Pokemon> = object : Callback<Pokemon> {
+                    val opponentPokemonCallback: Callback<Pokemon> = object : Callback<Pokemon> {
                         override fun onFailure(call: Call<Pokemon>, t: Throwable) {
                             // Code here what happens if calling the WebService fails
                             Log.w("WebServices", "PokeAPI call failed" + t.message)
@@ -101,7 +139,7 @@ class BattleLobbyFragment : Fragment() {
                         }
                     }
 
-                    pokeAPIservice.getPokemon(entry.id).enqueue(pokemonCallback);
+                    pokeAPIservice.getPokemon(entry.id).enqueue(opponentPokemonCallback);
                 }
 
                 battle_lobby_pokemon_list.apply {
@@ -126,6 +164,10 @@ class BattleLobbyFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         service.pokemonList().enqueue(pokemonListCallback)
+
+        battle_lobby_fight_button.setOnClickListener {
+            (activity as MainActivity).Battle(arrayListOf(opponentPokemon.id, pokedexEntries.random().id, pokedexEntries.random().id), pokemonSlots);
+        }
 
         val slotClickListener = View.OnClickListener {
             if (selectedPokemon != null) {

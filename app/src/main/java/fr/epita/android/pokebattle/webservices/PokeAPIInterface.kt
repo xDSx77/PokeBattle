@@ -19,4 +19,10 @@ interface PokeAPIInterface {
 
     @GET("type/{id}")
     fun getTypeById(@Path("id") id : Int) : Call<Type>
+
+    @GET("move-category/damage")
+    fun getMoves() : Call<MoveCategory>
+
+    @GET("move/{name}")
+    fun getMove(@Path("name") name : String) : Call<Move>
 }

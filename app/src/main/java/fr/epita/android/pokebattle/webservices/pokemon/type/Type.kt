@@ -14,4 +14,4 @@ data class Type(
     var names : List<Name>,
     var pokemon : List<TypePokemon>,
     var moves : List<NamedAPIResource>
-    )
+)

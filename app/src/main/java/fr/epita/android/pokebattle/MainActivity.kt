@@ -2,6 +2,7 @@ package fr.epita.android.pokebattle
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import fr.epita.android.pokebattle.webservices.Pokemon
 
 class MainActivity : AppCompatActivity() {
 
@@ -52,8 +53,26 @@ class MainActivity : AppCompatActivity() {
         typeHelpFragment.arguments = bundle
         supportFragmentManager
             .beginTransaction()
-            .replace(R.id.mainContainer, typeHelpFragment)
+            .hide(supportFragmentManager.findFragmentById(R.id.mainContainer)!!)
+            .add(R.id.mainContainer, typeHelpFragment)
             .addToBackStack(null)
             .commit()
+    }
+
+    fun Battle(opponentPokemon : ArrayList<Int>?, pokemonSlots : ArrayList<Pokemon?>?) {
+        val bundle = Bundle();
+        opponentPokemon?.forEachIndexed() { index, id ->
+            bundle.putInt("opponentPokemon$index", id);
+        }
+        pokemonSlots?.forEachIndexed() { index, pok ->
+            bundle.putInt("pokemon$index", pok!!.id);
+        }
+        val battleFragment = BattleFragment();
+        battleFragment.arguments = bundle;
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.mainContainer, battleFragment)
+            .addToBackStack(null)
+            .commit();
     }
 }
