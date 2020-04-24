@@ -1,18 +1,12 @@
 package fr.epita.android.pokebattle
 
-import android.graphics.Color
-import android.opengl.Visibility
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import fr.epita.android.pokebattle.webservices.Pokemon
-import kotlinx.android.synthetic.main.battle_lobby_pokemon_slot.*
 import kotlinx.android.synthetic.main.battle_lobby_pokemon_slot.view.*
-import kotlinx.android.synthetic.main.fragment_pokedex_details.*
-import kotlinx.android.synthetic.main.pokedex_entry.view.*
 import java.util.*
 
 class PokemonSlotAdapter(private val pokemonSlots : List<Pokemon?>,
@@ -24,7 +18,7 @@ class PokemonSlotAdapter(private val pokemonSlots : List<Pokemon?>,
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PokemonSlotViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.battle_lobby_pokemon_slot, parent, false)
-        view.pokemon_slot_id_button.setOnClickListener(slotClickListener)
+        view.PokemonSlotIdButton.setOnClickListener(slotClickListener)
         return PokemonSlotViewHolder(view)
     }
 
@@ -34,19 +28,19 @@ class PokemonSlotAdapter(private val pokemonSlots : List<Pokemon?>,
         var pokemon = pokemonSlots[position]
         if (pokemon == null) {
             holder.view.tag = position
-            holder.view.pokemon_slot_imageView.setImageResource(0);
-            holder.view.pokemon_slot_name_textView.text = ""
-            holder.view.pokemon_slot_id_button.text = (position + 1).toString()
+            holder.view.PokemonSlotImageView.setImageResource(0);
+            holder.view.PokemonSlotNameTextView.text = ""
+            holder.view.PokemonSlotIdButton.text = (position + 1).toString()
         }
         else
         {
-            holder.view.pokemon_slot_name_textView.text =
+            holder.view.PokemonSlotNameTextView.text =
                 pokemon.name.substring(0, 1).toUpperCase(Locale.getDefault())
                     .plus(pokemon.name.substring(1))
             Glide
                 .with(holder.view.context)
                 .load(pokemon.sprites.front_default)
-                .into(holder.view.pokemon_slot_imageView)
+                .into(holder.view.PokemonSlotImageView)
         }
     }
 

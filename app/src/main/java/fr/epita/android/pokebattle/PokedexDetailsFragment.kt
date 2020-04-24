@@ -63,7 +63,9 @@ class PokedexDetailsFragment : Fragment() {
                             .with(this@PokedexDetailsFragment)
                             .load(pokemon.sprites.front_default)
                             .into(PokemonImageView)
-                        PokemonNameTextView.text = pokemon.name.substring(0, 1).toUpperCase() + pokemon.name.substring(1)
+                        PokemonNameTextView.text =
+                            pokemon.name.substring(0, 1).toUpperCase(Locale.getDefault())
+                                .plus(pokemon.name.substring(1))
                         HeightValueTextView.text = pokemon.height.toString()
                         WeightValueTextView.text = pokemon.weight.toString()
                         for (stat: PokemonStat in pokemon.stats) {

@@ -7,142 +7,148 @@
     tools:context=".BattleLobbyFragment">
 
     <TextView
-        android:id="@+id/battle_lobby_nextOppenent_textView"
+        android:id="@+id/NextOpponentTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Your first oppenent will be..."
+        android:text="Your first opponent will be..."
+        android:textSize="18sp"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
-        android:id="@+id/battle_lobby_nextOpponent_imageView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:id="@+id/NextOpponentImageView"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:src="@drawable/ic_launcher_background"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/battle_lobby_nextOppenent_textView" />
+        app:layout_constraintTop_toBottomOf="@+id/NextOpponentTextView"
+        app:srcCompat="@android:drawable/screen_background_light_transparent" />
 
     <ImageView
-        android:id="@+id/battle_lobby_nextOpponentTypeType1_imageView"
+        android:id="@+id/NextOpponentType1ImageView"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_marginStart="16dp"
-        android:src="@drawable/ic_launcher_background"
-        app:layout_constraintStart_toEndOf="@+id/battle_lobby_nextOpponent_imageView"
-        app:layout_constraintTop_toTopOf="@+id/battle_lobby_nextOpponent_imageView" />
+        app:layout_constraintStart_toEndOf="@+id/NextOpponentImageView"
+        app:layout_constraintTop_toTopOf="@+id/NextOpponentImageView"
+        app:srcCompat="@android:drawable/screen_background_light_transparent" />
 
     <ImageView
-        android:id="@+id/battle_lobby_nextOpponentType2_imageView"
+        android:id="@+id/NextOpponentType2ImageView"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="10dp"
-        android:src="@drawable/ic_launcher_background"
-        app:layout_constraintStart_toEndOf="@+id/battle_lobby_nextOpponent_imageView"
-        app:layout_constraintTop_toBottomOf="@+id/battle_lobby_nextOpponentTypeType1_imageView" />
+        app:layout_constraintBottom_toBottomOf="@+id/NextOpponentImageView"
+        app:layout_constraintStart_toEndOf="@+id/NextOpponentImageView"
+        app:srcCompat="@android:drawable/screen_background_light_transparent" />
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/NextOpponentNameTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="TextView"
-        android:textSize="18sp"
-        app:layout_constraintTop_toBottomOf="@+id/battle_lobby_nextOpponent_imageView"
-        tools:layout_editor_absoluteX="34dp" />
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="@+id/NextOpponentImageView"
+        app:layout_constraintStart_toStartOf="@+id/NextOpponentImageView"
+        app:layout_constraintTop_toBottomOf="@+id/NextOpponentImageView"
+        tools:text="Pokemon Name" />
 
     <TextView
-        android:id="@+id/textView3"
+        android:id="@+id/PokemonSelectionTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="Please select your Pokemons for the battle to come."
+        android:textSize="16sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView2" />
+        app:layout_constraintTop_toBottomOf="@+id/NextOpponentNameTextView" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/battle_lobby_pokemon_list"
+        android:id="@+id/PokemonList"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/guideline4"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/Horizontal60"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView3"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintTop_toBottomOf="@+id/PokemonSelectionTextView"
+        app:layout_constraintVertical_bias="1.0">
 
-    <TextView
-        android:id="@+id/battle_lobby_selected_pokemon_textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="TextView"
-        app:layout_constraintBottom_toTopOf="@+id/guideline2"
-        app:layout_constraintEnd_toStartOf="@+id/guideline3"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline4" />
+    </androidx.recyclerview.widget.RecyclerView>
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline3"
+        android:id="@+id/Horizontal60"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.6" />
+
+    <TextView
+        android:id="@+id/SelectedPokemonTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@+id/Horizontal70"
+        app:layout_constraintEnd_toStartOf="@+id/Vertical40"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/Horizontal60"
+        tools:text="Pokemon Name" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/Vertical40"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.4" />
 
     <ImageView
-        android:id="@+id/battle_lobby_selected_pokemon_type1_imageView"
+        android:id="@+id/SelectedPokemonType1ImageView"
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:layout_marginStart="16dp"
-        android:src="@drawable/ic_launcher_background"
-        app:layout_constraintBottom_toTopOf="@+id/guideline2"
-        app:layout_constraintStart_toStartOf="@+id/guideline3"
-        app:layout_constraintTop_toTopOf="@+id/guideline4" />
+        app:layout_constraintBottom_toTopOf="@+id/Horizontal70"
+        app:layout_constraintStart_toStartOf="@+id/Vertical40"
+        app:layout_constraintTop_toTopOf="@+id/Horizontal60"
+        app:srcCompat="@android:drawable/screen_background_light_transparent" />
 
     <ImageView
-        android:id="@+id/battle_lobby_selected_pokemon_type_2_imageView"
+        android:id="@+id/SelectedPokemonType2ImageView"
         android:layout_width="64dp"
         android:layout_height="64dp"
-        android:src="@drawable/ic_launcher_background"
-        app:layout_constraintBottom_toTopOf="@+id/guideline2"
+        app:layout_constraintBottom_toTopOf="@+id/Horizontal70"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/battle_lobby_selected_pokemon_type1_imageView"
-        app:layout_constraintTop_toTopOf="@+id/guideline4" />
+        app:layout_constraintStart_toEndOf="@+id/SelectedPokemonType1ImageView"
+        app:layout_constraintTop_toTopOf="@+id/Horizontal60"
+        app:srcCompat="@android:drawable/screen_background_light_transparent" />
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline2"
+        android:id="@+id/Horizontal70"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.75" />
+        app:layout_constraintGuide_percent="0.7" />
 
     <Button
-        android:id="@+id/battle_lobby_fight_button"
+        android:id="@+id/FightButton"
         android:layout_width="wrap_content"
         android:layout_height="80dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="32dp"
         android:layout_marginEnd="32dp"
         android:text="Fight !"
         android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.6" />
-
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/battle_lobby_pokemon_slot_list"
+        android:id="@+id/PokemonSlotList"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline2" />
+        app:layout_constraintTop_toTopOf="@+id/Horizontal70" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

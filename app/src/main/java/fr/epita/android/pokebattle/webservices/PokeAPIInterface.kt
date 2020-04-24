@@ -14,6 +14,9 @@ interface PokeAPIInterface {
     @GET("pokemon/{id}")
     fun getPokemon(@Path("id") id : Int) : Call<Pokemon>
 
+    @GET("type")
+    fun getTypes() : Call<NamedAPIResourceList>
+
     @GET("type/{name}")
     fun getTypeByName(@Path("name") name : String) : Call<Type>
 
@@ -21,7 +24,7 @@ interface PokeAPIInterface {
     fun getTypeById(@Path("id") id : Int) : Call<Type>
 
     @GET("move-category/damage")
-    fun getMoves() : Call<MoveCategory>
+    fun getAllDamageMoves() : Call<MoveCategory>
 
     @GET("move/{name}")
     fun getMove(@Path("name") name : String) : Call<Move>

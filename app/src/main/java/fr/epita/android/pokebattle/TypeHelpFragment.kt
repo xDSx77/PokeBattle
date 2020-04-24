@@ -21,17 +21,14 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-/**
- * A simple [Fragment] subclass.
- */
 class TypeHelpFragment : Fragment() {
 
-    var doubleDamageToTypes : ArrayList<Int> = ArrayList<Int>()
-    var doubleDamageFromTypes : ArrayList<Int> = ArrayList<Int>()
-    var halfDamageToTypes : ArrayList<Int> = ArrayList<Int>()
-    var halfDamageFromTypes : ArrayList<Int> = ArrayList<Int>()
-    var noDamageToTypes : ArrayList<Int> = ArrayList<Int>()
-    var noDamageFromTypes : ArrayList<Int> = ArrayList<Int>()
+    var doubleDamageToTypes : ArrayList<Int> = ArrayList()
+    var doubleDamageFromTypes : ArrayList<Int> = ArrayList()
+    var halfDamageToTypes : ArrayList<Int> = ArrayList()
+    var halfDamageFromTypes : ArrayList<Int> = ArrayList()
+    var noDamageToTypes : ArrayList<Int> = ArrayList()
+    var noDamageFromTypes : ArrayList<Int> = ArrayList()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -55,11 +52,11 @@ class TypeHelpFragment : Fragment() {
 
         val typeCallback : Callback<Type> = object : Callback<Type> {
             override fun onFailure(call: Call<Type>, t: Throwable) {
-                Log.w("WebServices", "PokeAPI call failed " + t.message) //To change body of created functions use File | Settings | File Templates.
+                Log.w("WebServices", "PokeAPI call failed " + t.message)
             }
 
             override fun onResponse(call: Call<Type>, response: Response<Type>) {
-                Log.w("WebServices", "PokeAPI call success") //To change body of created functions use File | Settings | File Templates.
+                Log.w("WebServices", "PokeAPI call success")
                 if (response.code() != 200) return
                 val type : Type = response.body()!!
                 TypeImageView.setImageResource(getTypeImageResource(typeName))

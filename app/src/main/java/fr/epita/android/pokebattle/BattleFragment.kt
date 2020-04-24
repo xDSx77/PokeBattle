@@ -12,10 +12,9 @@ import android.widget.ProgressBar
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.google.gson.GsonBuilder
-import fr.epita.android.pokebattle.webservices.Move
-import fr.epita.android.pokebattle.webservices.MoveCategory
-import fr.epita.android.pokebattle.webservices.PokeAPIInterface
-import fr.epita.android.pokebattle.webservices.Pokemon
+import fr.epita.android.pokebattle.webservices.*
+import fr.epita.android.pokebattle.webservices.pokemon.type.Type
+import fr.epita.android.pokebattle.webservices.pokemon.type.TypeRelations
 import kotlinx.android.synthetic.main.fragment_battle.*
 import retrofit2.Call
 import retrofit2.Callback
@@ -33,25 +32,28 @@ class BattleFragment : Fragment() {
         var hp : Int
     );
 
-    private val jsonConverter = GsonConverterFactory.create(GsonBuilder().create());
+    private val jsonConverter = GsonConverterFactory.create(GsonBuilder().create())
     private val retrofit = Retrofit.Builder()
         .baseUrl(PokeAPIInterface.Constants.url)
         .addConverterFactory(jsonConverter)
-        .build();
-    private val service =  retrofit.create(PokeAPIInterface::class.java);
+        .build()
+    private val service =  retrofit.create(PokeAPIInterface::class.java)
 
-    private lateinit var moveList : MoveCategory;
-    private lateinit var opponentPokemon1 : PokemonInfo;
-    private lateinit var opponentPokemon2 : PokemonInfo;
-    private lateinit var opponentPokemon3 : PokemonInfo;
-    private lateinit var pokemon1 : PokemonInfo;
-    private lateinit var pokemon2 : PokemonInfo;
-    private lateinit var pokemon3 : PokemonInfo;
+    private var allTypes : MutableList<String> = mutableListOf()
+    private var allMovesTypesDamageRelations = mutableMapOf<String, TypeRelations>()
 
-    private lateinit var battlingPokemon : PokemonInfo;
-    private lateinit var opponentBattlingPokemon : PokemonInfo;
+    private lateinit var allDamageMovesList : MoveCategory
+    private lateinit var opponentPokemon1 : PokemonInfo
+    private lateinit var opponentPokemon2 : PokemonInfo
+    private lateinit var opponentPokemon3 : PokemonInfo
+    private lateinit var pokemon1 : PokemonInfo
+    private lateinit var pokemon2 : PokemonInfo
+    private lateinit var pokemon3 : PokemonInfo
 
-    private val actions : Queue<() -> Unit> = LinkedList<() -> Unit>();
+    private lateinit var battlingPokemon : PokemonInfo
+    private lateinit var opponentBattlingPokemon : PokemonInfo
+
+    private val actions : Queue<() -> Unit> = LinkedList()
 
     private fun <T> pokeAPICallback(onResponse : (Response<T>) -> Unit) : Callback<T> {
         return object : Callback<T> {
@@ -60,103 +62,108 @@ class BattleFragment : Fragment() {
             }
 
             override fun onResponse(call: Call<T>, response: Response<T>) {
-                Log.w("WebServices", "Poke API call success");
+                Log.w("WebServices", "Poke API call success")
                 if (response.code() == 200)
-                    onResponse(response);
+                    onResponse(response)
             }
         }
     }
 
     private fun doOrAddAction(action : () -> Unit) {
         if (actions.isEmpty())
-            action();
+            action()
         else
-            actions.add { action() };
+            actions.add { action() }
     }
 
     private fun nextAction() {
         if (actions.isEmpty())
-            showMoves();
+            showMoves()
         else
-            actions.remove()();
+            actions.remove()()
     }
 
     private fun getPokemonMoves(pok : Pokemon) : List<Move?> {
-        val moves = mutableListOf<Move?>();
-        val allMoves = pok.moves.shuffled();
-        var count = 0;
+        val moves = mutableListOf<Move?>()
+        val allPokemonMoves = pok.moves.shuffled()
+        var movesCount = 0
         val moveCallback : Callback<Move> = pokeAPICallback { response ->
-            moves.add(response.body()!!);
-        };
-        allMoves.forEach loop@{ move ->
-            if (moveList.moves.any { it.name == move.move.name }) {
-                service.getMove(move.move.name).enqueue(moveCallback);
-                count++;
-                if (count == 4)
-                    return@loop;
+            moves.add(response.body()!!)
+        }
+        for (pokemonMove in allPokemonMoves){
+            if (movesCount == 4)
+                break
+            if (allDamageMovesList.moves.any { it.name == pokemonMove.move.name }) {
+                service.getMove(pokemonMove.move.name).enqueue(moveCallback)
+                movesCount++
             }
         }
-        return moves;
+        return moves
     }
 
     private fun opponentTurn(next : () -> Unit = { nextAction(); }) {
-        attack(1, opponentBattlingPokemon, battlingPokemon, pokemonHealth, next);
+        attack(1, opponentBattlingPokemon, battlingPokemon, battlingPokemonHealth, next)
     }
 
     private fun showMessage(m : String) {
-        messageText.text = m;
-        move1.visibility = View.INVISIBLE;
-        move1Type.visibility = View.INVISIBLE;
-        move2.visibility = View.INVISIBLE;
-        move2Type.visibility = View.INVISIBLE;
-        move3.visibility = View.INVISIBLE;
-        move3Type.visibility = View.INVISIBLE;
-        move4.visibility = View.INVISIBLE;
-        move4Type.visibility = View.INVISIBLE;
-        messageText.visibility = View.VISIBLE;
+        MessageTextView.text = m
+        MessageTextView.visibility = View.VISIBLE
+        move1.visibility = View.INVISIBLE
+        move1Type.visibility = View.INVISIBLE
+        move2.visibility = View.INVISIBLE
+        move2Type.visibility = View.INVISIBLE
+        move3.visibility = View.INVISIBLE
+        move3Type.visibility = View.INVISIBLE
+        move4.visibility = View.INVISIBLE
+        move4Type.visibility = View.INVISIBLE
     }
 
     private fun showMoves() {
-        messageText.visibility = View.INVISIBLE;
-        move1.visibility = View.VISIBLE;
-        move1Type.visibility = View.VISIBLE;
-        move2.visibility = View.VISIBLE;
-        move2Type.visibility = View.VISIBLE;
-        move3.visibility = View.VISIBLE;
-        move3Type.visibility = View.VISIBLE;
-        move4.visibility = View.VISIBLE;
-        move4Type.visibility = View.VISIBLE;
+        MessageTextView.visibility = View.INVISIBLE
+        move1.visibility = View.VISIBLE
+        move1Type.visibility = View.VISIBLE
+        move2.visibility = View.VISIBLE
+        move2Type.visibility = View.VISIBLE
+        move3.visibility = View.VISIBLE
+        move3Type.visibility = View.VISIBLE
+        move4.visibility = View.VISIBLE
+        move4Type.visibility = View.VISIBLE
     }
 
     private fun setOpponentPokemon(pok : PokemonInfo) {
-        opponentBattlingPokemon = pok;
+        opponentBattlingPokemon = pok
         Glide
             .with(this@BattleFragment)
             .load(pok.pokemon.sprites.front_default)
-            .into(opponentPokemonImage);
-        opponentHealth.max = pok.pokemon.stats.find { it.stat.name == "hp" }!!.base_stat;
-        opponentHealth.progress = pok.hp;
+            .into(opponentPokemonImageView)
+        opponentPokemonHealth.max = pok.pokemon.stats.find { it.stat.name == "hp" }!!.base_stat
+        opponentPokemonHealth.progress = pok.hp
     }
 
     private fun setBattlingPokemon(pok : PokemonInfo) {
-        battlingPokemon = pok;
+        battlingPokemon = pok
+        val battlingSprite =
+            if (pok.pokemon.sprites.back_default.isNullOrBlank())
+                pok.pokemon.sprites.front_default
+            else
+                pok.pokemon.sprites.back_default
         Glide
             .with(this@BattleFragment)
-            .load(pok.pokemon.sprites.back_default)
-            .into(battlingPokemonImage);
-        pokemonHealth.max = pok.pokemon.stats.find { it.stat.name == "hp" }!!.base_stat;
-        pokemonHealth.progress = pok.hp;
-        setBattlingMove(1, pok.moves[0]!!);
-        setBattlingMove(2, pok.moves[1]!!);
-        setBattlingMove(3, pok.moves[2]!!);
-        setBattlingMove(4, pok.moves[3]!!);
+            .load(battlingSprite)
+            .into(battlingPokemonImageView)
+        battlingPokemonHealth.max = pok.pokemon.stats.find { it.stat.name == "hp" }!!.base_stat
+        battlingPokemonHealth.progress = pok.hp
+        setBattlingMove(1, pok.moves[0]!!)
+        setBattlingMove(2, pok.moves[1]!!)
+        setBattlingMove(3, pok.moves[2]!!)
+        setBattlingMove(4, pok.moves[3]!!)
     }
 
     private fun playerTurn(moveId : Int) {
         if (opponentBattlingPokemon.pokemon.stats.find { it.stat.name == "speed" }!!.base_stat > battlingPokemon.pokemon.stats.find { it.stat.name == "speed" }!!.base_stat)
-            opponentTurn { attack(moveId, battlingPokemon, opponentBattlingPokemon, opponentHealth) };
+            opponentTurn { attack(moveId, battlingPokemon, opponentBattlingPokemon, opponentPokemonHealth) }
         else
-            attack(moveId, battlingPokemon, opponentBattlingPokemon, opponentHealth) { opponentTurn() };
+            attack(moveId, battlingPokemon, opponentBattlingPokemon, opponentPokemonHealth) { opponentTurn() }
     }
 
     private fun greyImage(img : ImageView) {
@@ -168,65 +175,103 @@ class BattleFragment : Fragment() {
     }
 
     private fun handlePokemonKO(pok : PokemonInfo) {
-        showMessage(pok.pokemon.name + " is KO!");
+        showMessage(pok.pokemon.name + " fainted!")
         if (pok == battlingPokemon) {
             when (pok) {
-                pokemon1 -> greyImage(pokemon1Image)
-                pokemon2 -> greyImage(pokemon2Image)
-                pokemon3 -> greyImage(pokemon3Image)
+                pokemon1 -> greyImage(pokemon1ImageView)
+                pokemon2 -> greyImage(pokemon2ImageView)
+                pokemon3 -> greyImage(pokemon3ImageView)
             }
 
-            val pokemon = listOf<PokemonInfo>(pokemon1, pokemon2, pokemon3);
-            val newPokemon = pokemon.find { it.hp > 0 };
+            val pokemon = listOf(pokemon1, pokemon2, pokemon3)
+            val newPokemon = pokemon.find { it.hp > 0 }
             if (newPokemon == null) {
                 actions.add {
-                    showMessage("You lost!");
-                    messageText.setOnClickListener(null);
-                    greyImage(battlingPokemonImage);
+                    showMessage("You lost !")
+                    MessageTextView.setOnClickListener(null)
+                    greyImage(battlingPokemonImageView)
                 }
             }
             else
-                setBattlingPokemon(newPokemon);
+                setBattlingPokemon(newPokemon)
         }
         else {
-            val opponents = listOf<PokemonInfo>(opponentPokemon1, opponentPokemon2, opponentPokemon3);
-            val newOpponent = opponents.find { it.hp > 0 };
+            val opponents = listOf(opponentPokemon1, opponentPokemon2, opponentPokemon3)
+            val newOpponent = opponents.find { it.hp > 0 }
             if (newOpponent == null) {
                 actions.add {
-                    showMessage("You won!");
-                    messageText.setOnClickListener(null);
-                    greyImage(opponentPokemonImage);
+                    showMessage("You won!")
+                    MessageTextView.setOnClickListener(null)
+                    greyImage(opponentPokemonImageView)
                 }
             }
             else
-                setOpponentPokemon(newOpponent);
+                setOpponentPokemon(newOpponent)
         }
     }
 
     private fun attack(moveId : Int, attacker : PokemonInfo, defender : PokemonInfo, health : ProgressBar, next : () -> Unit = { nextAction(); }) {
-        val move = attacker.moves[moveId - 1]!!;
+        val move = attacker.moves[moveId - 1]!!
         doOrAddAction { showMessage(attacker.pokemon.name + " used " + move.name); }
-        actions.add {
-            val (att, def) = when (move.damage_class.name) {
-                "physical" -> Pair(
-                    attacker.pokemon.stats.find { it.stat.name == "attack" }!!.base_stat,
-                    defender.pokemon.stats.find { it.stat.name == "defense" }!!.base_stat
-                )
-                "special" -> Pair(
-                    attacker.pokemon.stats.find { it.stat.name == "special-attack" }!!.base_stat,
-                    defender.pokemon.stats.find { it.stat.name == "special-defense" }!!.base_stat
-                )
-                else -> Pair(0, 0)
+        val moveTypesDamageRelations = allMovesTypesDamageRelations[move.type.name]!!
+        val random = (1..100).random()
+        if (random <= move.accuracy) {
+            var efficiency = 1.0
+            for (pokemonType in defender.pokemon.types) {
+                for (moveType in moveTypesDamageRelations.no_damage_to)
+                    if (pokemonType.type.name == moveType.name) {
+                        efficiency = 0.0
+                        break
+                    }
+                if (efficiency == 0.0)
+                    break
+                for (moveType in moveTypesDamageRelations.double_damage_to)
+                    if (pokemonType.type.name == moveType.name)
+                        efficiency *= 2
+                for (moveType in moveTypesDamageRelations.half_damage_to)
+                    if (pokemonType.type.name == moveType.name)
+                        efficiency /= 2
             }
-            if (move.power == null)
-                move.power = 0;
-            defender.hp -= maxOf(att / 10 + move.power!! - def, 1);
-            defender.hp = maxOf(defender.hp, 0);
-            health.progress = defender.hp;
-            if (defender.hp > 0)
-                next();
-            else
-                handlePokemonKO(defender);
+            if (efficiency != 0.0) {
+                if (efficiency < 1)
+                    showMessage(move.name + " is not very effective...")
+                else if (efficiency > 1)
+                    showMessage(move.name + " is super effective!")
+                actions.add {
+                    val (att, def) = when (move.damage_class.name){
+                        "physical" -> Pair(
+                            attacker.pokemon.stats.find { it.stat.name == "attack" }!!.base_stat,
+                            defender.pokemon.stats.find { it.stat.name == "defense" }!!.base_stat
+                        )
+                        "special" -> Pair(
+                            attacker.pokemon.stats.find { it.stat.name == "special-attack" }!!.base_stat,
+                            defender.pokemon.stats.find { it.stat.name == "special-defense" }!!.base_stat
+                        )
+                        else -> Pair(0, 0)
+                    }
+                    if (move.power == null)
+                        move.power = 0
+                    defender.hp -= maxOf(((att / 10 + move.power!! - def) * efficiency).toInt(), 1)
+                    defender.hp = maxOf(defender.hp, 0)
+                    health.progress = defender.hp
+                    if (defender.hp > 0)
+                        next()
+                    else
+                        handlePokemonKO(defender)
+                }
+            }
+            else {
+                showMessage(move.name + " has no effect")
+                actions.add {
+                    next()
+                }
+            }
+        }
+        else {
+            showMessage(move.name + " failed!")
+            actions.add {
+                next()
+            }
         }
     }
 
@@ -238,95 +283,126 @@ class BattleFragment : Fragment() {
             4 -> Pair(move4, move4Type)
             else -> Pair(null, null)
         }
-        txt!!.text = move.name;
+        txt!!.text = move.name
         Glide
             .with(this@BattleFragment)
             .load(move.typeToRDrawable())
-            .into(img!!);
+            .into(img!!)
+    }
+
+    private fun getTypesDamageRelations()
+    {
+        for (typeName in allTypes) {
+            val typeCallback: Callback<Type> = pokeAPICallback { response ->
+                val type: Type = response.body()!!
+                allMovesTypesDamageRelations.put(typeName, type.damage_relations)
+            }
+            service.getTypeByName(typeName).enqueue(typeCallback)
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
             val opponent1Callback : Callback<Pokemon> = pokeAPICallback { response ->
-                val pok = response.body()!!;
-                opponentPokemon1 = PokemonInfo(pok, getPokemonMoves(pok), pok.stats.find { it.stat.name == "hp" }!!.base_stat);
-                setOpponentPokemon(opponentPokemon1);
-                showMessage("A wild " + pok.name + " has appeared!");
+                val pok = response.body()!!
+                val moves : List<Move?> = getPokemonMoves(pok)
+                opponentPokemon1 = PokemonInfo(pok, moves, pok.stats.find { it.stat.name == "hp" }!!.base_stat)
+                setOpponentPokemon(opponentPokemon1)
+                showMessage("A wild " + pok.name + " has appeared!")
             }
             val opponent2Callback : Callback<Pokemon> = pokeAPICallback { response ->
-                val pok = response.body()!!;
-                opponentPokemon2 = PokemonInfo(pok, getPokemonMoves(pok), pok.stats.find { it.stat.name == "hp" }!!.base_stat);
+                val pok = response.body()!!
+                val moves : List<Move?> = getPokemonMoves(pok)
+                opponentPokemon2 = PokemonInfo(pok, moves, pok.stats.find { it.stat.name == "hp" }!!.base_stat)
             }
             val opponent3Callback : Callback<Pokemon> = pokeAPICallback { response ->
-                val pok = response.body()!!;
-                opponentPokemon3 = PokemonInfo(pok, getPokemonMoves(pok), pok.stats.find { it.stat.name == "hp" }!!.base_stat);
+                val pok = response.body()!!
+                val moves : List<Move?> = getPokemonMoves(pok)
+                opponentPokemon3 = PokemonInfo(pok, moves, pok.stats.find { it.stat.name == "hp" }!!.base_stat)
             }
             val pokemon1Callback : Callback<Pokemon> = pokeAPICallback { response ->
-                val pok = response.body()!!;
-                pokemon1 = PokemonInfo(pok, getPokemonMoves(pok), pok.stats.find { it.stat.name == "hp" }!!.base_stat);
-                battlingPokemon = pokemon1;
+                val pok = response.body()!!
+                val moves : List<Move?> = getPokemonMoves(pok)
+                pokemon1 = PokemonInfo(pok, moves, pok.stats.find { it.stat.name == "hp" }!!.base_stat)
+                battlingPokemon = pokemon1
+                val battlingSprite =
+                    if (pokemon1.pokemon.sprites.back_default.isNullOrBlank())
+                        pokemon1.pokemon.sprites.front_default
+                    else
+                        pokemon1.pokemon.sprites.back_default
                 Glide
                     .with(this@BattleFragment)
-                    .load(pokemon1.pokemon.sprites.back_default)
-                    .into(battlingPokemonImage);
+                    .load(battlingSprite)
+                    .into(battlingPokemonImageView)
                 Glide
                     .with(this@BattleFragment)
                     .load(pokemon1.pokemon.sprites.front_default)
-                    .into(pokemon1Image);
-                pokemonHealth.max = pokemon1.pokemon.stats.find { it.stat.name == "hp" }!!.base_stat;
-                pokemonHealth.progress = pokemon1.hp;
-                pokemon1Image.setOnClickListener {
+                    .into(pokemon1ImageView)
+                battlingPokemonHealth.max = pokemon1.pokemon.stats.find { it.stat.name == "hp" }!!.base_stat
+                battlingPokemonHealth.progress = pokemon1.hp
+                pokemon1ImageView.setOnClickListener {
                     if (battlingPokemon != pokemon1)
-                        setBattlingPokemon(pokemon1);
+                        setBattlingPokemon(pokemon1)
                 }
             }
             val pokemon2Callback : Callback<Pokemon> = pokeAPICallback { response ->
-                val pok = response.body()!!;
-                pokemon2 = PokemonInfo(pok, getPokemonMoves(pok), pok.stats.find { it.stat.name == "hp" }!!.base_stat);
+                val pok = response.body()!!
+                val moves : List<Move?> = getPokemonMoves(pok)
+                pokemon2 = PokemonInfo(pok, moves, pok.stats.find { it.stat.name == "hp" }!!.base_stat)
                 Glide
                     .with(this@BattleFragment)
                     .load(pokemon2.pokemon.sprites.front_default)
-                    .into(pokemon2Image);
-                pokemon2Image.setOnClickListener {
+                    .into(pokemon2ImageView)
+                pokemon2ImageView.setOnClickListener {
                     if (battlingPokemon != pokemon2)
-                        setBattlingPokemon(pokemon2);
+                        setBattlingPokemon(pokemon2)
                 }
             }
             val pokemon3Callback : Callback<Pokemon> = pokeAPICallback { response ->
-                val pok = response.body()!!;
-                pokemon3 = PokemonInfo(pok, getPokemonMoves(pok), pok.stats.find { it.stat.name == "hp" }!!.base_stat);
+                val pok = response.body()!!
+                val moves : List<Move?> = getPokemonMoves(pok)
+                pokemon3 = PokemonInfo(pok, moves, pok.stats.find { it.stat.name == "hp" }!!.base_stat)
                 Glide
                     .with(this@BattleFragment)
                     .load(pokemon3.pokemon.sprites.front_default)
-                    .into(pokemon3Image);
-                pokemon3Image.setOnClickListener {
+                    .into(pokemon3ImageView)
+                pokemon3ImageView.setOnClickListener {
                     if (battlingPokemon != pokemon3)
-                        setBattlingPokemon(pokemon3);
+                        setBattlingPokemon(pokemon3)
                 }
             }
             val movesCallback : Callback<MoveCategory> = pokeAPICallback {response ->
-                moveList = response.body()!!;
-                service.getPokemon(it.getInt("opponentPokemon0")).enqueue(opponent1Callback);
-                service.getPokemon(it.getInt("opponentPokemon1")).enqueue(opponent2Callback);
-                service.getPokemon(it.getInt("opponentPokemon2")).enqueue(opponent3Callback);
-                service.getPokemon(it.getInt("pokemon0")).enqueue(pokemon1Callback);
-                service.getPokemon(it.getInt("pokemon1")).enqueue(pokemon2Callback);
-                service.getPokemon(it.getInt("pokemon2")).enqueue(pokemon3Callback);
+                allDamageMovesList = response.body()!!
+                service.getPokemon(it.getInt("opponentPokemon0")).enqueue(opponent1Callback)
+                service.getPokemon(it.getInt("opponentPokemon1")).enqueue(opponent2Callback)
+                service.getPokemon(it.getInt("opponentPokemon2")).enqueue(opponent3Callback)
+                service.getPokemon(it.getInt("pokemon0")).enqueue(pokemon1Callback)
+                service.getPokemon(it.getInt("pokemon1")).enqueue(pokemon2Callback)
+                service.getPokemon(it.getInt("pokemon2")).enqueue(pokemon3Callback)
             }
-            service.getMoves().enqueue(movesCallback);
+            val typesCallback : Callback<NamedAPIResourceList> = pokeAPICallback { response ->
+                val types = response.body()!!
+                for (type in types.results){
+                    allTypes.add(type.name)
+                }
+            }
+            service.getAllDamageMoves().enqueue(movesCallback)
+            service.getTypes().enqueue(typesCallback)
         }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        messageText.setOnClickListener {
-            setBattlingMove(1, battlingPokemon.moves[0]!!);
-            setBattlingMove(2, battlingPokemon.moves[1]!!);
-            setBattlingMove(3, battlingPokemon.moves[2]!!);
-            setBattlingMove(4, battlingPokemon.moves[3]!!);
-            nextAction();
+        MessageTextView.setOnClickListener {
+            setBattlingMove(1, battlingPokemon.moves[0]!!)
+            setBattlingMove(2, battlingPokemon.moves[1]!!)
+            setBattlingMove(3, battlingPokemon.moves[2]!!)
+            setBattlingMove(4, battlingPokemon.moves[3]!!)
+            nextAction()
+            if (allMovesTypesDamageRelations.isEmpty())
+                getTypesDamageRelations()
         }
         move1.setOnClickListener { playerTurn(1); }
         move2.setOnClickListener { playerTurn(2); }
