@@ -60,19 +60,19 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun Battle(opponentPokemon : ArrayList<Int>?, pokemonSlots : ArrayList<Pokemon?>?) {
-        val bundle = Bundle();
-        opponentPokemon?.forEachIndexed() { index, id ->
-            bundle.putInt("opponentPokemon$index", id);
+        val bundle = Bundle()
+        opponentPokemon?.forEachIndexed{ index, id ->
+            bundle.putInt("opponentPokemon$index", id)
         }
-        pokemonSlots?.forEachIndexed() { index, pok ->
-            bundle.putInt("pokemon$index", pok!!.id);
+        pokemonSlots?.forEachIndexed{ index, pok ->
+            bundle.putInt("pokemon$index", pok!!.id)
         }
-        val battleFragment = BattleFragment();
-        battleFragment.arguments = bundle;
+        val battleFragment = BattleFragment()
+        battleFragment.arguments = bundle
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.mainContainer, battleFragment)
             .addToBackStack(null)
-            .commit();
+            .commit()
     }
 }

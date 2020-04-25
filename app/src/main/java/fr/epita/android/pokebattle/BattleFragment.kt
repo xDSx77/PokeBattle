@@ -30,7 +30,7 @@ class BattleFragment : Fragment() {
         var pokemon : Pokemon,
         var moves : List<Move?>,
         var hp : Int
-    );
+    )
 
     private val jsonConverter = GsonConverterFactory.create(GsonBuilder().create())
     private val retrofit = Retrofit.Builder()
@@ -110,24 +110,32 @@ class BattleFragment : Fragment() {
         MessageTextView.visibility = View.VISIBLE
         move1.visibility = View.INVISIBLE
         move1Type.visibility = View.INVISIBLE
+        move1Description.visibility = View.INVISIBLE
         move2.visibility = View.INVISIBLE
         move2Type.visibility = View.INVISIBLE
+        move2Description.visibility = View.INVISIBLE
         move3.visibility = View.INVISIBLE
         move3Type.visibility = View.INVISIBLE
+        move3Description.visibility = View.INVISIBLE
         move4.visibility = View.INVISIBLE
         move4Type.visibility = View.INVISIBLE
+        move4Description.visibility = View.INVISIBLE
     }
 
     private fun showMoves() {
         MessageTextView.visibility = View.INVISIBLE
         move1.visibility = View.VISIBLE
         move1Type.visibility = View.VISIBLE
+        move1Description.visibility = View.VISIBLE
         move2.visibility = View.VISIBLE
         move2Type.visibility = View.VISIBLE
+        move2Description.visibility = View.VISIBLE
         move3.visibility = View.VISIBLE
         move3Type.visibility = View.VISIBLE
+        move3Description.visibility = View.VISIBLE
         move4.visibility = View.VISIBLE
         move4Type.visibility = View.VISIBLE
+        move4Description.visibility = View.VISIBLE
     }
 
     private fun setOpponentPokemon(pok : PokemonInfo) {
@@ -138,6 +146,8 @@ class BattleFragment : Fragment() {
             .into(opponentPokemonImageView)
         opponentPokemonHealth.max = pok.pokemon.stats.find { it.stat.name == "hp" }!!.base_stat
         opponentPokemonHealth.progress = pok.hp
+        opponentPokemonName.text = pok.pokemon.name.substring(0, 1).toUpperCase(Locale.getDefault())
+            .plus(pok.pokemon.name.substring(1))
     }
 
     private fun setBattlingPokemon(pok : PokemonInfo) {
@@ -153,6 +163,8 @@ class BattleFragment : Fragment() {
             .into(battlingPokemonImageView)
         battlingPokemonHealth.max = pok.pokemon.stats.find { it.stat.name == "hp" }!!.base_stat
         battlingPokemonHealth.progress = pok.hp
+        battlingPokemonName.text = pok.pokemon.name.substring(0, 1).toUpperCase(Locale.getDefault())
+            .plus(pok.pokemon.name.substring(1))
         setBattlingMove(1, pok.moves[0]!!)
         setBattlingMove(2, pok.moves[1]!!)
         setBattlingMove(3, pok.moves[2]!!)
@@ -175,12 +187,23 @@ class BattleFragment : Fragment() {
     }
 
     private fun handlePokemonKO(pok : PokemonInfo) {
-        showMessage(pok.pokemon.name + " fainted!")
+        val pokemonName = pok.pokemon.name.substring(0, 1).toUpperCase(Locale.getDefault())
+            .plus(pok.pokemon.name.substring(1))
+        showMessage("$pokemonName fainted!")
         if (pok == battlingPokemon) {
             when (pok) {
-                pokemon1 -> greyImage(pokemon1ImageView)
-                pokemon2 -> greyImage(pokemon2ImageView)
-                pokemon3 -> greyImage(pokemon3ImageView)
+                pokemon1 -> {
+                    greyImage(pokemon1ImageView)
+                    pokemon1ImageView.setOnClickListener(null)
+                }
+                pokemon2 -> {
+                    greyImage(pokemon2ImageView)
+                    pokemon2ImageView.setOnClickListener(null)
+                }
+                pokemon3 -> {
+                    greyImage(pokemon3ImageView)
+                    pokemon3ImageView.setOnClickListener(null)
+                }
             }
 
             val pokemon = listOf(pokemon1, pokemon2, pokemon3)
@@ -202,6 +225,9 @@ class BattleFragment : Fragment() {
                 actions.add {
                     showMessage("You won!")
                     MessageTextView.setOnClickListener(null)
+                    pokemon1ImageView.setOnClickListener(null)
+                    pokemon2ImageView.setOnClickListener(null)
+                    pokemon3ImageView.setOnClickListener(null)
                     greyImage(opponentPokemonImageView)
                 }
             }
@@ -212,7 +238,13 @@ class BattleFragment : Fragment() {
 
     private fun attack(moveId : Int, attacker : PokemonInfo, defender : PokemonInfo, health : ProgressBar, next : () -> Unit = { nextAction(); }) {
         val move = attacker.moves[moveId - 1]!!
-        doOrAddAction { showMessage(attacker.pokemon.name + " used " + move.name); }
+        val moveName = move.name.substring(0, 1).toUpperCase(Locale.getDefault())
+            .plus(move.name.substring(1))
+        doOrAddAction {
+            val attackerName = attacker.pokemon.name.substring(0, 1).toUpperCase(Locale.getDefault())
+                .plus(attacker.pokemon.name.substring(1))
+            showMessage("$attackerName used $moveName")
+        }
         val moveTypesDamageRelations = allMovesTypesDamageRelations[move.type.name]!!
         val random = (1..100).random()
         if (random <= move.accuracy) {
@@ -234,9 +266,9 @@ class BattleFragment : Fragment() {
             }
             if (efficiency != 0.0) {
                 if (efficiency < 1)
-                    showMessage(move.name + " is not very effective...")
+                    showMessage("$moveName is not very effective...")
                 else if (efficiency > 1)
-                    showMessage(move.name + " is super effective!")
+                    showMessage("$moveName is super effective!")
                 actions.add {
                     val (att, def) = when (move.damage_class.name){
                         "physical" -> Pair(
@@ -261,14 +293,14 @@ class BattleFragment : Fragment() {
                 }
             }
             else {
-                showMessage(move.name + " has no effect")
+                showMessage("$moveName has no effect...")
                 actions.add {
                     next()
                 }
             }
         }
         else {
-            showMessage(move.name + " failed!")
+            showMessage("$moveName failed!")
             actions.add {
                 next()
             }
@@ -283,7 +315,14 @@ class BattleFragment : Fragment() {
             4 -> Pair(move4, move4Type)
             else -> Pair(null, null)
         }
-        txt!!.text = move.name
+        txt!!.text = move.name.substring(0, 1).toUpperCase(Locale.getDefault())
+            .plus(move.name.substring(1))
+        when (id) {
+            1 -> move1Description.text = move.flavor_text_entries[2].flavor_text
+            2 -> move2Description.text = move.flavor_text_entries[2].flavor_text
+            3 -> move3Description.text = move.flavor_text_entries[2].flavor_text
+            4 -> move4Description.text = move.flavor_text_entries[2].flavor_text
+        }
         Glide
             .with(this@BattleFragment)
             .load(move.typeToRDrawable())
@@ -295,7 +334,7 @@ class BattleFragment : Fragment() {
         for (typeName in allTypes) {
             val typeCallback: Callback<Type> = pokeAPICallback { response ->
                 val type: Type = response.body()!!
-                allMovesTypesDamageRelations.put(typeName, type.damage_relations)
+                allMovesTypesDamageRelations[typeName] = type.damage_relations
             }
             service.getTypeByName(typeName).enqueue(typeCallback)
         }
@@ -309,7 +348,7 @@ class BattleFragment : Fragment() {
                 val moves : List<Move?> = getPokemonMoves(pok)
                 opponentPokemon1 = PokemonInfo(pok, moves, pok.stats.find { it.stat.name == "hp" }!!.base_stat)
                 setOpponentPokemon(opponentPokemon1)
-                showMessage("A wild " + pok.name + " has appeared!")
+                showMessage("A wild " + opponentPokemonName.text + " has appeared!")
             }
             val opponent2Callback : Callback<Pokemon> = pokeAPICallback { response ->
                 val pok = response.body()!!
@@ -341,6 +380,9 @@ class BattleFragment : Fragment() {
                     .into(pokemon1ImageView)
                 battlingPokemonHealth.max = pokemon1.pokemon.stats.find { it.stat.name == "hp" }!!.base_stat
                 battlingPokemonHealth.progress = pokemon1.hp
+                battlingPokemonName.text = pok.name.substring(0, 1).toUpperCase(Locale.getDefault())
+                    .plus(pok.name.substring(1))
+                pokemon1Name.text = battlingPokemonName.text
                 pokemon1ImageView.setOnClickListener {
                     if (battlingPokemon != pokemon1)
                         setBattlingPokemon(pokemon1)
@@ -354,6 +396,8 @@ class BattleFragment : Fragment() {
                     .with(this@BattleFragment)
                     .load(pokemon2.pokemon.sprites.front_default)
                     .into(pokemon2ImageView)
+                pokemon2Name.text = pok.name.substring(0, 1).toUpperCase(Locale.getDefault())
+                    .plus(pok.name.substring(1))
                 pokemon2ImageView.setOnClickListener {
                     if (battlingPokemon != pokemon2)
                         setBattlingPokemon(pokemon2)
@@ -367,6 +411,8 @@ class BattleFragment : Fragment() {
                     .with(this@BattleFragment)
                     .load(pokemon3.pokemon.sprites.front_default)
                     .into(pokemon3ImageView)
+                pokemon3Name.text = pok.name.substring(0, 1).toUpperCase(Locale.getDefault())
+                    .plus(pok.name.substring(1))
                 pokemon3ImageView.setOnClickListener {
                     if (battlingPokemon != pokemon3)
                         setBattlingPokemon(pokemon3)

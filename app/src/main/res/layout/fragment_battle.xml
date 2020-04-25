@@ -18,35 +18,44 @@
             app:layout_constraintGuide_percent="0.5" />
 
         <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/Horizontal50"
+            android:id="@+id/Horizontal45"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintGuide_percent="0.5" />
+            app:layout_constraintGuide_percent="0.45" />
 
         <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/Horizontal65"
+            android:id="@+id/Horizontal62.5"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintGuide_percent="0.65" />
+            app:layout_constraintGuide_percent="0.625" />
 
         <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/Honrizontal80"
+            android:id="@+id/Horizontal80"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             app:layout_constraintGuide_percent="0.8" />
 
-        <ImageView
-            android:id="@+id/opponentPokemonImageView"
+        <TextView
+            android:id="@+id/opponentPokemonName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            app:layout_constraintBottom_toTopOf="@+id/opponentPokemonImageView"
+            app:layout_constraintEnd_toEndOf="@+id/opponentPokemonImageView"
+            app:layout_constraintStart_toStartOf="@+id/opponentPokemonImageView"
+            tools:text="Pokemon Name" />
+
+        <ImageView
+            android:id="@+id/opponentPokemonImageView"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginTop="32dp"
             android:layout_marginEnd="16dp"
-            app:srcCompat="@drawable/ic_launcher_background"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@android:drawable/screen_background_light_transparent" />
 
         <ProgressBar
             android:id="@+id/opponentPokemonHealth"
@@ -57,14 +66,23 @@
             app:layout_constraintStart_toStartOf="@+id/opponentPokemonImageView"
             app:layout_constraintTop_toBottomOf="@+id/opponentPokemonImageView" />
 
-        <ImageView
-            android:id="@+id/battlingPokemonImageView"
+        <TextView
+            android:id="@+id/battlingPokemonName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            app:layout_constraintBottom_toTopOf="@+id/battlingPokemonImageView"
+            app:layout_constraintEnd_toEndOf="@+id/battlingPokemonImageView"
+            app:layout_constraintStart_toStartOf="@+id/battlingPokemonImageView"
+            tools:text="Pokemon Name" />
+
+        <ImageView
+            android:id="@+id/battlingPokemonImageView"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:layout_marginStart="16dp"
-            app:srcCompat="@drawable/ic_launcher_background"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/opponentPokemonImageView" />
+            app:layout_constraintTop_toBottomOf="@+id/opponentPokemonImageView"
+            app:srcCompat="@android:drawable/screen_background_light_transparent" />
 
         <ProgressBar
             android:id="@+id/battlingPokemonHealth"
@@ -79,27 +97,25 @@
             android:id="@+id/MessageTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="TextView"
             android:textSize="18sp"
             android:textStyle="bold"
             android:visibility="invisible"
-            app:layout_constraintBottom_toTopOf="@+id/Horizontal50"
+            app:layout_constraintBottom_toTopOf="@+id/Horizontal45"
             app:layout_constraintEnd_toStartOf="@+id/Vertical50"
             app:layout_constraintStart_toStartOf="@+id/Vertical50"
-            app:layout_constraintTop_toTopOf="@+id/Horizontal50"
+            tools:text="Message"
             tools:visibility="invisible" />
 
         <TextView
             android:id="@+id/move1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="TextView"
             android:textSize="18sp"
             android:visibility="invisible"
-            app:layout_constraintBottom_toTopOf="@+id/Horizontal65"
             app:layout_constraintEnd_toStartOf="@+id/Vertical50"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/Horizontal50"
+            app:layout_constraintTop_toTopOf="@+id/Horizontal45"
+            tools:text="Move 1"
             tools:visibility="invisible" />
 
         <ImageView
@@ -113,16 +129,26 @@
             tools:visibility="invisible" />
 
         <TextView
+            android:id="@+id/move1Description"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintBottom_toTopOf="@+id/Horizontal62.5"
+            app:layout_constraintEnd_toStartOf="@+id/Vertical50"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/move1"
+            tools:text="Move 1 Description" />
+
+        <TextView
             android:id="@+id/move2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="TextView"
             android:textSize="18sp"
             android:visibility="invisible"
-            app:layout_constraintBottom_toTopOf="@+id/Horizontal65"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@+id/Vertical50"
-            app:layout_constraintTop_toTopOf="@+id/Horizontal50"
+            app:layout_constraintTop_toTopOf="@+id/Horizontal45"
+            tools:text="Move 2"
             tools:visibility="invisible" />
 
         <ImageView
@@ -136,16 +162,26 @@
             tools:visibility="invisible" />
 
         <TextView
+            android:id="@+id/move2Description"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintBottom_toTopOf="@+id/Horizontal62.5"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/Vertical50"
+            app:layout_constraintTop_toBottomOf="@+id/move2"
+            tools:text="Move 2 Description" />
+
+        <TextView
             android:id="@+id/move3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="TextView"
             android:textSize="18sp"
             android:visibility="invisible"
-            app:layout_constraintBottom_toTopOf="@+id/Honrizontal80"
             app:layout_constraintEnd_toStartOf="@+id/Vertical50"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/Horizontal65"
+            app:layout_constraintTop_toTopOf="@+id/Horizontal62.5"
+            tools:text="Move 3"
             tools:visibility="invisible" />
 
         <ImageView
@@ -159,16 +195,26 @@
             tools:visibility="invisible" />
 
         <TextView
+            android:id="@+id/move3Description"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintBottom_toTopOf="@+id/Horizontal80"
+            app:layout_constraintEnd_toStartOf="@+id/Vertical50"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/move3"
+            tools:text="Move 3 Description" />
+
+        <TextView
             android:id="@+id/move4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="TextView"
             android:textSize="18sp"
             android:visibility="invisible"
-            app:layout_constraintBottom_toTopOf="@+id/Honrizontal80"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@+id/Vertical50"
-            app:layout_constraintTop_toTopOf="@+id/Horizontal65"
+            app:layout_constraintTop_toTopOf="@+id/Horizontal62.5"
+            tools:text="Move 4"
             tools:visibility="invisible" />
 
         <ImageView
@@ -181,35 +227,73 @@
             app:srcCompat="@drawable/ic_launcher_background"
             tools:visibility="invisible" />
 
-        <ImageView
-            android:id="@+id/pokemon1ImageView"
+        <TextView
+            android:id="@+id/move4Description"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintBottom_toTopOf="@+id/Horizontal80"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/Vertical50"
+            app:layout_constraintTop_toBottomOf="@+id/move4"
+            tools:text="Move 4 Description" />
+
+        <TextView
+            android:id="@+id/pokemon1Name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            app:layout_constraintBottom_toTopOf="@+id/pokemon1ImageView"
+            app:layout_constraintEnd_toEndOf="@+id/pokemon1ImageView"
+            app:layout_constraintStart_toStartOf="@+id/pokemon1ImageView"
+            tools:text="Pokemon Name" />
+
+        <ImageView
+            android:id="@+id/pokemon1ImageView"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:layout_marginStart="16dp"
             android:layout_marginBottom="16dp"
-            app:srcCompat="@drawable/ic_launcher_background"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:srcCompat="@android:drawable/screen_background_light_transparent" />
+
+        <TextView
+            android:id="@+id/pokemon2Name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toTopOf="@+id/pokemon2ImageView"
+            app:layout_constraintEnd_toEndOf="@+id/pokemon2ImageView"
+            app:layout_constraintStart_toStartOf="@+id/pokemon2ImageView"
+            tools:text="Pokemon Name" />
 
         <ImageView
             android:id="@+id/pokemon2ImageView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:layout_marginBottom="16dp"
-            app:srcCompat="@drawable/ic_launcher_background"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/pokemon3ImageView"
-            app:layout_constraintStart_toEndOf="@+id/pokemon1ImageView" />
+            app:layout_constraintStart_toEndOf="@+id/pokemon1ImageView"
+            app:srcCompat="@android:drawable/screen_background_light_transparent" />
+
+        <TextView
+            android:id="@+id/pokemon3Name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toTopOf="@+id/pokemon3ImageView"
+            app:layout_constraintEnd_toEndOf="@+id/pokemon3ImageView"
+            app:layout_constraintStart_toStartOf="@+id/pokemon3ImageView"
+            tools:text="Pokemon Name" />
 
         <ImageView
             android:id="@+id/pokemon3ImageView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="16dp"
-            app:srcCompat="@drawable/ic_launcher_background"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:srcCompat="@android:drawable/screen_background_light_transparent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>
