@@ -11,7 +11,11 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.google.gson.GsonBuilder
-import fr.epita.android.pokebattle.webservices.*
+import fr.epita.android.pokebattle.Utils.firstLetterUpperCase
+import fr.epita.android.pokebattle.webservices.pokeapi.PokeAPIInterface
+import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.Pokemon
+import fr.epita.android.pokebattle.webservices.surleweb.api.PokedexEntry
+import fr.epita.android.pokebattle.webservices.surleweb.api.SurLeWebAPIInterface
 import kotlinx.android.synthetic.main.fragment_battle_lobby.*
 import retrofit2.Call
 import retrofit2.Callback
@@ -34,8 +38,7 @@ class BattleLobbyFragment : Fragment() {
         .addConverterFactory(jsonConverter)
         .build()
 
-    val service : SurLeWebAPIInterface = retrofit.create(
-        SurLeWebAPIInterface::class.java)
+    val service : SurLeWebAPIInterface = retrofit.create(SurLeWebAPIInterface::class.java)
 
     val pokemonListCallback: Callback<List<PokedexEntry>> = object : Callback<List<PokedexEntry>> {
         override fun onFailure(call: Call<List<PokedexEntry>>, t: Throwable) {
@@ -60,7 +63,7 @@ class BattleLobbyFragment : Fragment() {
 
                 pokedexEntries.sort()
 
-                val opponentEntry = pokedexEntries.random();
+                val opponentEntry = pokedexEntries.random()
 
                 val pokeAPIretrofit = Retrofit.Builder()
                     .baseUrl(PokeAPIInterface.Constants.url)
@@ -81,9 +84,7 @@ class BattleLobbyFragment : Fragment() {
                         if (response.code() == 200) {
                             opponentPokemon = response.body()!!
 
-                            NextOpponentNameTextView.text =
-                                opponentEntry.name.substring(0, 1).toUpperCase(Locale.getDefault())
-                                    .plus(opponentEntry.name.substring(1))
+                            NextOpponentNameTextView.text = firstLetterUpperCase(opponentEntry.name)
                             Glide
                                 .with(this@BattleLobbyFragment)
                                 .load(opponentPokemon.sprites.front_default)
@@ -122,9 +123,7 @@ class BattleLobbyFragment : Fragment() {
                             if (response.code() == 200) {
                                 selectedPokemon = response.body()!!
 
-                                SelectedPokemonTextView.text =
-                                    entry.name.substring(0, 1).toUpperCase(Locale.getDefault())
-                                        .plus(entry.name.substring(1))
+                                SelectedPokemonTextView.text = firstLetterUpperCase(entry.name)
                                 SelectedPokemonType1ImageView.setImageResource(entry.types[0].toRDrawable())
                                 if (entry.types.size > 1) {
                                     SelectedPokemonType2ImageView.isVisible = true

@@ -10,16 +10,16 @@ import android.widget.ImageView
 import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.google.gson.GsonBuilder
-import fr.epita.android.pokebattle.webservices.PokeAPIInterface
-import fr.epita.android.pokebattle.webservices.Pokemon
-import fr.epita.android.pokebattle.webservices.PokemonStat
+import fr.epita.android.pokebattle.Utils.firstLetterUpperCase
+import fr.epita.android.pokebattle.webservices.pokeapi.PokeAPIInterface
+import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.Pokemon
+import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.PokemonStat
 import kotlinx.android.synthetic.main.fragment_pokedex_details.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import java.util.*
 
 class PokedexDetailsFragment : Fragment() {
     lateinit var pokemon : Pokemon
@@ -45,7 +45,8 @@ class PokedexDetailsFragment : Fragment() {
 
             // Use the client to create a service:
             // an object implementing the interface to the WebService
-            val service : PokeAPIInterface = retrofit.create(PokeAPIInterface::class.java)
+            val service : PokeAPIInterface = retrofit.create(
+                PokeAPIInterface::class.java)
 
             val pokemonCallback : Callback<Pokemon> = object : Callback<Pokemon> {
                 override fun onFailure(call: Call<Pokemon>, t: Throwable) {
@@ -58,14 +59,12 @@ class PokedexDetailsFragment : Fragment() {
                     if (response.code() == 200) {
                         // We got our data !
                         pokemonResponse = response
-                        pokemon = response.body()!!;
+                        pokemon = response.body()!!
                         Glide
                             .with(this@PokedexDetailsFragment)
                             .load(pokemon.sprites.front_default)
                             .into(PokemonImageView)
-                        PokemonNameTextView.text =
-                            pokemon.name.substring(0, 1).toUpperCase(Locale.getDefault())
-                                .plus(pokemon.name.substring(1))
+                        PokemonNameTextView.text = firstLetterUpperCase(pokemon.name)
                         HeightValueTextView.text = pokemon.height.toString()
                         WeightValueTextView.text = pokemon.weight.toString()
                         for (stat: PokemonStat in pokemon.stats) {

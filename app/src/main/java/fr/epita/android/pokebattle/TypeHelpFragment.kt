@@ -7,13 +7,10 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.GridView
-import android.widget.ImageView
-import androidx.fragment.app.FragmentActivity
 import com.google.gson.GsonBuilder
-import fr.epita.android.pokebattle.webservices.PokeAPIInterface
-import fr.epita.android.pokebattle.webservices.pokemon.type.Type
-import fr.epita.android.pokebattle.webservices.pokemon.type.TypeRelations
+import fr.epita.android.pokebattle.webservices.pokeapi.PokeAPIInterface
+import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.type.Type
+import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.type.TypeRelations
 import kotlinx.android.synthetic.main.fragment_type_help.*
 import retrofit2.Call
 import retrofit2.Callback
@@ -48,7 +45,8 @@ class TypeHelpFragment : Fragment() {
             .addConverterFactory(jsonConverter)
             .build()
 
-        val service : PokeAPIInterface = retrofit.create(PokeAPIInterface::class.java)
+        val service : PokeAPIInterface = retrofit.create(
+            PokeAPIInterface::class.java)
 
         val typeCallback : Callback<Type> = object : Callback<Type> {
             override fun onFailure(call: Call<Type>, t: Throwable) {
@@ -62,7 +60,7 @@ class TypeHelpFragment : Fragment() {
                 TypeImageView.setImageResource(getTypeImageResource(typeName))
                 clearTypesList()
                 setTypesList(type.damage_relations)
-                setGridView();
+                setGridView()
             }
         }
         service.getTypeByName(typeName).enqueue(typeCallback)
@@ -126,7 +124,4 @@ class TypeHelpFragment : Fragment() {
             "water" -> R.drawable.water
             else -> -1
         }
-
-
-
 }

@@ -2,7 +2,7 @@ package fr.epita.android.pokebattle
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import fr.epita.android.pokebattle.webservices.Pokemon
+import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.Pokemon
 
 class MainActivity : AppCompatActivity() {
 
@@ -48,7 +48,7 @@ class MainActivity : AppCompatActivity() {
     fun TypeHelp(typeName : String?) {
         val bundle = Bundle()
         if (typeName != null)
-            bundle.putString("typeName", typeName);
+            bundle.putString("typeName", typeName)
         val typeHelpFragment = TypeHelpFragment()
         typeHelpFragment.arguments = bundle
         supportFragmentManager
