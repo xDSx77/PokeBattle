@@ -189,7 +189,7 @@ class BattleFragment : Fragment() {
     private fun handlePokemonKO(pok : PokemonInfo) {
         val pokemonName = pok.pokemon.name.substring(0, 1).toUpperCase(Locale.getDefault())
             .plus(pok.pokemon.name.substring(1))
-        showMessage("$pokemonName fainted!")
+        doOrAddAction { showMessage("$pokemonName fainted!"); };
         if (pok == battlingPokemon) {
             when (pok) {
                 pokemon1 -> {
@@ -236,6 +236,53 @@ class BattleFragment : Fragment() {
         }
     }
 
+    private fun getEfficiency(moveType : NamedAPIResource, pokemonType : PokemonType) : Double {
+        val moveTypesDamageRelations = allMovesTypesDamageRelations[moveType.name]!!
+        if (moveTypesDamageRelations.no_damage_to.any {  it.name == pokemonType.type.name })
+            return 0.0;
+        if (moveTypesDamageRelations.double_damage_to.any {  it.name == pokemonType.type.name })
+            return 2.0;
+        if (moveTypesDamageRelations.half_damage_to.any {  it.name == pokemonType.type.name })
+            return 0.5;
+        return 1.0;
+    }
+
+    private fun dealDamage(move : Move, attacker : PokemonInfo, defender: PokemonInfo, health: ProgressBar) : Boolean {
+        val random = (1..100).random()
+        if (random > move.accuracy) {
+            doOrAddAction { showMessage(attacker.pokemon.name + "'s attack missed!"); };
+            return true;
+        }
+        var efficiency = 1.0;
+        for (pokemonType in defender.pokemon.types)
+            efficiency *= getEfficiency(move.type, pokemonType);
+        val moveName = move.name;
+        when {
+            efficiency == 0.0 -> doOrAddAction { showMessage("$moveName has no effect..."); }
+            efficiency < 1 -> doOrAddAction { showMessage("$moveName is not very effective..."); }
+            efficiency > 1 -> doOrAddAction { showMessage("$moveName is super effective!"); }
+        };
+        if (efficiency == 0.0)
+            return true;
+        val (att, def) = when (move.damage_class.name) {
+            "physical" -> Pair(
+                attacker.pokemon.stats.find { it.stat.name == "attack" }!!.base_stat,
+                defender.pokemon.stats.find { it.stat.name == "defense" }!!.base_stat
+            )
+            "special" -> Pair(
+                attacker.pokemon.stats.find { it.stat.name == "special-attack" }!!.base_stat,
+                defender.pokemon.stats.find { it.stat.name == "special-defense" }!!.base_stat
+            )
+            else -> Pair(0, 0)
+        }
+        if (move.power == null)
+            move.power = 0;
+        defender.hp -= maxOf(((att / 10 + move.power!! - def) * efficiency).toInt(), 1)
+        defender.hp = maxOf(defender.hp, 0)
+        health.progress = defender.hp
+        return efficiency != 1.0;
+    }
+
     private fun attack(moveId : Int, attacker : PokemonInfo, defender : PokemonInfo, health : ProgressBar, next : () -> Unit = { nextAction(); }) {
         val move = attacker.moves[moveId - 1]!!
         val moveName = move.name.substring(0, 1).toUpperCase(Locale.getDefault())
@@ -245,67 +292,23 @@ class BattleFragment : Fragment() {
                 .plus(attacker.pokemon.name.substring(1))
             showMessage("$attackerName used $moveName")
         }
-        val moveTypesDamageRelations = allMovesTypesDamageRelations[move.type.name]!!
-        val random = (1..100).random()
-        if (random <= move.accuracy) {
-            var efficiency = 1.0
-            for (pokemonType in defender.pokemon.types) {
-                for (moveType in moveTypesDamageRelations.no_damage_to)
-                    if (pokemonType.type.name == moveType.name) {
-                        efficiency = 0.0
-                        break
-                    }
-                if (efficiency == 0.0)
-                    break
-                for (moveType in moveTypesDamageRelations.double_damage_to)
-                    if (pokemonType.type.name == moveType.name)
-                        efficiency *= 2
-                for (moveType in moveTypesDamageRelations.half_damage_to)
-                    if (pokemonType.type.name == moveType.name)
-                        efficiency /= 2
-            }
-            if (efficiency != 0.0) {
-                if (efficiency < 1)
-                    showMessage("$moveName is not very effective...")
-                else if (efficiency > 1)
-                    showMessage("$moveName is super effective!")
-                actions.add {
-                    val (att, def) = when (move.damage_class.name){
-                        "physical" -> Pair(
-                            attacker.pokemon.stats.find { it.stat.name == "attack" }!!.base_stat,
-                            defender.pokemon.stats.find { it.stat.name == "defense" }!!.base_stat
-                        )
-                        "special" -> Pair(
-                            attacker.pokemon.stats.find { it.stat.name == "special-attack" }!!.base_stat,
-                            defender.pokemon.stats.find { it.stat.name == "special-defense" }!!.base_stat
-                        )
-                        else -> Pair(0, 0)
-                    }
-                    if (move.power == null)
-                        move.power = 0
-                    defender.hp -= maxOf(((att / 10 + move.power!! - def) * efficiency).toInt(), 1)
-                    defender.hp = maxOf(defender.hp, 0)
-                    health.progress = defender.hp
-                    if (defender.hp > 0)
-                        next()
-                    else
-                        handlePokemonKO(defender)
-                }
+        actions.add {
+            val message = dealDamage(move, attacker, defender, health);
+            if (defender.hp > 0) {
+                if (!message)
+                    next();
+                else
+                    actions.add { next(); };
             }
             else {
-                showMessage("$moveName has no effect...")
-                actions.add {
-                    next()
-                }
-            }
-        }
-        else {
-            showMessage("$moveName failed!")
-            actions.add {
-                next()
+                if (!message)
+                    handlePokemonKO(defender);
+                else
+                    actions.add { handlePokemonKO(defender); };
             }
         }
     }
+
 
     private fun setBattlingMove(id : Int, move : Move) {
         val (txt, img) = when (id) {
@@ -378,8 +381,8 @@ class BattleFragment : Fragment() {
                     .with(this@BattleFragment)
                     .load(pokemon1.pokemon.sprites.front_default)
                     .into(pokemon1ImageView)
-                battlingPokemonHealth.max = pokemon1.pokemon.stats.find { it.stat.name == "hp" }!!.base_stat
-                battlingPokemonHealth.progress = pokemon1.hp
+                battlingPokemonHealth.max = pokemon1.hp;
+                battlingPokemonHealth.progress = pokemon1.hp;
                 battlingPokemonName.text = pok.name.substring(0, 1).toUpperCase(Locale.getDefault())
                     .plus(pok.name.substring(1))
                 pokemon1Name.text = battlingPokemonName.text
@@ -449,6 +452,7 @@ class BattleFragment : Fragment() {
             nextAction()
             if (allMovesTypesDamageRelations.isEmpty())
                 getTypesDamageRelations()
+            MessageTextView.setOnClickListener { nextAction() }
         }
         move1.setOnClickListener { playerTurn(1); }
         move2.setOnClickListener { playerTurn(2); }
