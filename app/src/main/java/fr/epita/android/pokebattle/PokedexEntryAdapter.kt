@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import fr.epita.android.pokebattle.Utils.firstLetterUpperCase
+import fr.epita.android.pokebattle.Utils.typeToRDrawable
 import fr.epita.android.pokebattle.webservices.surleweb.api.PokedexEntry
 import kotlinx.android.synthetic.main.pokedex_entry.view.*
 
@@ -25,13 +26,13 @@ class PokedexEntryAdapter(private val pokedexEntries : List<PokedexEntry>,
     override fun getItemCount() = pokedexEntries.size
 
     override fun onBindViewHolder(holder: PokedexEntryViewHolder, position: Int) {
-        var pokedexEntry = pokedexEntries[position]
+        val pokedexEntry = pokedexEntries[position]
         holder.view.tag = position
         holder.view.name_textView.text = firstLetterUpperCase(pokedexEntry.name)
-        holder.view.type1_imageView.setImageResource(pokedexEntry.types[0].toRDrawable())
+        holder.view.type1_imageView.setImageResource(typeToRDrawable(pokedexEntry.types[0].name))
         if (pokedexEntry.types.size > 1) {
             holder.view.type2_imageView.isVisible = true
-            holder.view.type2_imageView.setImageResource(pokedexEntry.types[1].toRDrawable())
+            holder.view.type2_imageView.setImageResource(typeToRDrawable(pokedexEntry.types[1].name))
         }
         else
             holder.view.type2_imageView.isVisible = false

@@ -6,11 +6,11 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.google.gson.GsonBuilder
 import fr.epita.android.pokebattle.Utils.firstLetterUpperCase
+import fr.epita.android.pokebattle.Utils.typeToRDrawable
 import fr.epita.android.pokebattle.webservices.pokeapi.PokeAPIInterface
 import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.Pokemon
 import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.PokemonStat
@@ -81,41 +81,18 @@ class PokedexDetailsFragment : Fragment() {
                             2 -> {
                                 TypeImageView.isVisible = false
                                 Type1ImageView.isVisible = true
-                                setImageResource(pokemon.types[0].type.name, Type1ImageView)
+                                Type1ImageView.setImageResource(typeToRDrawable(pokemon.types[0].type.name))
                                 Type2ImageView.isVisible = true
-                                setImageResource(pokemon.types[1].type.name, Type2ImageView)
+                                Type2ImageView.setImageResource(typeToRDrawable(pokemon.types[1].type.name))
                             }
                             1 -> {
                                 Type1ImageView.isVisible = false
                                 Type2ImageView.isVisible = false
                                 TypeImageView.isVisible = true
-                                setImageResource(pokemon.types[0].type.name, TypeImageView)
+                                TypeImageView.setImageResource(typeToRDrawable(pokemon.types[0].type.name))
                             }
                             else -> Log.w("Pokemon types", "No type found for this pokemon")
                         }
-                    }
-                }
-
-                private fun setImageResource(typeName: String, imageView: ImageView) {
-                    when (typeName) {
-                        "bug" -> imageView.setImageResource(R.drawable.bug)
-                        "dark" -> imageView.setImageResource(R.drawable.dark)
-                        "dragon" -> imageView.setImageResource(R.drawable.dragon)
-                        "electric" -> imageView.setImageResource(R.drawable.electric)
-                        "fairy" -> imageView.setImageResource(R.drawable.fairy)
-                        "fighting" -> imageView.setImageResource(R.drawable.fighting)
-                        "fire" -> imageView.setImageResource(R.drawable.fire)
-                        "flying" -> imageView.setImageResource(R.drawable.flying)
-                        "ghost" -> imageView.setImageResource(R.drawable.ghost)
-                        "grass" -> imageView.setImageResource(R.drawable.grass)
-                        "ground" -> imageView.setImageResource(R.drawable.ground)
-                        "ice" -> imageView.setImageResource(R.drawable.ice)
-                        "normal" -> imageView.setImageResource(R.drawable.normal)
-                        "poison" -> imageView.setImageResource(R.drawable.poison)
-                        "psychic" -> imageView.setImageResource(R.drawable.psychic)
-                        "rock" -> imageView.setImageResource(R.drawable.rock)
-                        "steel" -> imageView.setImageResource(R.drawable.steel)
-                        "water" -> imageView.setImageResource(R.drawable.water)
                     }
                 }
             }

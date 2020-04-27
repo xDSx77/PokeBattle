@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.google.gson.GsonBuilder
 import fr.epita.android.pokebattle.Utils.firstLetterUpperCase
+import fr.epita.android.pokebattle.Utils.typeToRDrawable
 import fr.epita.android.pokebattle.webservices.pokeapi.PokeAPIInterface
 import fr.epita.android.pokebattle.webservices.pokeapi.moves.Move
 import fr.epita.android.pokebattle.webservices.pokeapi.moves.MoveCategory
@@ -327,7 +328,7 @@ class BattleFragment : Fragment() {
         }
         Glide
             .with(this@BattleFragment)
-            .load(move.typeToRDrawable())
+            .load(typeToRDrawable(move.type.name))
             .into(img!!)
     }
 

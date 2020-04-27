@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.google.gson.GsonBuilder
 import fr.epita.android.pokebattle.Utils.firstLetterUpperCase
+import fr.epita.android.pokebattle.Utils.typeToRDrawable
 import fr.epita.android.pokebattle.webservices.pokeapi.PokeAPIInterface
 import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.Pokemon
 import fr.epita.android.pokebattle.webservices.surleweb.api.PokedexEntry
@@ -89,13 +90,13 @@ class BattleLobbyFragment : Fragment() {
                                 .with(this@BattleLobbyFragment)
                                 .load(opponentPokemon.sprites.front_default)
                                 .into(NextOpponentImageView)
-                            NextOpponentType1ImageView.setImageResource(opponentEntry.types[0].toRDrawable())
+                            NextOpponentType1ImageView.setImageResource(typeToRDrawable(opponentEntry.types[0].name))
                             NextOpponentType1ImageView.setOnClickListener {
                                 (activity as MainActivity).TypeHelp(opponentEntry.types[0].name)
                             }
                             if (opponentEntry.types.size > 1) {
                                 NextOpponentType2ImageView.isVisible = true
-                                NextOpponentType2ImageView.setImageResource(opponentEntry.types[1].toRDrawable())
+                                NextOpponentType2ImageView.setImageResource(typeToRDrawable(opponentEntry.types[1].name))
                                 NextOpponentType2ImageView.setOnClickListener {
                                     (activity as MainActivity).TypeHelp(opponentEntry.types[1].name)
                                 }
@@ -124,10 +125,10 @@ class BattleLobbyFragment : Fragment() {
                                 selectedPokemon = response.body()!!
 
                                 SelectedPokemonTextView.text = firstLetterUpperCase(entry.name)
-                                SelectedPokemonType1ImageView.setImageResource(entry.types[0].toRDrawable())
+                                SelectedPokemonType1ImageView.setImageResource(typeToRDrawable(entry.types[0].name))
                                 if (entry.types.size > 1) {
                                     SelectedPokemonType2ImageView.isVisible = true
-                                    SelectedPokemonType2ImageView.setImageResource(entry.types[1].toRDrawable())
+                                    SelectedPokemonType2ImageView.setImageResource(typeToRDrawable(entry.types[1].name))
                                 } else {
                                     SelectedPokemonType2ImageView.isVisible = false
                                 }
