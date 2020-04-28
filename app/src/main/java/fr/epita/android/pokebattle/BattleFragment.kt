@@ -12,9 +12,17 @@ import android.widget.ProgressBar
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.google.gson.GsonBuilder
-import fr.epita.android.pokebattle.webservices.*
-import fr.epita.android.pokebattle.webservices.pokemon.type.Type
-import fr.epita.android.pokebattle.webservices.pokemon.type.TypeRelations
+import fr.epita.android.pokebattle.Utils.firstLetterUpperCase
+import fr.epita.android.pokebattle.Utils.typeToRDrawable
+import fr.epita.android.pokebattle.webservices.pokeapi.PokeAPIInterface
+import fr.epita.android.pokebattle.webservices.pokeapi.moves.Move
+import fr.epita.android.pokebattle.webservices.pokeapi.moves.MoveCategory
+import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.Pokemon
+import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.PokemonType
+import fr.epita.android.pokebattle.webservices.pokeapi.resourcelist.NamedAPIResourceList
+import fr.epita.android.pokebattle.webservices.pokeapi.utils.NamedAPIResource
+import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.type.Type
+import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.type.TypeRelations
 import kotlinx.android.synthetic.main.fragment_battle.*
 import retrofit2.Call
 import retrofit2.Callback
@@ -146,8 +154,7 @@ class BattleFragment : Fragment() {
             .into(opponentPokemonImageView)
         opponentPokemonHealth.max = pok.pokemon.stats.find { it.stat.name == "hp" }!!.base_stat
         opponentPokemonHealth.progress = pok.hp
-        opponentPokemonName.text = pok.pokemon.name.substring(0, 1).toUpperCase(Locale.getDefault())
-            .plus(pok.pokemon.name.substring(1))
+        opponentPokemonName.text = firstLetterUpperCase(pok.pokemon.name)
     }
 
     private fun setBattlingPokemon(pok : PokemonInfo) {
@@ -163,8 +170,7 @@ class BattleFragment : Fragment() {
             .into(battlingPokemonImageView)
         battlingPokemonHealth.max = pok.pokemon.stats.find { it.stat.name == "hp" }!!.base_stat
         battlingPokemonHealth.progress = pok.hp
-        battlingPokemonName.text = pok.pokemon.name.substring(0, 1).toUpperCase(Locale.getDefault())
-            .plus(pok.pokemon.name.substring(1))
+        battlingPokemonName.text = firstLetterUpperCase(pok.pokemon.name)
         setBattlingMove(1, pok.moves[0]!!)
         setBattlingMove(2, pok.moves[1]!!)
         setBattlingMove(3, pok.moves[2]!!)
@@ -180,16 +186,15 @@ class BattleFragment : Fragment() {
 
     private fun greyImage(img : ImageView) {
         val matrix = ColorMatrix()
-        matrix.setSaturation(0f) //0 means grayscale
+        matrix.setSaturation(0f) // 0 means grayscale
         val cf = ColorMatrixColorFilter(matrix)
         img.colorFilter = cf
         img.imageAlpha = 128 // 128 = 0.5
     }
 
     private fun handlePokemonKO(pok : PokemonInfo) {
-        val pokemonName = pok.pokemon.name.substring(0, 1).toUpperCase(Locale.getDefault())
-            .plus(pok.pokemon.name.substring(1))
-        doOrAddAction { showMessage("$pokemonName fainted!"); };
+        val pokemonName = firstLetterUpperCase(pok.pokemon.name)
+        doOrAddAction { showMessage("$pokemonName fainted!"); }
         if (pok == battlingPokemon) {
             when (pok) {
                 pokemon1 -> {
@@ -239,31 +244,31 @@ class BattleFragment : Fragment() {
     private fun getEfficiency(moveType : NamedAPIResource, pokemonType : PokemonType) : Double {
         val moveTypesDamageRelations = allMovesTypesDamageRelations[moveType.name]!!
         if (moveTypesDamageRelations.no_damage_to.any {  it.name == pokemonType.type.name })
-            return 0.0;
+            return 0.0
         if (moveTypesDamageRelations.double_damage_to.any {  it.name == pokemonType.type.name })
-            return 2.0;
+            return 2.0
         if (moveTypesDamageRelations.half_damage_to.any {  it.name == pokemonType.type.name })
-            return 0.5;
-        return 1.0;
+            return 0.5
+        return 1.0
     }
 
     private fun dealDamage(move : Move, attacker : PokemonInfo, defender: PokemonInfo, health: ProgressBar) : Boolean {
+        val moveName = firstLetterUpperCase(move.name)
         val random = (1..100).random()
         if (random > move.accuracy) {
-            doOrAddAction { showMessage(attacker.pokemon.name + "'s attack missed!"); };
-            return true;
+            doOrAddAction { showMessage("$moveName missed!"); }
+            return true
         }
-        var efficiency = 1.0;
+        var efficiency = 1.0
         for (pokemonType in defender.pokemon.types)
-            efficiency *= getEfficiency(move.type, pokemonType);
-        val moveName = move.name;
+            efficiency *= getEfficiency(move.type, pokemonType)
         when {
             efficiency == 0.0 -> doOrAddAction { showMessage("$moveName has no effect..."); }
             efficiency < 1 -> doOrAddAction { showMessage("$moveName is not very effective..."); }
             efficiency > 1 -> doOrAddAction { showMessage("$moveName is super effective!"); }
-        };
+        }
         if (efficiency == 0.0)
-            return true;
+            return true
         val (att, def) = when (move.damage_class.name) {
             "physical" -> Pair(
                 attacker.pokemon.stats.find { it.stat.name == "attack" }!!.base_stat,
@@ -276,35 +281,31 @@ class BattleFragment : Fragment() {
             else -> Pair(0, 0)
         }
         if (move.power == null)
-            move.power = 0;
+            move.power = 0
         defender.hp -= maxOf(((att / 10 + move.power!! - def) * efficiency).toInt(), 1)
         defender.hp = maxOf(defender.hp, 0)
         health.progress = defender.hp
-        return efficiency != 1.0;
+        return efficiency != 1.0
     }
 
     private fun attack(moveId : Int, attacker : PokemonInfo, defender : PokemonInfo, health : ProgressBar, next : () -> Unit = { nextAction(); }) {
         val move = attacker.moves[moveId - 1]!!
-        val moveName = move.name.substring(0, 1).toUpperCase(Locale.getDefault())
-            .plus(move.name.substring(1))
-        doOrAddAction {
-            val attackerName = attacker.pokemon.name.substring(0, 1).toUpperCase(Locale.getDefault())
-                .plus(attacker.pokemon.name.substring(1))
-            showMessage("$attackerName used $moveName")
-        }
+        val attackerName = firstLetterUpperCase(attacker.pokemon.name)
+        val moveName = firstLetterUpperCase(move.name)
+        doOrAddAction { showMessage("$attackerName used $moveName") }
         actions.add {
-            val message = dealDamage(move, attacker, defender, health);
+            val message = dealDamage(move, attacker, defender, health)
             if (defender.hp > 0) {
                 if (!message)
-                    next();
+                    next()
                 else
-                    actions.add { next(); };
+                    actions.add { next(); }
             }
             else {
                 if (!message)
-                    handlePokemonKO(defender);
+                    handlePokemonKO(defender)
                 else
-                    actions.add { handlePokemonKO(defender); };
+                    actions.add { handlePokemonKO(defender); }
             }
         }
     }
@@ -318,8 +319,7 @@ class BattleFragment : Fragment() {
             4 -> Pair(move4, move4Type)
             else -> Pair(null, null)
         }
-        txt!!.text = move.name.substring(0, 1).toUpperCase(Locale.getDefault())
-            .plus(move.name.substring(1))
+        txt!!.text = firstLetterUpperCase(move.name)
         when (id) {
             1 -> move1Description.text = move.flavor_text_entries[2].flavor_text
             2 -> move2Description.text = move.flavor_text_entries[2].flavor_text
@@ -328,7 +328,7 @@ class BattleFragment : Fragment() {
         }
         Glide
             .with(this@BattleFragment)
-            .load(move.typeToRDrawable())
+            .load(typeToRDrawable(move.type.name))
             .into(img!!)
     }
 
@@ -381,10 +381,9 @@ class BattleFragment : Fragment() {
                     .with(this@BattleFragment)
                     .load(pokemon1.pokemon.sprites.front_default)
                     .into(pokemon1ImageView)
-                battlingPokemonHealth.max = pokemon1.hp;
-                battlingPokemonHealth.progress = pokemon1.hp;
-                battlingPokemonName.text = pok.name.substring(0, 1).toUpperCase(Locale.getDefault())
-                    .plus(pok.name.substring(1))
+                battlingPokemonHealth.max = pokemon1.hp
+                battlingPokemonHealth.progress = pokemon1.hp
+                battlingPokemonName.text = firstLetterUpperCase(pok.name)
                 pokemon1Name.text = battlingPokemonName.text
                 pokemon1ImageView.setOnClickListener {
                     if (battlingPokemon != pokemon1)
@@ -399,8 +398,7 @@ class BattleFragment : Fragment() {
                     .with(this@BattleFragment)
                     .load(pokemon2.pokemon.sprites.front_default)
                     .into(pokemon2ImageView)
-                pokemon2Name.text = pok.name.substring(0, 1).toUpperCase(Locale.getDefault())
-                    .plus(pok.name.substring(1))
+                pokemon2Name.text = firstLetterUpperCase(pok.name)
                 pokemon2ImageView.setOnClickListener {
                     if (battlingPokemon != pokemon2)
                         setBattlingPokemon(pokemon2)
@@ -414,14 +412,13 @@ class BattleFragment : Fragment() {
                     .with(this@BattleFragment)
                     .load(pokemon3.pokemon.sprites.front_default)
                     .into(pokemon3ImageView)
-                pokemon3Name.text = pok.name.substring(0, 1).toUpperCase(Locale.getDefault())
-                    .plus(pok.name.substring(1))
+                pokemon3Name.text = firstLetterUpperCase(pok.name)
                 pokemon3ImageView.setOnClickListener {
                     if (battlingPokemon != pokemon3)
                         setBattlingPokemon(pokemon3)
                 }
             }
-            val movesCallback : Callback<MoveCategory> = pokeAPICallback {response ->
+            val movesCallback : Callback<MoveCategory> = pokeAPICallback { response ->
                 allDamageMovesList = response.body()!!
                 service.getPokemon(it.getInt("opponentPokemon0")).enqueue(opponent1Callback)
                 service.getPokemon(it.getInt("opponentPokemon1")).enqueue(opponent2Callback)
@@ -460,11 +457,7 @@ class BattleFragment : Fragment() {
         move4.setOnClickListener { playerTurn(4); }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_battle, container, false)
     }

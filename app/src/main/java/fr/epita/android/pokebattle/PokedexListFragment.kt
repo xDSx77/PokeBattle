@@ -10,8 +10,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.fragment_pokedex_list.*
 import com.google.gson.GsonBuilder
-import fr.epita.android.pokebattle.webservices.PokedexEntry
-import fr.epita.android.pokebattle.webservices.SurLeWebAPIInterface
+import fr.epita.android.pokebattle.webservices.surleweb.api.PokedexEntry
+import fr.epita.android.pokebattle.webservices.surleweb.api.SurLeWebAPIInterface
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -52,8 +52,8 @@ class PokedexListFragment : Fragment() {
             Log.w("WebServices", "SurLeWeb API call success")
             if (response.code() == 200) {
                 // We got our data !
-                val pokedexEntriesResponse : List<PokedexEntry> = response.body()!!;
-                pokedexEntries.clear();
+                val pokedexEntriesResponse : List<PokedexEntry> = response.body()!!
+                pokedexEntries.clear()
                 for (pokedexEntry in pokedexEntriesResponse) {
                     pokedexEntries.add(pokedexEntry)
                 }

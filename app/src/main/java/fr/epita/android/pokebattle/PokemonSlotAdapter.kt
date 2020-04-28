@@ -5,9 +5,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import fr.epita.android.pokebattle.webservices.Pokemon
+import fr.epita.android.pokebattle.Utils.firstLetterUpperCase
+import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.Pokemon
 import kotlinx.android.synthetic.main.battle_lobby_pokemon_slot.view.*
-import java.util.*
 
 class PokemonSlotAdapter(private val pokemonSlots : List<Pokemon?>,
                          private val slotClickListener : View.OnClickListener)
@@ -28,15 +28,13 @@ class PokemonSlotAdapter(private val pokemonSlots : List<Pokemon?>,
         var pokemon = pokemonSlots[position]
         if (pokemon == null) {
             holder.view.tag = position
-            holder.view.PokemonSlotImageView.setImageResource(0);
+            holder.view.PokemonSlotImageView.setImageResource(0)
             holder.view.PokemonSlotNameTextView.text = ""
             holder.view.PokemonSlotIdButton.text = (position + 1).toString()
         }
         else
         {
-            holder.view.PokemonSlotNameTextView.text =
-                pokemon.name.substring(0, 1).toUpperCase(Locale.getDefault())
-                    .plus(pokemon.name.substring(1))
+            holder.view.PokemonSlotNameTextView.text = firstLetterUpperCase(pokemon.name)
             Glide
                 .with(holder.view.context)
                 .load(pokemon.sprites.front_default)
