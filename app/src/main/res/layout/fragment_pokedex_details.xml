@@ -12,6 +12,7 @@
         android:layout_height="100dp"
         android:layout_marginStart="32dp"
         android:layout_marginTop="32dp"
+        android:contentDescription="@string/pokemonSlotImage"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:srcCompat="@android:drawable/ic_menu_gallery" />
@@ -21,7 +22,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="75dp"
+        android:fontFamily="cursive"
+        android:textColor="#000000"
         android:textSize="24sp"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/PokemonImageView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/PokemonImageView"
@@ -33,9 +37,9 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="50dp"
-        android:text="Height:"
+        android:text="@string/height"
+        android:textColor="#000000"
         android:textSize="20sp"
-        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/PokemonImageView" />
 
@@ -57,9 +61,9 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="Speed:"
+        android:text="@string/speed"
+        android:textColor="#000000"
         android:textSize="20sp"
-        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/HeightTextView" />
 
@@ -81,9 +85,9 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="Attack:"
+        android:text="@string/attack"
+        android:textColor="#000000"
         android:textSize="20sp"
-        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/SpeedTextView" />
 
@@ -105,9 +109,9 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="Special Attack:"
+        android:text="@string/specialAttack"
+        android:textColor="#000000"
         android:textSize="20sp"
-        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/AttackTextView" />
 
@@ -135,9 +139,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:text="Weight:"
+        android:text="@string/weight"
+        android:textColor="#000000"
         android:textSize="20sp"
-        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="@+id/Vertical50"
         app:layout_constraintTop_toTopOf="@+id/HeightTextView" />
 
@@ -159,9 +163,9 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="HP:"
+        android:text="@string/hp"
+        android:textColor="#000000"
         android:textSize="20sp"
-        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="@+id/Vertical50"
         app:layout_constraintTop_toBottomOf="@+id/WeightTextView" />
 
@@ -183,9 +187,9 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="Defense:"
+        android:text="@string/defense"
+        android:textColor="#000000"
         android:textSize="20sp"
-        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="@+id/Vertical50"
         app:layout_constraintTop_toBottomOf="@+id/HPTextView" />
 
@@ -208,9 +212,9 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="Special Defense:"
+        android:text="@string/specialDefense"
+        android:textColor="#000000"
         android:textSize="20sp"
-        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="@+id/Vertical50"
         app:layout_constraintTop_toBottomOf="@+id/DefenseTextView" />
 
@@ -232,9 +236,9 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
         android:layout_marginTop="32dp"
-        android:text="Type(s):"
+        android:text="@string/types"
+        android:textColor="#000000"
         android:textSize="20sp"
-        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/SpecialAttackTextView" />
 
@@ -243,6 +247,7 @@
         android:layout_width="75dp"
         android:layout_height="75dp"
         android:layout_marginTop="32dp"
+        android:contentDescription="@string/typeImage"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/TypesTextView" />
@@ -252,6 +257,7 @@
         android:layout_width="75dp"
         android:layout_height="75dp"
         android:layout_marginTop="32dp"
+        android:contentDescription="@string/typeImage"
         app:layout_constraintEnd_toStartOf="@+id/Vertical50"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/TypesTextView" />
@@ -261,6 +267,7 @@
         android:layout_width="75dp"
         android:layout_height="75dp"
         android:layout_marginTop="32dp"
+        android:contentDescription="@string/typeImage"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/Vertical50"
         app:layout_constraintTop_toBottomOf="@+id/TypesTextView" />

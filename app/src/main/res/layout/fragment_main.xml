@@ -11,9 +11,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="PokeBattle"
-        android:textColor="#FF0000"
+        android:fontFamily="casual"
+        android:text="@string/appTitle"
+        android:textColor="#DC5B17"
         android:textSize="40sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -25,10 +27,11 @@
         android:layout_marginTop="40dp"
         android:paddingStart="12dp"
         android:paddingEnd="12dp"
-        android:text="Welcome Trainer! You have a team of three pokemons and you will fight 3 wild pokemons in a row. But before the battle starts, you only know your first opponent. And remember, most Pokemons have strengths and weaknesses. Good luck!"
+        android:text="@string/appDescription"
         android:textAlignment="viewStart"
+        android:textColor="#000000"
         android:textSize="16sp"
-        android:textStyle="bold|italic"
+        android:textStyle="italic"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/TitleTextView" />
@@ -39,7 +42,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="24dp"
-        android:text="An application made by:"
+        android:text="@string/madeBy"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/DescriptionTextView" />
 
@@ -48,7 +51,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:text="James RICHET"
+        android:text="@string/james"
         app:layout_constraintStart_toEndOf="@+id/SignatureTextView"
         app:layout_constraintTop_toTopOf="@+id/SignatureTextView" />
 
@@ -56,7 +59,7 @@
         android:id="@+id/Dev2NameTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Ingo BRAEKMAN"
+        android:text="@string/ingo"
         app:layout_constraintStart_toStartOf="@+id/Dev1NameTextView"
         app:layout_constraintTop_toBottomOf="@+id/Dev1NameTextView" />
 
@@ -64,7 +67,7 @@
         android:id="@+id/Dev3NameTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Bastien SEIRA"
+        android:text="@string/bastien"
         app:layout_constraintStart_toStartOf="@+id/Dev2NameTextView"
         app:layout_constraintTop_toBottomOf="@+id/Dev2NameTextView" />
 
@@ -72,7 +75,7 @@
         android:id="@+id/Dev4NameTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Allan CANTIN"
+        android:text="@string/allan"
         app:layout_constraintStart_toStartOf="@+id/Dev3NameTextView"
         app:layout_constraintTop_toBottomOf="@+id/Dev3NameTextView" />
 
@@ -87,17 +90,17 @@
         android:id="@+id/BattleButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="200dp"
-        android:text="Battle"
+        android:text="@string/battleButton"
+        app:layout_constraintBottom_toTopOf="@+id/EpitaImageView"
         app:layout_constraintEnd_toStartOf="@+id/guideline"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/SignatureTextView" />
+        app:layout_constraintTop_toBottomOf="@+id/Dev4NameTextView" />
 
     <Button
         android:id="@+id/PokedexButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Pokedex"
+        android:text="@string/pokedex"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/guideline"
         app:layout_constraintTop_toTopOf="@+id/BattleButton" />
@@ -108,7 +111,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginBottom="32dp"
-        android:text="Made at"
+        android:text="@string/madeAt"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="@+id/guideline" />
 
@@ -116,7 +119,7 @@
         android:id="@+id/EpitaImageView"
         android:layout_width="110dp"
         android:layout_height="110dp"
-        android:layout_marginStart="12dp"
+        android:contentDescription="@string/epita"
         app:layout_constraintBottom_toBottomOf="@+id/LocationTextView"
         app:layout_constraintStart_toEndOf="@+id/LocationTextView"
         app:layout_constraintTop_toTopOf="@+id/LocationTextView"

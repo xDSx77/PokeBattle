@@ -10,9 +10,9 @@
         android:id="@+id/NextOpponentTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Your first opponent will be..."
+        android:layout_marginStart="4dp"
+        android:text="@string/battleLobbyText"
         android:textSize="18sp"
-        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -22,25 +22,28 @@
         android:layout_height="100dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
+        android:contentDescription="@string/pokemonSlotImage"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/NextOpponentTextView"
         app:srcCompat="@android:drawable/screen_background_light_transparent" />
 
     <ImageView
         android:id="@+id/NextOpponentType1ImageView"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
         android:layout_marginStart="16dp"
+        android:contentDescription="@string/typeImage"
         app:layout_constraintStart_toEndOf="@+id/NextOpponentImageView"
         app:layout_constraintTop_toTopOf="@+id/NextOpponentImageView"
         app:srcCompat="@android:drawable/screen_background_light_transparent" />
 
     <ImageView
         android:id="@+id/NextOpponentType2ImageView"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
         android:layout_marginStart="16dp"
-        app:layout_constraintBottom_toBottomOf="@+id/NextOpponentImageView"
+        android:contentDescription="@string/typeImage"
+        app:layout_constraintBottom_toBottomOf="@+id/NextOpponentNameTextView"
         app:layout_constraintStart_toEndOf="@+id/NextOpponentImageView"
         app:srcCompat="@android:drawable/screen_background_light_transparent" />
 
@@ -49,7 +52,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
+        android:fontFamily="cursive"
+        android:textColor="#000000"
         android:textSize="16sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="@+id/NextOpponentImageView"
         app:layout_constraintStart_toStartOf="@+id/NextOpponentImageView"
         app:layout_constraintTop_toBottomOf="@+id/NextOpponentImageView"
@@ -59,8 +65,9 @@
         android:id="@+id/PokemonSelectionTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
         android:layout_marginTop="8dp"
-        android:text="Please select your Pokemons for the battle to come."
+        android:text="@string/battleLobbyList"
         android:textSize="16sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/NextOpponentNameTextView" />
@@ -108,6 +115,7 @@
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:layout_marginStart="16dp"
+        android:contentDescription="@string/typeImage"
         app:layout_constraintBottom_toTopOf="@+id/Horizontal70"
         app:layout_constraintStart_toStartOf="@+id/Vertical40"
         app:layout_constraintTop_toTopOf="@+id/Horizontal60"
@@ -117,6 +125,7 @@
         android:id="@+id/SelectedPokemonType2ImageView"
         android:layout_width="64dp"
         android:layout_height="64dp"
+        android:contentDescription="@string/typeImage"
         app:layout_constraintBottom_toTopOf="@+id/Horizontal70"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/SelectedPokemonType1ImageView"
@@ -136,7 +145,7 @@
         android:layout_height="80dp"
         android:layout_marginTop="32dp"
         android:layout_marginEnd="32dp"
-        android:text="Fight !"
+        android:text="@string/fightButton"
         android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

@@ -4,9 +4,10 @@
     android:layout_height="40dp"
     android:gravity="center"
     android:orientation="vertical">
+
     <ImageView
         android:id="@+id/TypeEntryImageView"
         android:layout_width="50dp"
         android:layout_height="55dp"
-        android:contentDescription="Type Illustration"/>
+        android:contentDescription="@string/typeImage" />
 </LinearLayout>
