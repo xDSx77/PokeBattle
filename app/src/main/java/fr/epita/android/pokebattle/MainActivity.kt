@@ -75,4 +75,12 @@ class MainActivity : AppCompatActivity() {
             .addToBackStack(null)
             .commit()
     }
+
+    fun Home() {
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.mainContainer, MainFragment())
+            .addToBackStack(null)
+            .commit()
+    }
 }

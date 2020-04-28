@@ -110,7 +110,31 @@ class BattleFragment : Fragment() {
     }
 
     private fun opponentTurn(next : () -> Unit = { nextAction(); }) {
-        attack(1, opponentBattlingPokemon, battlingPokemon, battlingPokemonHealth, next)
+        var moveId = 1;
+        var maxDamage = 0;
+        for (i in 0 until opponentBattlingPokemon.moves.count()) {
+            val move = opponentBattlingPokemon.moves[i]!!;
+            val efficiency = getEfficiency(move.type, battlingPokemon.pokemon.types);
+            val (att, def) = when (move.damage_class.name) {
+                "physical" -> Pair(
+                    opponentBattlingPokemon.pokemon.stats.find { it.stat.name == "attack" }!!.base_stat,
+                    battlingPokemon.pokemon.stats.find { it.stat.name == "defense" }!!.base_stat
+                )
+                "special" -> Pair(
+                    opponentBattlingPokemon.pokemon.stats.find { it.stat.name == "special-attack" }!!.base_stat,
+                    battlingPokemon.pokemon.stats.find { it.stat.name == "special-defense" }!!.base_stat
+                )
+                else -> Pair(0, 0)
+            }
+            if (move.power == null)
+                move.power = 0
+            val damage = maxOf(((att / 10 + move.power!! - def) * efficiency).toInt(), 1);
+            if (damage > maxDamage) {
+                maxDamage = damage;
+                moveId = i + 1;
+            }
+        }
+        attack(moveId, opponentBattlingPokemon, battlingPokemon, battlingPokemonHealth, next)
     }
 
     private fun showMessage(m : String) {
@@ -216,7 +240,7 @@ class BattleFragment : Fragment() {
             if (newPokemon == null) {
                 actions.add {
                     showMessage("You lost !")
-                    MessageTextView.setOnClickListener(null)
+                    MessageTextView.setOnClickListener { (activity as MainActivity).Home(); };
                     greyImage(battlingPokemonImageView)
                 }
             }
@@ -229,7 +253,7 @@ class BattleFragment : Fragment() {
             if (newOpponent == null) {
                 actions.add {
                     showMessage("You won!")
-                    MessageTextView.setOnClickListener(null)
+                    MessageTextView.setOnClickListener { (activity as MainActivity).Home(); };
                     pokemon1ImageView.setOnClickListener(null)
                     pokemon2ImageView.setOnClickListener(null)
                     pokemon3ImageView.setOnClickListener(null)
@@ -241,15 +265,18 @@ class BattleFragment : Fragment() {
         }
     }
 
-    private fun getEfficiency(moveType : NamedAPIResource, pokemonType : PokemonType) : Double {
+    private fun getEfficiency(moveType : NamedAPIResource, pokemonTypes : List<PokemonType>) : Double {
+        var efficiency = 1.0;
         val moveTypesDamageRelations = allMovesTypesDamageRelations[moveType.name]!!
-        if (moveTypesDamageRelations.no_damage_to.any {  it.name == pokemonType.type.name })
-            return 0.0
-        if (moveTypesDamageRelations.double_damage_to.any {  it.name == pokemonType.type.name })
-            return 2.0
-        if (moveTypesDamageRelations.half_damage_to.any {  it.name == pokemonType.type.name })
-            return 0.5
-        return 1.0
+        for (pokemonType in pokemonTypes) {
+            if (moveTypesDamageRelations.no_damage_to.any { it.name == pokemonType.type.name })
+                efficiency *= 0.0
+            if (moveTypesDamageRelations.double_damage_to.any { it.name == pokemonType.type.name })
+                efficiency *= 2.0
+            if (moveTypesDamageRelations.half_damage_to.any { it.name == pokemonType.type.name })
+                efficiency *= 0.5
+        }
+        return efficiency;
     }
 
     private fun dealDamage(move : Move, attacker : PokemonInfo, defender: PokemonInfo, health: ProgressBar) : Boolean {
@@ -259,9 +286,7 @@ class BattleFragment : Fragment() {
             doOrAddAction { showMessage("$moveName missed!"); }
             return true
         }
-        var efficiency = 1.0
-        for (pokemonType in defender.pokemon.types)
-            efficiency *= getEfficiency(move.type, pokemonType)
+        val efficiency = getEfficiency(move.type, defender.pokemon.types);
         when {
             efficiency == 0.0 -> doOrAddAction { showMessage("$moveName has no effect..."); }
             efficiency < 1 -> doOrAddAction { showMessage("$moveName is not very effective..."); }
