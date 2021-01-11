@@ -1,5 +1,5 @@
-# mti_p21_pokebattle
-Simplified version of a Pokemon battle Android app called PokeBattle
+# PokeBattle
+A simple Pokemon battle Android app.
 
 # Authors
 James RICHET (james.richet)
