@@ -8,21 +8,21 @@
 
     <ImageView
         android:id="@+id/TypeImageView"
-        android:layout_width="131dp"
-        android:layout_height="126dp"
+        android:layout_width="140dp"
+        android:layout_height="140dp"
         android:layout_marginTop="4dp"
-        android:contentDescription="@string/typeImageDescription"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        android:contentDescription="@string/typeImage"
+        app:layout_constraintEnd_toStartOf="@+id/guideline_v50"
+        app:layout_constraintStart_toStartOf="@+id/guideline_v50"
         app:layout_constraintTop_toTopOf="parent"
-        tools:srcCompat="@android:drawable/ic_menu_gallery" />
+        tools:srcCompat="@android:drawable/screen_background_light_transparent" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/damageTextEndGuideline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_begin="33dp" />
+        app:layout_constraintGuide_percent="0.08" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline_v50"
@@ -61,7 +61,7 @@
 
     <View
         android:id="@+id/horizontalDivider_1"
-        android:layout_width="409dp"
+        android:layout_width="0dp"
         android:layout_height="1dp"
         android:layout_marginTop="5dp"
         android:background="?android:attr/listDivider"
@@ -102,7 +102,7 @@
 
     <View
         android:id="@+id/horizontalDivider_2"
-        android:layout_width="409dp"
+        android:layout_width="0dp"
         android:layout_height="1dp"
         android:background="?android:attr/listDivider"
         app:layout_constraintBottom_toTopOf="@+id/horizontalDivider_3"
@@ -144,7 +144,7 @@
 
     <View
         android:id="@+id/horizontalDivider_3"
-        android:layout_width="409dp"
+        android:layout_width="0dp"
         android:layout_height="1dp"
         android:background="?android:attr/listDivider"
         app:layout_constraintBottom_toBottomOf="parent"
