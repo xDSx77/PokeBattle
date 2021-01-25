@@ -1,29 +1,24 @@
 <resources>
-    <string name="app_name">PokeFight</string>
-
+    <string name="appName">PokeBattle</string>
     <string name="toText">To</string>
     <string name="fromText">From</string>
     <string name="doubleEffectText">x2</string>
     <string name="halfEffectText">x0.5</string>
     <string name="noEffectText">x0</string>
-    <string name="typeImageDescription">Type illustration</string>
-
-    <string name="typeEntryImageDescription">Type Illustration</string>
-    <string name="pokemonSlotImage">Pokemon Slot Image</string>
+    <string name="pokemonSlotImage">Pokémon Slot Image</string>
     <string name="typeImage">Type Image</string>
     <string name="battleLobbyText">Your first opponent will be…</string>
-    <string name="battleLobbyList">Please select your Pokemons for the battle to come.</string>
+    <string name="battleLobbyList">Please select your 3 Pokémon for the battle to come:</string>
+    <string name="battleLobbySelected">Selected Pokémon:</string>
     <string name="fightButton">Fight !</string>
-    <string name="appDescription">Welcome Trainer! You have a team of three pokemons and you will fight 3 wild pokemons in a row. But before the battle starts, you only know your first opponent. And remember, most Pokemons have strengths and weaknesses. Good luck!</string>
+    <string name="appDescription">Welcome Trainer! You have a team of 3 Pokémon and you will fight 3 wild Pokémon in a row. But before the battle starts, you only know your first opponent. And remember, most Pokémon have strengths and weaknesses. Good luck!</string>
     <string name="madeBy">An application made by:</string>
     <string name="james">James RICHET</string>
     <string name="ingo">Ingo BRAEKMAN</string>
-    <string name="allan">Bastien SEIRA</string>
-    <string name="bastien">Allan CANTIN</string>
+    <string name="bastien">Bastien SEIRA</string>
+    <string name="allan">Allan CANTIN</string>
     <string name="battleButton">Battle</string>
-    <string name="pokedex">PokeDex</string>
-    <string name="madeAt">Made at</string>
-    <string name="epita">EPITA</string>
+    <string name="pokedex">Pokédex</string>
     <string name="height">Height:</string>
     <string name="speed">Speed:</string>
     <string name="attack">Attack:</string>
@@ -33,8 +28,7 @@
     <string name="defense">Defense:</string>
     <string name="specialDefense">Special Defense:</string>
     <string name="types">Types:</string>
-    <string name="appTitle">PokeBattle</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="hashtag">#</string>
+    <string name="pokemonNumber10_99">0%1$d</string>
+    <string name="pokemonNumber0_9">00%1$d</string>
 </resources>
