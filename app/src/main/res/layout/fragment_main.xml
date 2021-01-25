@@ -11,9 +11,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:fontFamily="casual"
-        android:text="@string/appTitle"
-        android:textColor="#DC5B17"
+        android:fontFamily="serif"
+        android:text="@string/appName"
+        android:textColor="#FF0000"
         android:textSize="40sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
@@ -40,44 +40,44 @@
         android:id="@+id/SignatureTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="24dp"
         android:text="@string/madeBy"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/DescriptionTextView" />
+        app:layout_constraintBottom_toTopOf="@+id/Dev1NameTextView"
+        app:layout_constraintEnd_toStartOf="@+id/guideline"
+        app:layout_constraintStart_toStartOf="@+id/guideline" />
 
     <TextView
         android:id="@+id/Dev1NameTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
         android:text="@string/james"
-        app:layout_constraintStart_toEndOf="@+id/SignatureTextView"
-        app:layout_constraintTop_toTopOf="@+id/SignatureTextView" />
+        app:layout_constraintBottom_toTopOf="@+id/Dev2NameTextView"
+        app:layout_constraintStart_toStartOf="@+id/Dev2NameTextView" />
 
     <TextView
         android:id="@+id/Dev2NameTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/ingo"
-        app:layout_constraintStart_toStartOf="@+id/Dev1NameTextView"
-        app:layout_constraintTop_toBottomOf="@+id/Dev1NameTextView" />
+        app:layout_constraintBottom_toTopOf="@+id/Dev3NameTextView"
+        app:layout_constraintStart_toStartOf="@+id/Dev3NameTextView" />
 
     <TextView
         android:id="@+id/Dev3NameTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/bastien"
-        app:layout_constraintStart_toStartOf="@+id/Dev2NameTextView"
-        app:layout_constraintTop_toBottomOf="@+id/Dev2NameTextView" />
+        app:layout_constraintBottom_toTopOf="@+id/Dev4NameTextView"
+        app:layout_constraintStart_toStartOf="@+id/Dev4NameTextView" />
 
     <TextView
         android:id="@+id/Dev4NameTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="16dp"
         android:text="@string/allan"
-        app:layout_constraintStart_toStartOf="@+id/Dev3NameTextView"
-        app:layout_constraintTop_toBottomOf="@+id/Dev3NameTextView" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline"
@@ -90,11 +90,12 @@
         android:id="@+id/BattleButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
         android:text="@string/battleButton"
-        app:layout_constraintBottom_toTopOf="@+id/EpitaImageView"
         app:layout_constraintEnd_toStartOf="@+id/guideline"
+        app:layout_constraintHorizontal_bias="0.525"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/Dev4NameTextView" />
+        app:layout_constraintTop_toBottomOf="@+id/DescriptionTextView" />
 
     <Button
         android:id="@+id/PokedexButton"
@@ -105,23 +106,4 @@
         app:layout_constraintStart_toStartOf="@+id/guideline"
         app:layout_constraintTop_toTopOf="@+id/BattleButton" />
 
-    <TextView
-        android:id="@+id/LocationTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginBottom="32dp"
-        android:text="@string/madeAt"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/guideline" />
-
-    <ImageView
-        android:id="@+id/EpitaImageView"
-        android:layout_width="110dp"
-        android:layout_height="110dp"
-        android:contentDescription="@string/epita"
-        app:layout_constraintBottom_toBottomOf="@+id/LocationTextView"
-        app:layout_constraintStart_toEndOf="@+id/LocationTextView"
-        app:layout_constraintTop_toTopOf="@+id/LocationTextView"
-        app:srcCompat="@drawable/epita" />
 </androidx.constraintlayout.widget.ConstraintLayout>
