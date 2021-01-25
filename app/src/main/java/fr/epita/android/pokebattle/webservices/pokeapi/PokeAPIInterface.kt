@@ -11,8 +11,7 @@ import retrofit2.http.Path
 
 interface PokeAPIInterface {
     object Constants {
-        @JvmField   // for access in java code
-        val url : String = "https://pokeapi.co/api/v2/"
+        const val url : String = "https://pokeapi.co/api/v2/"
     }
 
     @GET("pokemon/{id}")
