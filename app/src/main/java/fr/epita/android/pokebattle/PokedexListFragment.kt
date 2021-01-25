@@ -23,24 +23,24 @@ class PokedexListFragment : Fragment() {
     private lateinit var viewAdapter: RecyclerView.Adapter<*>
     private lateinit var viewManager: RecyclerView.LayoutManager
 
-    var pokedexEntries : ArrayList<PokedexEntry> = ArrayList()
+    var pokedexEntries: ArrayList<PokedexEntry> = ArrayList()
 
     // Use GSON library to create our JSON parser
-    val jsonConverter = GsonConverterFactory.create(GsonBuilder().create())
+    private val jsonConverter: GsonConverterFactory = GsonConverterFactory.create(GsonBuilder().create())
 
     // Create a Retrofit client object targeting the provided URL
     // and add a JSON converter (because we are expecting json responses)
-    val retrofit = Retrofit.Builder()
+    private val retrofit: Retrofit = Retrofit.Builder()
         .baseUrl(SurLeWebAPIInterface.Constants.url)
         .addConverterFactory(jsonConverter)
         .build()
 
     // Use the client to create a service:
     // an object implementing the interface to the WebService
-    val service : SurLeWebAPIInterface = retrofit.create(
+    private val service: SurLeWebAPIInterface = retrofit.create(
         SurLeWebAPIInterface::class.java)
 
-    val pokemonListCallback: Callback<List<PokedexEntry>> = object : Callback<List<PokedexEntry>> {
+    private val pokemonListCallback: Callback<List<PokedexEntry>> = object : Callback<List<PokedexEntry>> {
         override fun onFailure(call: Call<List<PokedexEntry>>, t: Throwable) {
             // Code here what happens if calling the WebService fails
             Log.w("WebServices", "SurLeWeb API call failed" + t.message)
@@ -55,9 +55,9 @@ class PokedexListFragment : Fragment() {
                 val pokedexEntriesResponse : List<PokedexEntry> = response.body()!!
                 pokedexEntries.clear()
                 for (pokedexEntry in pokedexEntriesResponse) {
-                    pokedexEntries.add(pokedexEntry)
+                    if (pokedexEntry.id < 10000)
+                        pokedexEntries.add(pokedexEntry)
                 }
-                pokedexEntries.sort()
 
                 val entryClickListener = View.OnClickListener {
                     val position = it.tag as Int
@@ -81,11 +81,7 @@ class PokedexListFragment : Fragment() {
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_pokedex_list, container, false)
     }
