@@ -82,14 +82,23 @@ class PokedexDetailsFragment : Fragment() {
                                 TypeImageView.isVisible = false
                                 Type1ImageView.isVisible = true
                                 Type1ImageView.setImageResource(typeToRDrawable(pokemon.types[0].type.name))
+                                Type1ImageView.setOnClickListener {
+                                    (view.context as MainActivity).TypeHelp(pokemon.types[0].type.name)
+                                }
                                 Type2ImageView.isVisible = true
                                 Type2ImageView.setImageResource(typeToRDrawable(pokemon.types[1].type.name))
+                                Type2ImageView.setOnClickListener {
+                                    (view.context as MainActivity).TypeHelp(pokemon.types[1].type.name)
+                                }
                             }
                             1 -> {
                                 Type1ImageView.isVisible = false
                                 Type2ImageView.isVisible = false
                                 TypeImageView.isVisible = true
                                 TypeImageView.setImageResource(typeToRDrawable(pokemon.types[0].type.name))
+                                TypeImageView.setOnClickListener {
+                                    (view.context as MainActivity).TypeHelp(pokemon.types[0].type.name)
+                                }
                             }
                             else -> Log.w("Pokemon types", "No type found for this pokemon")
                         }
