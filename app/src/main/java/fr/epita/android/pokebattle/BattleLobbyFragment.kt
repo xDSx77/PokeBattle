@@ -6,7 +6,6 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
@@ -24,6 +23,7 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.*
+import kotlin.collections.ArrayList
 
 class BattleLobbyFragment : Fragment() {
 
@@ -32,25 +32,21 @@ class BattleLobbyFragment : Fragment() {
     private var selectedPokemon : Pokemon? = null
     private val pokedexEntries : ArrayList<PokedexEntry> = ArrayList()
 
-    val jsonConverter = GsonConverterFactory.create(GsonBuilder().create())
+    val jsonConverter: GsonConverterFactory = GsonConverterFactory.create(GsonBuilder().create())
 
-    val retrofit = Retrofit.Builder()
+    private val retrofit: Retrofit = Retrofit.Builder()
         .baseUrl(SurLeWebAPIInterface.Constants.url)
         .addConverterFactory(jsonConverter)
         .build()
 
-    val service : SurLeWebAPIInterface = retrofit.create(SurLeWebAPIInterface::class.java)
+    private val service : SurLeWebAPIInterface = retrofit.create(SurLeWebAPIInterface::class.java)
 
-    val pokemonListCallback: Callback<List<PokedexEntry>> = object : Callback<List<PokedexEntry>> {
+    private val pokemonListCallback: Callback<List<PokedexEntry>> = object : Callback<List<PokedexEntry>> {
         override fun onFailure(call: Call<List<PokedexEntry>>, t: Throwable) {
-            // Code here what happens if calling the WebService fails
             Log.w("WebServices", "SurLeWeb API call failed" + t.message)
         }
 
-        override fun onResponse(
-            call: Call<List<PokedexEntry>>,
-            response: Response<List<PokedexEntry>>
-        ) {
+        override fun onResponse(call: Call<List<PokedexEntry>>, response: Response<List<PokedexEntry>>) {
             Log.w("WebServices", "SurLeWeb API call success")
             if (response.code() == 200) {
                 // We got our data !
@@ -58,11 +54,7 @@ class BattleLobbyFragment : Fragment() {
 
                 pokedexEntries.clear()
 
-                for (pokedexEntry in pokedexEntriesResponse) {
-                    pokedexEntries.add(pokedexEntry)
-                }
-
-                pokedexEntries.sort()
+                pokedexEntries.addAll(pokedexEntriesResponse.filter { p -> p.id < 10000 })
 
                 val opponentEntry = pokedexEntries.random()
 
@@ -71,12 +63,10 @@ class BattleLobbyFragment : Fragment() {
                     .addConverterFactory(jsonConverter)
                     .build()
 
-                val pokeAPIservice: PokeAPIInterface =
-                    pokeAPIretrofit.create(PokeAPIInterface::class.java)
+                val pokeAPIservice: PokeAPIInterface = pokeAPIretrofit.create(PokeAPIInterface::class.java)
 
-                val pokemonCallback: Callback<Pokemon> = object : Callback<Pokemon> {
+                val opponentPokemonCallback: Callback<Pokemon> = object : Callback<Pokemon> {
                     override fun onFailure(call: Call<Pokemon>, t: Throwable) {
-                        // Code here what happens if calling the WebService fails
                         Log.w("WebServices", "PokeAPI call failed" + t.message)
                     }
 
@@ -90,32 +80,62 @@ class BattleLobbyFragment : Fragment() {
                                 .with(this@BattleLobbyFragment)
                                 .load(opponentPokemon.sprites.front_default)
                                 .into(NextOpponentImageView)
-                            NextOpponentType1ImageView.setImageResource(typeToRDrawable(opponentEntry.types[0].name))
-                            NextOpponentType1ImageView.setOnClickListener {
-                                (activity as MainActivity).TypeHelp(opponentEntry.types[0].name)
+
+                            if (opponentEntry.types.size == 1) {
+                                NextOpponentType1ImageView.setImageResource(typeToRDrawable(opponentEntry.types[0].name))
+                                NextOpponentType1ImageView.setOnClickListener {
+                                    (activity as MainActivity).TypeHelp(opponentEntry.types[0].name)
+                                }
+                                NextOpponentType2ImageView.visibility = View.INVISIBLE
                             }
-                            if (opponentEntry.types.size > 1) {
-                                NextOpponentType2ImageView.isVisible = true
-                                NextOpponentType2ImageView.setImageResource(typeToRDrawable(opponentEntry.types[1].name))
-                                NextOpponentType2ImageView.setOnClickListener {
+                            else if (opponentEntry.types.size == 2) {
+                                NextOpponentType2ImageView.visibility = View.VISIBLE
+                                NextOpponentType1ImageView.setImageResource(typeToRDrawable(opponentEntry.types[1].name))
+                                NextOpponentType1ImageView.setOnClickListener {
                                     (activity as MainActivity).TypeHelp(opponentEntry.types[1].name)
                                 }
-                            } else {
-                                NextOpponentType2ImageView.isVisible = false
+                                NextOpponentType2ImageView.setImageResource(typeToRDrawable(opponentEntry.types[0].name))
+                                NextOpponentType2ImageView.setOnClickListener {
+                                    (activity as MainActivity).TypeHelp(opponentEntry.types[0].name)
+                                }
                             }
                         }
                     }
                 }
-                pokeAPIservice.getPokemon(opponentEntry.id).enqueue(pokemonCallback)
+                pokeAPIservice.getPokemon(opponentEntry.id).enqueue(opponentPokemonCallback)
 
                 val entryClickListener = View.OnClickListener {
                     val position = it.tag as Int
 
                     val entry = pokedexEntries[position]
 
-                    val opponentPokemonCallback: Callback<Pokemon> = object : Callback<Pokemon> {
+                    SelectedPokemonTextView.text = firstLetterUpperCase(entry.name)
+                    Glide
+                        .with(this@BattleLobbyFragment)
+                        .load(entry.sprite)
+                        .into(SelectedPokemonImageView)
+                    if (entry.types.size == 1) {
+                        SelectedPokemonType2ImageView.visibility = View.INVISIBLE
+                        SelectedPokemonType1ImageView.setImageResource(typeToRDrawable(entry.types[0].name))
+                        SelectedPokemonType1ImageView.setOnClickListener {
+                            (activity as MainActivity).TypeHelp(entry.types[0].name)
+                        }
+                    }
+
+                    else if (entry.types.size == 2) {
+                        SelectedPokemonType2ImageView.visibility = View.VISIBLE
+                        SelectedPokemonType1ImageView.setImageResource(typeToRDrawable(entry.types[1].name))
+                        SelectedPokemonType1ImageView.setOnClickListener {
+                            (activity as MainActivity).TypeHelp(entry.types[1].name)
+                        }
+                        SelectedPokemonType2ImageView.setImageResource(typeToRDrawable(entry.types[0].name))
+                        SelectedPokemonType2ImageView.setOnClickListener {
+                            (activity as MainActivity).TypeHelp(entry.types[0].name)
+                        }
+                    }
+
+                    val selectedPokemonCallback: Callback<Pokemon> = object : Callback<Pokemon> {
                         override fun onFailure(call: Call<Pokemon>, t: Throwable) {
-                            // Code here what happens if calling the WebService fails
                             Log.w("WebServices", "PokeAPI call failed" + t.message)
                         }
 
@@ -123,20 +143,11 @@ class BattleLobbyFragment : Fragment() {
                             Log.w("WebServices", "PokeAPI call success")
                             if (response.code() == 200) {
                                 selectedPokemon = response.body()!!
-
-                                SelectedPokemonTextView.text = firstLetterUpperCase(entry.name)
-                                SelectedPokemonType1ImageView.setImageResource(typeToRDrawable(entry.types[0].name))
-                                if (entry.types.size > 1) {
-                                    SelectedPokemonType2ImageView.isVisible = true
-                                    SelectedPokemonType2ImageView.setImageResource(typeToRDrawable(entry.types[1].name))
-                                } else {
-                                    SelectedPokemonType2ImageView.isVisible = false
-                                }
                             }
                         }
                     }
 
-                    pokeAPIservice.getPokemon(entry.id).enqueue(opponentPokemonCallback)
+                    pokeAPIservice.getPokemon(entry.id).enqueue(selectedPokemonCallback)
                 }
 
                 PokemonList.apply {
@@ -148,11 +159,7 @@ class BattleLobbyFragment : Fragment() {
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_battle_lobby, container, false)
     }
@@ -166,21 +173,50 @@ class BattleLobbyFragment : Fragment() {
             (activity as MainActivity).Battle(arrayListOf(opponentPokemon.id, pokedexEntries.random().id, pokedexEntries.random().id), pokemonSlots)
         }
 
-        val slotClickListener = View.OnClickListener {
+        val slot1ClickListener = View.OnClickListener {
             if (selectedPokemon != null) {
-                val position = (it.parent as ConstraintLayout).tag as Int
-                pokemonSlots[position] = selectedPokemon
-                PokemonSlotList.adapter?.notifyDataSetChanged()
+                pokemonSlots[0] = selectedPokemon
+                pokemonSlotNameTextView.text = firstLetterUpperCase(selectedPokemon!!.name)
+                Glide
+                    .with(this@BattleLobbyFragment)
+                    .load(selectedPokemon!!.sprites.front_default)
+                    .into(pokemonSlotImageView)
 
                 if (!pokemonSlots.contains(null))
                     FightButton.isVisible = true
             }
         }
 
-        PokemonSlotList.apply {
-            setHasFixedSize(true)
-            layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-            adapter = PokemonSlotAdapter(pokemonSlots, slotClickListener)
+        val slot2ClickListener = View.OnClickListener {
+            if (selectedPokemon != null) {
+                pokemonSlots[1] = selectedPokemon
+                pokemonSlotNameTextView2.text = firstLetterUpperCase(selectedPokemon!!.name)
+                Glide
+                    .with(this@BattleLobbyFragment)
+                    .load(selectedPokemon!!.sprites.front_default)
+                    .into(pokemonSlotImageView2)
+
+                if (!pokemonSlots.contains(null))
+                    FightButton.isVisible = true
+            }
         }
+
+        val slot3ClickListener = View.OnClickListener {
+            if (selectedPokemon != null) {
+                pokemonSlots[2] = selectedPokemon
+                pokemonSlotNameTextView3.text = firstLetterUpperCase(selectedPokemon!!.name)
+                Glide
+                    .with(this@BattleLobbyFragment)
+                    .load(selectedPokemon!!.sprites.front_default)
+                    .into(pokemonSlotImageView3)
+
+                if (!pokemonSlots.contains(null))
+                    FightButton.isVisible = true
+            }
+        }
+
+        pokemonSlotIdButton.setOnClickListener(slot1ClickListener)
+        pokemonSlotIdButton2.setOnClickListener(slot2ClickListener)
+        pokemonSlotIdButton3.setOnClickListener(slot3ClickListener)
     }
 }
