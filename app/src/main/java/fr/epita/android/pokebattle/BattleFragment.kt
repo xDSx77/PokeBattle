@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.ProgressBar
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.google.gson.GsonBuilder
@@ -30,6 +31,7 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.*
+import kotlin.random.Random
 
 
 class BattleFragment : Fragment() {
@@ -110,28 +112,18 @@ class BattleFragment : Fragment() {
     }
 
     private fun opponentTurn(next : () -> Unit = { nextAction(); }) {
-        var moveId = 1;
-        var maxDamage = 0;
+        var moveId = 1
+        var maxDamage = 0
         for (i in 0 until opponentBattlingPokemon.moves.count()) {
-            val move = opponentBattlingPokemon.moves[i]!!;
-            val efficiency = getEfficiency(move.type, battlingPokemon.pokemon.types);
-            val (att, def) = when (move.damage_class.name) {
-                "physical" -> Pair(
-                    opponentBattlingPokemon.pokemon.stats.find { it.stat.name == "attack" }!!.base_stat,
-                    battlingPokemon.pokemon.stats.find { it.stat.name == "defense" }!!.base_stat
-                )
-                "special" -> Pair(
-                    opponentBattlingPokemon.pokemon.stats.find { it.stat.name == "special-attack" }!!.base_stat,
-                    battlingPokemon.pokemon.stats.find { it.stat.name == "special-defense" }!!.base_stat
-                )
-                else -> Pair(0, 0)
-            }
+            val move = opponentBattlingPokemon.moves[i]!!
+            val efficiency = getEfficiency(move.type, battlingPokemon.pokemon.types)
             if (move.power == null)
                 move.power = 0
-            val damage = maxOf(((att / 10 + move.power!! - def) * efficiency).toInt(), 1);
+
+            val damage = computeDamage(opponentBattlingPokemon, battlingPokemon, move, false, efficiency).toInt()
             if (damage > maxDamage) {
-                maxDamage = damage;
-                moveId = i + 1;
+                maxDamage = damage
+                moveId = i + 1
             }
         }
         attack(moveId, opponentBattlingPokemon, battlingPokemon, battlingPokemonHealth, next)
@@ -240,7 +232,7 @@ class BattleFragment : Fragment() {
             if (newPokemon == null) {
                 actions.add {
                     showMessage("You lost !")
-                    MessageTextView.setOnClickListener { (activity as MainActivity).Home(); };
+                    MessageTextView.setOnClickListener { (activity as MainActivity).Home(); }
                     greyImage(battlingPokemonImageView)
                 }
             }
@@ -253,7 +245,7 @@ class BattleFragment : Fragment() {
             if (newOpponent == null) {
                 actions.add {
                     showMessage("You won!")
-                    MessageTextView.setOnClickListener { (activity as MainActivity).Home(); };
+                    MessageTextView.setOnClickListener { (activity as MainActivity).Home(); }
                     pokemon1ImageView.setOnClickListener(null)
                     pokemon2ImageView.setOnClickListener(null)
                     pokemon3ImageView.setOnClickListener(null)
@@ -266,7 +258,7 @@ class BattleFragment : Fragment() {
     }
 
     private fun getEfficiency(moveType : NamedAPIResource, pokemonTypes : List<PokemonType>) : Double {
-        var efficiency = 1.0;
+        var efficiency = 1.0
         val moveTypesDamageRelations = allMovesTypesDamageRelations[moveType.name]!!
         for (pokemonType in pokemonTypes) {
             if (moveTypesDamageRelations.no_damage_to.any { it.name == pokemonType.type.name })
@@ -276,17 +268,17 @@ class BattleFragment : Fragment() {
             if (moveTypesDamageRelations.half_damage_to.any { it.name == pokemonType.type.name })
                 efficiency *= 0.5
         }
-        return efficiency;
+        return efficiency
     }
 
     private fun dealDamage(move : Move, attacker : PokemonInfo, defender: PokemonInfo, health: ProgressBar) : Boolean {
         val moveName = firstLetterUpperCase(move.name)
         val random = (1..100).random()
-        if (random > move.accuracy) {
+        if (random <= move.accuracy) {
             doOrAddAction { showMessage("$moveName missed!"); }
             return true
         }
-        val efficiency = getEfficiency(move.type, defender.pokemon.types);
+        val efficiency = getEfficiency(move.type, defender.pokemon.types)
         when {
             efficiency == 0.0 -> doOrAddAction { showMessage("$moveName has no effect..."); }
             efficiency < 1 -> doOrAddAction { showMessage("$moveName is not very effective..."); }
@@ -294,20 +286,17 @@ class BattleFragment : Fragment() {
         }
         if (efficiency == 0.0)
             return true
-        val (att, def) = when (move.damage_class.name) {
-            "physical" -> Pair(
-                attacker.pokemon.stats.find { it.stat.name == "attack" }!!.base_stat,
-                defender.pokemon.stats.find { it.stat.name == "defense" }!!.base_stat
-            )
-            "special" -> Pair(
-                attacker.pokemon.stats.find { it.stat.name == "special-attack" }!!.base_stat,
-                defender.pokemon.stats.find { it.stat.name == "special-defense" }!!.base_stat
-            )
-            else -> Pair(0, 0)
-        }
+
         if (move.power == null)
             move.power = 0
-        defender.hp -= maxOf(((att / 10 + move.power!! - def) * efficiency).toInt(), 1)
+
+        val isCritical = critical()
+        if (isCritical)
+            doOrAddAction { showMessage("A critical hit!"); }
+        val damage = computeDamage(attacker, defender, move, isCritical, efficiency)
+        Toast.makeText(this@BattleFragment.context, "damage: $damage", Toast.LENGTH_LONG).show()
+
+        defender.hp -= maxOf(damage.toInt(), 1)
         defender.hp = maxOf(defender.hp, 0)
         health.progress = defender.hp
         return efficiency != 1.0
@@ -357,8 +346,7 @@ class BattleFragment : Fragment() {
             .into(img!!)
     }
 
-    private fun getTypesDamageRelations()
-    {
+    private fun getTypesDamageRelations() {
         for (typeName in allTypes) {
             val typeCallback: Callback<Type> = pokeAPICallback { response ->
                 val type: Type = response.body()!!
@@ -366,6 +354,41 @@ class BattleFragment : Fragment() {
             }
             service.getTypeByName(typeName).enqueue(typeCallback)
         }
+    }
+
+    private fun critical() : Boolean {
+        val threshold = 1
+        val random = (1..16).random()
+        return random == threshold
+    }
+
+    private fun computeDamage(attacker : PokemonInfo, defender: PokemonInfo, move: Move, critical: Boolean, efficiency: Double) : Number {
+        // calculation based on https://bulbapedia.bulbagarden.net/wiki/Damage
+        val targets = 1
+        val weather = 1
+        val badge = 1
+        val criticalValue = if (critical) 1.5 else 1.0
+        val random = Random.nextInt(85, 101).toDouble() / 100
+        val stab = if (move.type in attacker.pokemon.types.map { t -> t.type }) 1.5 else 1.0
+        val burn = 1
+        val other = 1
+
+        val modifier = targets * weather * badge * criticalValue * random * stab * efficiency * burn * other
+
+        val (att, def) = when (move.damage_class.name) {
+            "physical" -> Pair(
+                attacker.pokemon.stats.find { it.stat.name == "attack" }!!.base_stat,
+                defender.pokemon.stats.find { it.stat.name == "defense" }!!.base_stat
+            )
+            "special" -> Pair(
+                attacker.pokemon.stats.find { it.stat.name == "special-attack" }!!.base_stat,
+                defender.pokemon.stats.find { it.stat.name == "special-defense" }!!.base_stat
+            )
+            else -> Pair(0, 0)
+        }
+
+        val level = 50
+        return (((((2 * level) / 5) + 2 * move.power!! * (att / def)) / 50) + 2) * modifier
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
