@@ -25,7 +25,7 @@ class PokemonSlotAdapter(private val pokemonSlots : List<Pokemon?>,
     override fun getItemCount() = pokemonSlots.size
 
     override fun onBindViewHolder(holder: PokemonSlotViewHolder, position: Int) {
-        var pokemon = pokemonSlots[position]
+        val pokemon = pokemonSlots[position]
         if (pokemon == null) {
             holder.view.tag = position
             holder.view.PokemonSlotImageView.setImageResource(0)
