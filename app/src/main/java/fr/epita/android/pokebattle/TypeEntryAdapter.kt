@@ -6,9 +6,9 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.ImageView
 import com.bumptech.glide.Glide
-import kotlinx.android.synthetic.main.fragment_main.*
+import fr.epita.android.pokebattle.Utils.typeToRDrawable
 
-class TypeEntryAdapter(private var context: Context, private var typesList : List<Int>) : BaseAdapter() {
+class TypeEntryAdapter(private var context: Context, private var typesList : List<String>) : BaseAdapter() {
 
     override fun getCount(): Int {
         return typesList.size
@@ -30,9 +30,12 @@ class TypeEntryAdapter(private var context: Context, private var typesList : Lis
             cvView = inflater.inflate(R.layout.type_entry, null)
         }
         val typeIllustration: ImageView = cvView!!.findViewById(R.id.TypeEntryImageView)
+        typeIllustration.setOnClickListener {
+            (cvView.context as MainActivity).TypeHelp(type)
+        }
 
         Glide.with(context)
-             .load(type)
+             .load(typeToRDrawable(type))
              .into(typeIllustration)
         return cvView
     }

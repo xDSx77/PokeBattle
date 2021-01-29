@@ -21,17 +21,14 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class TypeHelpFragment : Fragment() {
 
-    var doubleDamageToTypes : ArrayList<Int> = ArrayList()
-    var doubleDamageFromTypes : ArrayList<Int> = ArrayList()
-    var halfDamageToTypes : ArrayList<Int> = ArrayList()
-    var halfDamageFromTypes : ArrayList<Int> = ArrayList()
-    var noDamageToTypes : ArrayList<Int> = ArrayList()
-    var noDamageFromTypes : ArrayList<Int> = ArrayList()
+    var doubleDamageToTypes : ArrayList<String> = ArrayList()
+    var doubleDamageFromTypes : ArrayList<String> = ArrayList()
+    var halfDamageToTypes : ArrayList<String> = ArrayList()
+    var halfDamageFromTypes : ArrayList<String> = ArrayList()
+    var noDamageToTypes : ArrayList<String> = ArrayList()
+    var noDamageFromTypes : ArrayList<String> = ArrayList()
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_type_help, container, false)
     }
@@ -46,8 +43,7 @@ class TypeHelpFragment : Fragment() {
             .addConverterFactory(jsonConverter)
             .build()
 
-        val service : PokeAPIInterface = retrofit.create(
-            PokeAPIInterface::class.java)
+        val service : PokeAPIInterface = retrofit.create(PokeAPIInterface::class.java)
 
         val typeCallback : Callback<Type> = object : Callback<Type> {
             override fun onFailure(call: Call<Type>, t: Throwable) {
@@ -90,16 +86,16 @@ class TypeHelpFragment : Fragment() {
     private fun setTypesList(damageRelations : TypeRelations)
     {
         for (doubleDamageToType in damageRelations.double_damage_to)
-            doubleDamageToTypes.add(typeToRDrawable(doubleDamageToType.name))
+            doubleDamageToTypes.add(doubleDamageToType.name)
         for (doubleDamageFromType in damageRelations.double_damage_from)
-            doubleDamageFromTypes.add(typeToRDrawable(doubleDamageFromType.name))
+            doubleDamageFromTypes.add(doubleDamageFromType.name)
         for (halfDamageToType in damageRelations.half_damage_to)
-            halfDamageToTypes.add(typeToRDrawable(halfDamageToType.name))
+            halfDamageToTypes.add(halfDamageToType.name)
         for (halfDamageFromType in damageRelations.half_damage_from)
-            halfDamageFromTypes.add(typeToRDrawable(halfDamageFromType.name))
+            halfDamageFromTypes.add(halfDamageFromType.name)
         for (noDamageToType in damageRelations.no_damage_to)
-            noDamageToTypes.add(typeToRDrawable(noDamageToType.name))
+            noDamageToTypes.add(noDamageToType.name)
         for (noDamageFromType in damageRelations.no_damage_from)
-            noDamageFromTypes.add(typeToRDrawable(noDamageFromType.name))
+            noDamageFromTypes.add(noDamageFromType.name)
     }
 }
