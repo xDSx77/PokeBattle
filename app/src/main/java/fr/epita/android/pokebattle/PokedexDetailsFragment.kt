@@ -31,8 +31,8 @@ class PokedexDetailsFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val id : Int? = arguments!!.getInt("pokemonId")
-        if (id != null) {
+        val id : Int = arguments!!.getInt("pokemonId")
+        if (id != 0) {
             // Use GSON library to create our JSON parser
             val jsonConverter = GsonConverterFactory.create(GsonBuilder().create())
 
