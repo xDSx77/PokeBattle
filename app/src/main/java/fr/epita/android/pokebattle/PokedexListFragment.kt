@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.fragment_pokedex_list.*
 import com.google.gson.GsonBuilder
+import fr.epita.android.pokebattle.Utils.filterPokedexEntriesByGeneration
 import fr.epita.android.pokebattle.webservices.surleweb.api.PokedexEntry
 import fr.epita.android.pokebattle.webservices.surleweb.api.SurLeWebAPIInterface
 import retrofit2.Call
@@ -23,7 +24,7 @@ class PokedexListFragment : Fragment() {
     private lateinit var viewAdapter: RecyclerView.Adapter<*>
     private lateinit var viewManager: RecyclerView.LayoutManager
 
-    var pokedexEntries: ArrayList<PokedexEntry> = ArrayList()
+    private val pokedexEntries: ArrayList<PokedexEntry> = ArrayList()
 
     // Use GSON library to create our JSON parser
     private val jsonConverter: GsonConverterFactory = GsonConverterFactory.create(GsonBuilder().create())
@@ -46,18 +47,15 @@ class PokedexListFragment : Fragment() {
             Log.w("WebServices", "SurLeWeb API call failed" + t.message)
         }
 
-        override fun onResponse(
-            call: Call<List<PokedexEntry>>,
-            response: Response<List<PokedexEntry>>) {
+        override fun onResponse(call: Call<List<PokedexEntry>>, response: Response<List<PokedexEntry>>) {
             Log.w("WebServices", "SurLeWeb API call success")
             if (response.code() == 200) {
                 // We got our data !
                 val pokedexEntriesResponse : List<PokedexEntry> = response.body()!!
+
                 pokedexEntries.clear()
-                for (pokedexEntry in pokedexEntriesResponse) {
-                    if (pokedexEntry.id < 10000)
-                        pokedexEntries.add(pokedexEntry)
-                }
+
+                filterPokedexEntriesByGeneration(pokedexEntriesResponse, pokedexEntries)
 
                 val entryClickListener = View.OnClickListener {
                     val position = it.tag as Int
