@@ -39,7 +39,7 @@
         android:layout_marginTop="50dp"
         android:text="@string/height"
         android:textColor="#000000"
-        android:textSize="20sp"
+        android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/PokemonImageView" />
 
@@ -47,8 +47,8 @@
         android:id="@+id/HeightValueTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:textSize="20sp"
+        android:layout_marginStart="4dp"
+        android:textSize="18sp"
         android:textStyle="italic"
         app:layout_constraintBottom_toBottomOf="@+id/HeightTextView"
         app:layout_constraintStart_toEndOf="@+id/HeightTextView"
@@ -63,7 +63,7 @@
         android:layout_marginTop="8dp"
         android:text="@string/speed"
         android:textColor="#000000"
-        android:textSize="20sp"
+        android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/HeightTextView" />
 
@@ -71,8 +71,8 @@
         android:id="@+id/SpeedValueTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:textSize="20sp"
+        android:layout_marginStart="4dp"
+        android:textSize="18sp"
         android:textStyle="italic"
         app:layout_constraintBottom_toBottomOf="@+id/SpeedTextView"
         app:layout_constraintStart_toEndOf="@+id/SpeedTextView"
@@ -87,7 +87,7 @@
         android:layout_marginTop="8dp"
         android:text="@string/attack"
         android:textColor="#000000"
-        android:textSize="20sp"
+        android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/SpeedTextView" />
 
@@ -95,8 +95,8 @@
         android:id="@+id/AttackValueTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:textSize="20sp"
+        android:layout_marginStart="4dp"
+        android:textSize="18sp"
         android:textStyle="italic"
         app:layout_constraintBottom_toBottomOf="@+id/AttackTextView"
         app:layout_constraintStart_toEndOf="@+id/AttackTextView"
@@ -111,7 +111,7 @@
         android:layout_marginTop="8dp"
         android:text="@string/specialAttack"
         android:textColor="#000000"
-        android:textSize="20sp"
+        android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/AttackTextView" />
 
@@ -119,8 +119,8 @@
         android:id="@+id/SpecialAttackValueTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:textSize="20sp"
+        android:layout_marginStart="4dp"
+        android:textSize="18sp"
         android:textStyle="italic"
         app:layout_constraintBottom_toBottomOf="@+id/SpecialAttackTextView"
         app:layout_constraintStart_toEndOf="@+id/SpecialAttackTextView"
@@ -141,7 +141,7 @@
         android:layout_marginStart="8dp"
         android:text="@string/weight"
         android:textColor="#000000"
-        android:textSize="20sp"
+        android:textSize="18sp"
         app:layout_constraintStart_toStartOf="@+id/Vertical50"
         app:layout_constraintTop_toTopOf="@+id/HeightTextView" />
 
@@ -149,8 +149,8 @@
         android:id="@+id/WeightValueTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:textSize="20sp"
+        android:layout_marginStart="4dp"
+        android:textSize="18sp"
         android:textStyle="italic"
         app:layout_constraintBottom_toBottomOf="@+id/WeightTextView"
         app:layout_constraintStart_toEndOf="@+id/WeightTextView"
@@ -165,7 +165,7 @@
         android:layout_marginTop="8dp"
         android:text="@string/hp"
         android:textColor="#000000"
-        android:textSize="20sp"
+        android:textSize="18sp"
         app:layout_constraintStart_toStartOf="@+id/Vertical50"
         app:layout_constraintTop_toBottomOf="@+id/WeightTextView" />
 
@@ -173,8 +173,8 @@
         android:id="@+id/HPValueTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:textSize="20sp"
+        android:layout_marginStart="4dp"
+        android:textSize="18sp"
         android:textStyle="italic"
         app:layout_constraintBottom_toBottomOf="@+id/HPTextView"
         app:layout_constraintStart_toEndOf="@+id/HPTextView"
@@ -189,7 +189,7 @@
         android:layout_marginTop="8dp"
         android:text="@string/defense"
         android:textColor="#000000"
-        android:textSize="20sp"
+        android:textSize="18sp"
         app:layout_constraintStart_toStartOf="@+id/Vertical50"
         app:layout_constraintTop_toBottomOf="@+id/HPTextView" />
 
@@ -197,8 +197,8 @@
         android:id="@+id/DefenseValueTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:textSize="20sp"
+        android:layout_marginStart="4dp"
+        android:textSize="18sp"
         android:textStyle="italic"
         app:layout_constraintBottom_toBottomOf="@+id/DefenseTextView"
         app:layout_constraintStart_toEndOf="@+id/DefenseTextView"
@@ -214,7 +214,7 @@
         android:layout_marginTop="8dp"
         android:text="@string/specialDefense"
         android:textColor="#000000"
-        android:textSize="20sp"
+        android:textSize="18sp"
         app:layout_constraintStart_toStartOf="@+id/Vertical50"
         app:layout_constraintTop_toBottomOf="@+id/DefenseTextView" />
 
@@ -222,8 +222,8 @@
         android:id="@+id/SpecialDefenseValueTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:textSize="20sp"
+        android:layout_marginStart="4dp"
+        android:textSize="18sp"
         android:textStyle="italic"
         app:layout_constraintBottom_toBottomOf="@+id/SpecialDefenseTextView"
         app:layout_constraintStart_toEndOf="@+id/SpecialDefenseTextView"
