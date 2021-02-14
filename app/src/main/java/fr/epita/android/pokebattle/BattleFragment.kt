@@ -12,6 +12,7 @@ import com.bumptech.glide.Glide
 import fr.epita.android.pokebattle.Utils.firstLetterUpperCase
 import fr.epita.android.pokebattle.Utils.pokeAPICallback
 import fr.epita.android.pokebattle.Utils.typeToRDrawable
+import fr.epita.android.pokebattle.enums.NonVolatileStatusEffect
 import fr.epita.android.pokebattle.webservices.pokeapi.PokeAPIServiceFragment
 import fr.epita.android.pokebattle.webservices.pokeapi.moves.Move
 import fr.epita.android.pokebattle.webservices.pokeapi.moves.MoveCategory
@@ -24,6 +25,7 @@ import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.type.TypeRelation
 import kotlinx.android.synthetic.main.fragment_battle.*
 import retrofit2.Callback
 import java.util.*
+import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.PokemonStat
 import kotlin.math.max
 
 
@@ -32,7 +34,8 @@ class BattleFragment : PokeAPIServiceFragment() {
     data class PokemonInfo(
         var pokemon : Pokemon,
         var moves : List<Move?>,
-        var hp : Int
+        var hp : Int,
+        var currentNonVolatileStatus : NonVolatileStatusEffect?
     )
 
     private var allTypes : MutableList<String> = mutableListOf()
@@ -262,7 +265,7 @@ class BattleFragment : PokeAPIServiceFragment() {
         if (move.power == null)
             move.power = 0
 
-        val isCritical = critical()
+        val isCritical = if (Globals.GENERATION == 1) criticalGen1(attacker.pokemon.stats.find { t -> t.stat.name == "speed" }!!) else critical()
         if (isCritical)
             showMessage("A critical hit!")
         val damage = computeDamage(attacker, defender, move, isCritical, efficiency)
@@ -329,6 +332,13 @@ class BattleFragment : PokeAPIServiceFragment() {
         }
     }
 
+    private fun criticalGen1(stat: PokemonStat): Boolean {
+        // see https://bulbapedia.bulbagarden.net/wiki/Critical_hit in generation 1
+        val threshold = stat.base_stat / 2
+        val random = (0..255).random()
+        return random < threshold
+    }
+
     private fun critical() : Boolean {
         // see https://bulbapedia.bulbagarden.net/wiki/Critical_hit generation 2 onwards
         val threshold = 1
@@ -341,10 +351,10 @@ class BattleFragment : PokeAPIServiceFragment() {
         val targets = 1
         val weather = 1
         val badge = 1
-        val criticalValue = if (critical) 1.5 else 1.0
-        val random = (85..101).random().toDouble() / 100
+        val criticalValue = if (critical && Globals.GENERATION in (2..5)) 2.0 else if (critical && Globals.GENERATION >= 6) 1.5 else 1.0
+        val random = if (Globals.GENERATION in (1..2)) ((217..255).random()/255).toDouble() else (85..101).random().toDouble() / 100
         val stab = if (move.type in attacker.pokemon.types.map { t -> t.type }) 1.5 else 1.0
-        val burn = 1
+        val burn = if (Globals.GENERATION >= 3 && attacker.currentNonVolatileStatus == NonVolatileStatusEffect.BURN && move.damage_class.name == "physical") 0.5 else 1.0
         val other = 1
 
         val modifier = targets * weather * badge * criticalValue * random * stab * efficiency * burn * other
@@ -361,7 +371,7 @@ class BattleFragment : PokeAPIServiceFragment() {
             else -> Pair(0, 0)
         }
 
-        val level = Globals.POKEMON_LEVEL
+        val level = if (Globals.GENERATION == 1 && critical) Globals.POKEMON_LEVEL * 2 else Globals.POKEMON_LEVEL
         return (((((2 * level) / 5) + 2 * move.power!! * (att / def)) / 50) + 2) * modifier
     }
 
@@ -371,24 +381,24 @@ class BattleFragment : PokeAPIServiceFragment() {
             val opponent1Callback : Callback<Pokemon> = pokeAPICallback { response ->
                 val pok = response.body()!!
                 val moves : List<Move?> = getPokemonMoves(pok)
-                opponentPokemon1 = PokemonInfo(pok, moves, pok.stats.find { it.stat.name == "hp" }!!.base_stat)
+                opponentPokemon1 = PokemonInfo(pok, moves, pok.stats.find { it.stat.name == "hp" }!!.base_stat, null)
                 setOpponentPokemon(opponentPokemon1)
                 showMessage("A wild " + opponentPokemonName.text + " has appeared!")
             }
             val opponent2Callback : Callback<Pokemon> = pokeAPICallback { response ->
                 val pok = response.body()!!
                 val moves : List<Move?> = getPokemonMoves(pok)
-                opponentPokemon2 = PokemonInfo(pok, moves, pok.stats.find { it.stat.name == "hp" }!!.base_stat)
+                opponentPokemon2 = PokemonInfo(pok, moves, pok.stats.find { it.stat.name == "hp" }!!.base_stat, null)
             }
             val opponent3Callback : Callback<Pokemon> = pokeAPICallback { response ->
                 val pok = response.body()!!
                 val moves : List<Move?> = getPokemonMoves(pok)
-                opponentPokemon3 = PokemonInfo(pok, moves, pok.stats.find { it.stat.name == "hp" }!!.base_stat)
+                opponentPokemon3 = PokemonInfo(pok, moves, pok.stats.find { it.stat.name == "hp" }!!.base_stat, null)
             }
             val pokemon1Callback : Callback<Pokemon> = pokeAPICallback { response ->
                 val pok = response.body()!!
                 val moves : List<Move?> = getPokemonMoves(pok)
-                pokemon1 = PokemonInfo(pok, moves, pok.stats.find { it.stat.name == "hp" }!!.base_stat)
+                pokemon1 = PokemonInfo(pok, moves, pok.stats.find { it.stat.name == "hp" }!!.base_stat, null)
                 battlingPokemon = pokemon1
                 val battlingSprite =
                     if (pokemon1.pokemon.sprites.back_default.isNullOrBlank())
@@ -417,7 +427,7 @@ class BattleFragment : PokeAPIServiceFragment() {
             val pokemon2Callback : Callback<Pokemon> = pokeAPICallback { response ->
                 val pok = response.body()!!
                 val moves : List<Move?> = getPokemonMoves(pok)
-                pokemon2 = PokemonInfo(pok, moves, pok.stats.find { it.stat.name == "hp" }!!.base_stat)
+                pokemon2 = PokemonInfo(pok, moves, pok.stats.find { it.stat.name == "hp" }!!.base_stat, null)
                 Glide
                     .with(this@BattleFragment)
                     .load(pokemon2.pokemon.sprites.front_default)
@@ -433,7 +443,7 @@ class BattleFragment : PokeAPIServiceFragment() {
             val pokemon3Callback : Callback<Pokemon> = pokeAPICallback { response ->
                 val pok = response.body()!!
                 val moves : List<Move?> = getPokemonMoves(pok)
-                pokemon3 = PokemonInfo(pok, moves, pok.stats.find { it.stat.name == "hp" }!!.base_stat)
+                pokemon3 = PokemonInfo(pok, moves, pok.stats.find { it.stat.name == "hp" }!!.base_stat, null)
                 Glide
                     .with(this@BattleFragment)
                     .load(pokemon3.pokemon.sprites.front_default)
