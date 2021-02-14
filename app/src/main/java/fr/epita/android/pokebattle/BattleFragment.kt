@@ -3,19 +3,16 @@ package fr.epita.android.pokebattle
 import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.ProgressBar
-import android.widget.Toast
-import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
-import com.google.gson.GsonBuilder
 import fr.epita.android.pokebattle.Utils.firstLetterUpperCase
+import fr.epita.android.pokebattle.Utils.pokeAPICallback
 import fr.epita.android.pokebattle.Utils.typeToRDrawable
-import fr.epita.android.pokebattle.webservices.pokeapi.PokeAPIInterface
+import fr.epita.android.pokebattle.webservices.pokeapi.PokeAPIServiceFragment
 import fr.epita.android.pokebattle.webservices.pokeapi.moves.Move
 import fr.epita.android.pokebattle.webservices.pokeapi.moves.MoveCategory
 import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.Pokemon
@@ -25,29 +22,18 @@ import fr.epita.android.pokebattle.webservices.pokeapi.utils.NamedAPIResource
 import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.type.Type
 import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.type.TypeRelations
 import kotlinx.android.synthetic.main.fragment_battle.*
-import retrofit2.Call
 import retrofit2.Callback
-import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import java.util.*
-import kotlin.random.Random
+import kotlin.math.max
 
 
-class BattleFragment : Fragment() {
+class BattleFragment : PokeAPIServiceFragment() {
 
     data class PokemonInfo(
         var pokemon : Pokemon,
         var moves : List<Move?>,
         var hp : Int
     )
-
-    private val jsonConverter = GsonConverterFactory.create(GsonBuilder().create())
-    private val retrofit = Retrofit.Builder()
-        .baseUrl(PokeAPIInterface.Constants.url)
-        .addConverterFactory(jsonConverter)
-        .build()
-    private val service =  retrofit.create(PokeAPIInterface::class.java)
 
     private var allTypes : MutableList<String> = mutableListOf()
     private var allMovesTypesDamageRelations = mutableMapOf<String, TypeRelations>()
@@ -64,20 +50,6 @@ class BattleFragment : Fragment() {
     private lateinit var opponentBattlingPokemon : PokemonInfo
 
     private val actions : Queue<() -> Unit> = LinkedList()
-
-    private fun <T> pokeAPICallback(onResponse : (Response<T>) -> Unit) : Callback<T> {
-        return object : Callback<T> {
-            override fun onFailure(call: Call<T>, t: Throwable) {
-                Log.w("WebServices", "Poke API call failed" + t.message)
-            }
-
-            override fun onResponse(call: Call<T>, response: Response<T>) {
-                Log.w("WebServices", "Poke API call success")
-                if (response.code() == 200)
-                    onResponse(response)
-            }
-        }
-    }
 
     private fun doOrAddAction(action : () -> Unit) {
         if (actions.isEmpty())
@@ -104,7 +76,7 @@ class BattleFragment : Fragment() {
             if (movesCount == 4)
                 break
             if (allDamageMovesList.moves.any { it.name == pokemonMove.move.name }) {
-                service.getMove(pokemonMove.move.name).enqueue(moveCallback)
+                pokeAPIService.getMove(pokemonMove.move.name).enqueue(moveCallback)
                 movesCount++
             }
         }
@@ -294,10 +266,9 @@ class BattleFragment : Fragment() {
         if (isCritical)
             doOrAddAction { showMessage("A critical hit!"); }
         val damage = computeDamage(attacker, defender, move, isCritical, efficiency)
-        Toast.makeText(this@BattleFragment.context, "damage: $damage", Toast.LENGTH_LONG).show()
 
-        defender.hp -= maxOf(damage.toInt(), 1)
-        defender.hp = maxOf(defender.hp, 0)
+        defender.hp -= max(damage.toInt(), 1)
+        defender.hp = max(defender.hp, 0)
         health.progress = defender.hp
         return efficiency != 1.0
     }
@@ -352,11 +323,12 @@ class BattleFragment : Fragment() {
                 val type: Type = response.body()!!
                 allMovesTypesDamageRelations[typeName] = type.damage_relations
             }
-            service.getTypeByName(typeName).enqueue(typeCallback)
+            pokeAPIService.getTypeByName(typeName).enqueue(typeCallback)
         }
     }
 
     private fun critical() : Boolean {
+        // see https://bulbapedia.bulbagarden.net/wiki/Critical_hit generation 2 onwards
         val threshold = 1
         val random = (1..16).random()
         return random == threshold
@@ -368,7 +340,7 @@ class BattleFragment : Fragment() {
         val weather = 1
         val badge = 1
         val criticalValue = if (critical) 1.5 else 1.0
-        val random = Random.nextInt(85, 101).toDouble() / 100
+        val random = (85..101).random().toDouble() / 100
         val stab = if (move.type in attacker.pokemon.types.map { t -> t.type }) 1.5 else 1.0
         val burn = 1
         val other = 1
@@ -387,7 +359,7 @@ class BattleFragment : Fragment() {
             else -> Pair(0, 0)
         }
 
-        val level = 50
+        val level = Globals.POKEMON_LEVEL
         return (((((2 * level) / 5) + 2 * move.power!! * (att / def)) / 50) + 2) * modifier
     }
 
@@ -468,12 +440,12 @@ class BattleFragment : Fragment() {
             }
             val movesCallback : Callback<MoveCategory> = pokeAPICallback { response ->
                 allDamageMovesList = response.body()!!
-                service.getPokemon(it.getInt("opponentPokemon0")).enqueue(opponent1Callback)
-                service.getPokemon(it.getInt("opponentPokemon1")).enqueue(opponent2Callback)
-                service.getPokemon(it.getInt("opponentPokemon2")).enqueue(opponent3Callback)
-                service.getPokemon(it.getInt("pokemon0")).enqueue(pokemon1Callback)
-                service.getPokemon(it.getInt("pokemon1")).enqueue(pokemon2Callback)
-                service.getPokemon(it.getInt("pokemon2")).enqueue(pokemon3Callback)
+                pokeAPIService.getPokemon(it.getInt("opponentPokemon0")).enqueue(opponent1Callback)
+                pokeAPIService.getPokemon(it.getInt("opponentPokemon1")).enqueue(opponent2Callback)
+                pokeAPIService.getPokemon(it.getInt("opponentPokemon2")).enqueue(opponent3Callback)
+                pokeAPIService.getPokemon(it.getInt("pokemon0")).enqueue(pokemon1Callback)
+                pokeAPIService.getPokemon(it.getInt("pokemon1")).enqueue(pokemon2Callback)
+                pokeAPIService.getPokemon(it.getInt("pokemon2")).enqueue(pokemon3Callback)
             }
             val typesCallback : Callback<NamedAPIResourceList> = pokeAPICallback { response ->
                 val types = response.body()!!
@@ -481,8 +453,8 @@ class BattleFragment : Fragment() {
                     allTypes.add(type.name)
                 }
             }
-            service.getAllDamageMoves().enqueue(movesCallback)
-            service.getTypes().enqueue(typesCallback)
+            pokeAPIService.getAllDamageMoves().enqueue(movesCallback)
+            pokeAPIService.getTypes().enqueue(typesCallback)
         }
     }
 
