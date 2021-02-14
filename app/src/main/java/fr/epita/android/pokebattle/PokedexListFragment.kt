@@ -1,90 +1,60 @@
 package fr.epita.android.pokebattle
 
 import android.os.Bundle
-import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.fragment_pokedex_list.*
-import com.google.gson.GsonBuilder
 import fr.epita.android.pokebattle.Utils.filterPokedexEntriesByGeneration
+import fr.epita.android.pokebattle.Utils.surLeWebAPICallback
 import fr.epita.android.pokebattle.webservices.surleweb.api.PokedexEntry
-import fr.epita.android.pokebattle.webservices.surleweb.api.SurLeWebAPIInterface
-import retrofit2.Call
+import fr.epita.android.pokebattle.webservices.surleweb.api.SurLeWebServiceFragment
+import kotlinx.android.synthetic.main.fragment_pokedex_list.*
 import retrofit2.Callback
-import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
-class PokedexListFragment : Fragment() {
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var viewAdapter: RecyclerView.Adapter<*>
-    private lateinit var viewManager: RecyclerView.LayoutManager
+class PokedexListFragment : SurLeWebServiceFragment() {
 
-    private val pokedexEntries: ArrayList<PokedexEntry> = ArrayList()
+    private lateinit var recyclerView : RecyclerView
+    private lateinit var viewAdapter : RecyclerView.Adapter<*>
+    private lateinit var viewManager : RecyclerView.LayoutManager
 
-    // Use GSON library to create our JSON parser
-    private val jsonConverter: GsonConverterFactory = GsonConverterFactory.create(GsonBuilder().create())
+    private val pokedexEntries : ArrayList<PokedexEntry> = ArrayList()
 
-    // Create a Retrofit client object targeting the provided URL
-    // and add a JSON converter (because we are expecting json responses)
-    private val retrofit: Retrofit = Retrofit.Builder()
-        .baseUrl(SurLeWebAPIInterface.Constants.url)
-        .addConverterFactory(jsonConverter)
-        .build()
+    private val pokemonListCallback : Callback<List<PokedexEntry>> =
+        surLeWebAPICallback { response ->
+            val pokedexEntriesResponse : List<PokedexEntry> = response.body()!!
 
-    // Use the client to create a service:
-    // an object implementing the interface to the WebService
-    private val service: SurLeWebAPIInterface = retrofit.create(
-        SurLeWebAPIInterface::class.java)
+            pokedexEntries.clear()
 
-    private val pokemonListCallback: Callback<List<PokedexEntry>> = object : Callback<List<PokedexEntry>> {
-        override fun onFailure(call: Call<List<PokedexEntry>>, t: Throwable) {
-            // Code here what happens if calling the WebService fails
-            Log.w("WebServices", "SurLeWeb API call failed" + t.message)
-        }
+            filterPokedexEntriesByGeneration(pokedexEntriesResponse, pokedexEntries)
 
-        override fun onResponse(call: Call<List<PokedexEntry>>, response: Response<List<PokedexEntry>>) {
-            Log.w("WebServices", "SurLeWeb API call success")
-            if (response.code() == 200) {
-                // We got our data !
-                val pokedexEntriesResponse : List<PokedexEntry> = response.body()!!
+            val entryClickListener = View.OnClickListener {
+                val position = it.tag as Int
+                (activity as MainActivity).PokedexDetails(pokedexEntries[position].id)
+            }
 
-                pokedexEntries.clear()
+            viewManager = LinearLayoutManager(context)
+            viewAdapter = PokedexEntryAdapter(pokedexEntries, entryClickListener)
+            recyclerView = PokedexListView.apply {
+                // use this setting to improve performance if you know that changes
+                // in content do not change the layout size of the RecyclerView
+                setHasFixedSize(true)
 
-                filterPokedexEntriesByGeneration(pokedexEntriesResponse, pokedexEntries)
+                // use a linear layout manager
+                layoutManager = viewManager
 
-                val entryClickListener = View.OnClickListener {
-                    val position = it.tag as Int
-                    (activity as MainActivity).PokedexDetails(pokedexEntries[position].id)
-                }
-
-                viewManager = LinearLayoutManager(context)
-                viewAdapter = PokedexEntryAdapter(pokedexEntries, entryClickListener)
-                recyclerView = PokedexListView.apply {
-                    // use this setting to improve performance if you know that changes
-                    // in content do not change the layout size of the RecyclerView
-                    setHasFixedSize(true)
-
-                    // use a linear layout manager
-                    layoutManager = viewManager
-
-                    // specify an viewAdapter (see also next example)
-                    adapter = viewAdapter
-                }
+                // specify an viewAdapter (see also next example)
+                adapter = viewAdapter
             }
         }
-    }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater : LayoutInflater, container : ViewGroup?, savedInstanceState : Bundle?) : View? {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_pokedex_list, container, false)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        service.pokemonList().enqueue(pokemonListCallback)
+    override fun onViewCreated(view : View, savedInstanceState : Bundle?) {
+        surLeWebService.pokemonList().enqueue(pokemonListCallback)
     }
 }
