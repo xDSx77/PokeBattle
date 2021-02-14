@@ -10,93 +10,91 @@
         android:id="@+id/pokemonSlotImageView"
         android:layout_width="80dp"
         android:layout_height="80dp"
-        android:layout_marginTop="4dp"
+        android:layout_marginBottom="8dp"
         android:background="#f7f1c1"
         android:contentDescription="@string/pokemonSlotImage"
+        app:layout_constraintBottom_toTopOf="@+id/pokemonSlotNameTextView"
         app:layout_constraintEnd_toStartOf="@+id/Vertical33"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/pokemonSlotIdButton"
         app:srcCompat="@android:drawable/screen_background_light_transparent" />
 
     <ImageView
         android:id="@+id/pokemonSlotImageView2"
         android:layout_width="80dp"
         android:layout_height="80dp"
-        android:layout_marginTop="4dp"
         android:background="#f7f1c1"
         android:contentDescription="@string/pokemonSlotImage"
         app:layout_constraintEnd_toStartOf="@+id/Vertical66"
         app:layout_constraintStart_toStartOf="@+id/Vertical33"
-        app:layout_constraintTop_toBottomOf="@+id/pokemonSlotIdButton2"
+        app:layout_constraintTop_toTopOf="@+id/pokemonSlotImageView"
         app:srcCompat="@android:drawable/screen_background_light_transparent" />
 
     <ImageView
         android:id="@+id/pokemonSlotImageView3"
         android:layout_width="80dp"
         android:layout_height="80dp"
-        android:layout_marginTop="4dp"
         android:background="#f7f1c1"
         android:contentDescription="@string/pokemonSlotImage"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/Vertical66"
-        app:layout_constraintTop_toBottomOf="@+id/pokemonSlotIdButton3"
+        app:layout_constraintTop_toTopOf="@+id/pokemonSlotImageView2"
         app:srcCompat="@android:drawable/screen_background_light_transparent" />
 
     <Button
         android:id="@+id/pokemonSlotIdButton"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:layout_marginTop="4dp"
         android:text="1"
-        app:layout_constraintStart_toStartOf="@+id/pokemonSlotImageView"
-        app:layout_constraintTop_toTopOf="@+id/Horizontal70" />
+        app:layout_constraintBottom_toTopOf="@+id/pokemonSlotImageView"
+        app:layout_constraintStart_toStartOf="@+id/pokemonSlotImageView" />
 
     <Button
         android:id="@+id/pokemonSlotIdButton2"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:layout_marginTop="4dp"
         android:text="2"
         app:layout_constraintStart_toStartOf="@+id/pokemonSlotImageView2"
-        app:layout_constraintTop_toTopOf="@+id/Horizontal70" />
+        app:layout_constraintTop_toTopOf="@+id/pokemonSlotIdButton" />
 
     <Button
         android:id="@+id/pokemonSlotIdButton3"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:layout_marginTop="4dp"
         android:text="3"
         app:layout_constraintStart_toStartOf="@+id/pokemonSlotImageView3"
-        app:layout_constraintTop_toTopOf="@+id/Horizontal70" />
+        app:layout_constraintTop_toTopOf="@+id/pokemonSlotIdButton2" />
 
     <TextView
         android:id="@+id/pokemonSlotNameTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textAlignment="center"
         android:textSize="16sp"
-        app:layout_constraintEnd_toStartOf="@+id/Vertical33"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/pokemonSlotImageView"
+        app:layout_constraintBottom_toTopOf="@+id/FightButton"
+        app:layout_constraintEnd_toEndOf="@+id/pokemonSlotImageView"
+        app:layout_constraintStart_toStartOf="@+id/pokemonSlotImageView"
         tools:text="Pokemon Name" />
 
     <TextView
         android:id="@+id/pokemonSlotNameTextView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textAlignment="center"
         android:textSize="16sp"
-        app:layout_constraintEnd_toStartOf="@+id/Vertical66"
-        app:layout_constraintStart_toStartOf="@+id/Vertical33"
-        app:layout_constraintTop_toBottomOf="@+id/pokemonSlotImageView2"
+        app:layout_constraintEnd_toEndOf="@+id/pokemonSlotImageView2"
+        app:layout_constraintStart_toStartOf="@+id/pokemonSlotImageView2"
+        app:layout_constraintTop_toTopOf="@+id/pokemonSlotNameTextView"
         tools:text="Pokemon Name" />
 
     <TextView
         android:id="@+id/pokemonSlotNameTextView3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textAlignment="center"
         android:textSize="16sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/Vertical66"
-        app:layout_constraintTop_toBottomOf="@+id/pokemonSlotImageView3"
+        app:layout_constraintEnd_toEndOf="@+id/pokemonSlotImageView3"
+        app:layout_constraintStart_toStartOf="@+id/pokemonSlotImageView3"
+        app:layout_constraintTop_toTopOf="@+id/pokemonSlotNameTextView2"
         tools:text="Pokemon Name" />
 
     <TextView
@@ -112,10 +110,10 @@
 
     <ImageView
         android:id="@+id/NextOpponentImageView"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_marginTop="16dp"
+        android:layout_width="85dp"
+        android:layout_height="85dp"
         android:contentDescription="@string/pokemonSlotImage"
+        android:visibility="invisible"
         app:layout_constraintEnd_toStartOf="@+id/Vertical40"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/NextOpponentTextView"
@@ -127,6 +125,7 @@
         android:layout_height="56dp"
         android:layout_marginStart="16dp"
         android:contentDescription="@string/typeImage"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="@+id/NextOpponentImageView"
         app:layout_constraintEnd_toStartOf="@+id/Vertical70"
         app:layout_constraintStart_toStartOf="@+id/Vertical40"
@@ -138,6 +137,7 @@
         android:layout_height="56dp"
         android:layout_marginEnd="16dp"
         android:contentDescription="@string/typeImage"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="@+id/NextOpponentType1ImageView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/Vertical70"
@@ -151,8 +151,7 @@
         android:textColor="#000000"
         android:textSize="16sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/Vertical40"
+        app:layout_constraintStart_toStartOf="@+id/NextOpponentType1ImageView"
         app:layout_constraintTop_toTopOf="@+id/NextOpponentImageView"
         tools:text="Pokemon Name" />
 
@@ -160,7 +159,6 @@
         android:id="@+id/PokemonSelectionTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
         android:text="@string/battleLobbyList"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -171,8 +169,7 @@
         android:id="@+id/PokemonList"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="4dp"
+        android:layout_marginBottom="10dp"
         android:fadeScrollbars="false"
         android:scrollbarAlwaysDrawHorizontalTrack="false"
         android:scrollbarAlwaysDrawVerticalTrack="false"
@@ -181,31 +178,29 @@
         app:fastScrollHorizontalTrackDrawable="?android:attr/fastScrollTrackDrawable"
         app:fastScrollVerticalThumbDrawable="?android:attr/fastScrollThumbDrawable"
         app:fastScrollVerticalTrackDrawable="?android:attr/fastScrollTrackDrawable"
-        app:layout_constraintBottom_toTopOf="@+id/SelectedTextView"
+        app:layout_constraintBottom_toTopOf="@+id/Horizontal50"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/PokemonSelectionTextView"
-        app:layout_constraintVertical_bias="1.0">
+        app:layout_constraintTop_toBottomOf="@+id/PokemonSelectionTextView">
 
     </androidx.recyclerview.widget.RecyclerView>
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/Horizontal60"
+        android:id="@+id/Horizontal50"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.6" />
+        app:layout_constraintGuide_percent="0.50" />
 
     <TextView
         android:id="@+id/SelectedTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
-        android:layout_marginBottom="4dp"
         android:text="@string/battleLobbySelected"
         android:textSize="16sp"
-        app:layout_constraintBottom_toTopOf="@+id/Horizontal60"
+        app:layout_constraintBottom_toTopOf="@+id/SelectedPokemonImageView"
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
@@ -214,9 +209,9 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
         android:textSize="16sp"
-        app:layout_constraintBottom_toTopOf="@+id/Horizontal70"
+        app:layout_constraintBottom_toBottomOf="@+id/SelectedPokemonImageView"
         app:layout_constraintStart_toEndOf="@+id/SelectedPokemonImageView"
-        app:layout_constraintTop_toTopOf="@+id/Horizontal60"
+        app:layout_constraintTop_toTopOf="@+id/SelectedPokemonImageView"
         tools:text="Pokemon Name" />
 
     <androidx.constraintlayout.widget.Guideline
@@ -253,10 +248,10 @@
         android:layout_height="64dp"
         android:layout_marginStart="16dp"
         android:contentDescription="@string/typeImage"
-        app:layout_constraintBottom_toTopOf="@+id/Horizontal70"
+        android:visibility="invisible"
         app:layout_constraintEnd_toStartOf="@+id/Vertical70"
         app:layout_constraintStart_toStartOf="@+id/Vertical40"
-        app:layout_constraintTop_toTopOf="@+id/Horizontal60"
+        app:layout_constraintTop_toTopOf="@+id/SelectedPokemonImageView"
         app:srcCompat="@android:drawable/screen_background_light_transparent" />
 
     <ImageView
@@ -265,29 +260,22 @@
         android:layout_height="64dp"
         android:layout_marginEnd="16dp"
         android:contentDescription="@string/typeImage"
-        app:layout_constraintBottom_toTopOf="@+id/Horizontal70"
+        android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/Vertical70"
-        app:layout_constraintTop_toTopOf="@+id/Horizontal60"
+        app:layout_constraintTop_toTopOf="@+id/SelectedPokemonType1ImageView"
         app:srcCompat="@android:drawable/screen_background_light_transparent" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/Horizontal70"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.7" />
 
     <Button
         android:id="@+id/FightButton"
         android:layout_width="wrap_content"
         android:layout_height="50dp"
-        android:layout_marginTop="4dp"
+        android:layout_marginBottom="4dp"
         android:text="@string/fightButton"
         android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/pokemonSlotNameTextView2" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <ImageView
         android:id="@+id/SelectedPokemonImageView"
@@ -296,9 +284,9 @@
         android:layout_marginStart="8dp"
         android:contentDescription="@string/pokemonSlotImage"
         android:src="@android:drawable/screen_background_light_transparent"
-        app:layout_constraintBottom_toTopOf="@+id/Horizontal70"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/pokemonSlotIdButton"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/Horizontal60"
         app:srcCompat="@android:drawable/screen_background_light_transparent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
