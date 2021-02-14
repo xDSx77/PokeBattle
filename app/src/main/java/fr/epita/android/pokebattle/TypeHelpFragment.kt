@@ -2,65 +2,43 @@ package fr.epita.android.pokebattle
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.google.gson.GsonBuilder
+import fr.epita.android.pokebattle.Utils.pokeAPICallback
 import fr.epita.android.pokebattle.Utils.typeToRDrawable
-import fr.epita.android.pokebattle.webservices.pokeapi.PokeAPIInterface
+import fr.epita.android.pokebattle.webservices.pokeapi.PokeAPIServiceFragment
 import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.type.Type
 import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.type.TypeRelations
 import kotlinx.android.synthetic.main.fragment_type_help.*
-import retrofit2.Call
 import retrofit2.Callback
-import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
-class TypeHelpFragment : Fragment() {
+class TypeHelpFragment : PokeAPIServiceFragment() {
 
-    var doubleDamageToTypes : ArrayList<String> = ArrayList()
-    var doubleDamageFromTypes : ArrayList<String> = ArrayList()
-    var halfDamageToTypes : ArrayList<String> = ArrayList()
-    var halfDamageFromTypes : ArrayList<String> = ArrayList()
-    var noDamageToTypes : ArrayList<String> = ArrayList()
-    var noDamageFromTypes : ArrayList<String> = ArrayList()
+    private val doubleDamageToTypes : ArrayList<String> = ArrayList()
+    private val doubleDamageFromTypes : ArrayList<String> = ArrayList()
+    private val halfDamageToTypes : ArrayList<String> = ArrayList()
+    private val halfDamageFromTypes : ArrayList<String> = ArrayList()
+    private val noDamageToTypes : ArrayList<String> = ArrayList()
+    private val noDamageFromTypes : ArrayList<String> = ArrayList()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater : LayoutInflater, container : ViewGroup?, savedInstanceState : Bundle?) : View? {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_type_help, container, false)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view : View, savedInstanceState : Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val typeName : String = arguments!!.getString("typeName") ?: return
-        val jsonConverter = GsonConverterFactory.create(GsonBuilder().create())
 
-        val retrofit = Retrofit.Builder()
-            .baseUrl(PokeAPIInterface.Constants.url)
-            .addConverterFactory(jsonConverter)
-            .build()
-
-        val service : PokeAPIInterface = retrofit.create(PokeAPIInterface::class.java)
-
-        val typeCallback : Callback<Type> = object : Callback<Type> {
-            override fun onFailure(call: Call<Type>, t: Throwable) {
-                Log.w("WebServices", "PokeAPI call failed " + t.message)
-            }
-
-            override fun onResponse(call: Call<Type>, response: Response<Type>) {
-                Log.w("WebServices", "PokeAPI call success")
-                if (response.code() != 200) return
-                val type : Type = response.body()!!
-                TypeImageView.setImageResource(typeToRDrawable(typeName))
-                clearTypesList()
-                setTypesList(type.damage_relations)
-                setGridView()
-            }
+        val typeCallback : Callback<Type> = pokeAPICallback { response ->
+            val type : Type = response.body()!!
+            TypeImageView.setImageResource(typeToRDrawable(typeName))
+            clearTypesList()
+            setTypesList(type.damage_relations)
+            setGridView()
         }
-        service.getTypeByName(typeName).enqueue(typeCallback)
+        pokeAPIService.getTypeByName(typeName).enqueue(typeCallback)
     }
 
     private fun clearTypesList() {
@@ -83,8 +61,7 @@ class TypeHelpFragment : Fragment() {
         NoDamageFromGridView.adapter = TypeEntryAdapter(activity as Context, noDamageFromTypes)
     }
 
-    private fun setTypesList(damageRelations : TypeRelations)
-    {
+    private fun setTypesList(damageRelations : TypeRelations) {
         for (doubleDamageToType in damageRelations.double_damage_to)
             doubleDamageToTypes.add(doubleDamageToType.name)
         for (doubleDamageFromType in damageRelations.double_damage_from)
