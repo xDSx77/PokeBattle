@@ -408,8 +408,10 @@ class BattleFragment : PokeAPIServiceFragment() {
                 battlingPokemonName.text = firstLetterUpperCase(pok.name)
                 pokemon1Name.text = battlingPokemonName.text
                 pokemon1ImageView.setOnClickListener {
-                    if (battlingPokemon != pokemon1)
+                    if (battlingPokemon != pokemon1) {
                         setBattlingPokemon(pokemon1)
+                        opponentTurn{}
+                    }
                 }
             }
             val pokemon2Callback : Callback<Pokemon> = pokeAPICallback { response ->
@@ -422,8 +424,10 @@ class BattleFragment : PokeAPIServiceFragment() {
                     .into(pokemon2ImageView)
                 pokemon2Name.text = firstLetterUpperCase(pok.name)
                 pokemon2ImageView.setOnClickListener {
-                    if (battlingPokemon != pokemon2)
+                    if (battlingPokemon != pokemon2) {
                         setBattlingPokemon(pokemon2)
+                        opponentTurn{}
+                    }
                 }
             }
             val pokemon3Callback : Callback<Pokemon> = pokeAPICallback { response ->
@@ -436,8 +440,10 @@ class BattleFragment : PokeAPIServiceFragment() {
                     .into(pokemon3ImageView)
                 pokemon3Name.text = firstLetterUpperCase(pok.name)
                 pokemon3ImageView.setOnClickListener {
-                    if (battlingPokemon != pokemon3)
+                    if (battlingPokemon != pokemon3) {
                         setBattlingPokemon(pokemon3)
+                        opponentTurn{}
+                    }
                 }
             }
             val movesCallback : Callback<MoveCategory> = pokeAPICallback { response ->
