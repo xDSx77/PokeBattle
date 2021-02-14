@@ -264,7 +264,7 @@ class BattleFragment : PokeAPIServiceFragment() {
 
         val isCritical = critical()
         if (isCritical)
-            doOrAddAction { showMessage("A critical hit!"); }
+            showMessage("A critical hit!")
         val damage = computeDamage(attacker, defender, move, isCritical, efficiency)
 
         defender.hp -= max(damage.toInt(), 1)
