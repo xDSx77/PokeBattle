@@ -3,6 +3,7 @@ package fr.epita.android.pokebattle
 import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -43,8 +44,8 @@ class BattleFragment : PokeAPIServiceFragment() {
 
     private var allTypes : MutableList<String> = mutableListOf()
     private var allMovesTypesDamageRelations = mutableMapOf<String, TypeRelations>()
+    private var allDamageMovesList : MutableList<NamedAPIResource> = mutableListOf()
 
-    private lateinit var allDamageMovesList : MoveCategory
     private lateinit var opponentPokemon1 : PokemonInfo
     private lateinit var opponentPokemon2 : PokemonInfo
     private lateinit var opponentPokemon3 : PokemonInfo
@@ -81,7 +82,7 @@ class BattleFragment : PokeAPIServiceFragment() {
         for (pokemonMove in allPokemonMoves){
             if (movesCount == 4)
                 break
-            if (allDamageMovesList.moves.any { it.name == pokemonMove.move.name }) {
+            if (allDamageMovesList.any { it.name == pokemonMove.move.name }) {
                 pokeAPIService.getMove(pokemonMove.move.name).enqueue(moveCallback)
                 movesCount++
             }
@@ -483,7 +484,20 @@ class BattleFragment : PokeAPIServiceFragment() {
                 }
             }
             val movesCallback : Callback<MoveCategory> = pokeAPICallback { response ->
-                allDamageMovesList = response.body()!!
+                val allDamageMovesGenerationsList : MoveCategory = response.body()!!
+                allDamageMovesList.addAll(allDamageMovesGenerationsList.moves.filterIndexed { index, _ ->
+                    index <= when (Globals.GENERATION) {
+                        1 -> 71
+                        2 -> 98
+                        3 -> 134
+                        4 -> 188
+                        5 -> 231
+                        6 -> 249
+                        7 -> 330
+                        8 -> 827
+                        else -> { Log.e("PokeBattle", "Unknown Generation"); 999}
+                    }
+                })
                 pokeAPIService.getPokemon(it.getInt("opponentPokemon0")).enqueue(opponent1Callback)
                 pokeAPIService.getPokemon(it.getInt("opponentPokemon1")).enqueue(opponent2Callback)
                 pokeAPIService.getPokemon(it.getInt("opponentPokemon2")).enqueue(opponent3Callback)
