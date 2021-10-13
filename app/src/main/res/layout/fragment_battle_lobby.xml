@@ -178,9 +178,8 @@
         app:fastScrollHorizontalTrackDrawable="?android:attr/fastScrollTrackDrawable"
         app:fastScrollVerticalThumbDrawable="?android:attr/fastScrollThumbDrawable"
         app:fastScrollVerticalTrackDrawable="?android:attr/fastScrollTrackDrawable"
-        app:layout_constraintBottom_toTopOf="@+id/Horizontal50"
+        app:layout_constraintBottom_toTopOf="@+id/SelectedTextView"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/PokemonSelectionTextView">
 
