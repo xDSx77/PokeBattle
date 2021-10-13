@@ -9,7 +9,7 @@ import java.util.*
 
 object Utils {
     fun firstLetterUpperCase(string : String) : String {
-        return string.substring(0, 1).toUpperCase(Locale.getDefault())
+        return string.substring(0, 1).uppercase()
             .plus(string.substring(1))
     }
 
