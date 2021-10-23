@@ -46,6 +46,8 @@ class BattleFragment : PokeAPIServiceFragment() {
     private var allMovesTypesDamageRelations = mutableMapOf<String, TypeRelations>()
     private var allDamageMovesList : MutableList<NamedAPIResource> = mutableListOf()
 
+    private var playerTurn = true
+
     private lateinit var opponentPokemon1 : PokemonInfo
     private lateinit var opponentPokemon2 : PokemonInfo
     private lateinit var opponentPokemon3 : PokemonInfo
@@ -91,6 +93,7 @@ class BattleFragment : PokeAPIServiceFragment() {
     }
 
     private fun opponentTurn(next : () -> Unit = { nextAction(); }) {
+        playerTurn = false
         var moveId = 1
         var maxDamage = 0
         for (i in 0 until opponentBattlingPokemon.moves.count()) {
@@ -166,17 +169,20 @@ class BattleFragment : PokeAPIServiceFragment() {
         battlingPokemonHealth.max = pok.pokemon.stats.find { it.stat.name == "hp" }!!.base_stat
         battlingPokemonHealth.progress = pok.hp
         battlingPokemonName.text = firstLetterUpperCase(pok.pokemon.name)
-        setBattlingMove(1, pok.moves[0]!!)
-        setBattlingMove(2, pok.moves[1]!!)
-        setBattlingMove(3, pok.moves[2]!!)
-        setBattlingMove(4, pok.moves[3]!!)
+        setBattlingMove(1, if (pok.moves.isNotEmpty()) pok.moves[0] else null)
+        setBattlingMove(2, if (pok.moves.size > 1) pok.moves[1] else null)
+        setBattlingMove(3, if (pok.moves.size > 2) pok.moves[2] else null)
+        setBattlingMove(4, if (pok.moves.size > 3) pok.moves[3] else null)
     }
 
     private fun playerTurn(moveId : Int) {
         if (opponentBattlingPokemon.pokemon.stats.find { it.stat.name == "speed" }!!.base_stat > battlingPokemon.pokemon.stats.find { it.stat.name == "speed" }!!.base_stat)
-            opponentTurn { attack(moveId, battlingPokemon, opponentBattlingPokemon, opponentPokemonHealth) }
+            opponentTurn {
+                playerTurn = true
+                attack(moveId, battlingPokemon, opponentBattlingPokemon, opponentPokemonHealth) { playerTurn = true }
+            }
         else
-            attack(moveId, battlingPokemon, opponentBattlingPokemon, opponentPokemonHealth) { opponentTurn() }
+            attack(moveId, battlingPokemon, opponentBattlingPokemon, opponentPokemonHealth) { opponentTurn { playerTurn = true } }
     }
 
     private fun greyImage(img : ImageView) {
@@ -280,6 +286,7 @@ class BattleFragment : PokeAPIServiceFragment() {
     }
 
     private fun attack(moveId : Int, attacker : PokemonInfo, defender : PokemonInfo, health : ProgressBar, next : () -> Unit = { nextAction(); }) {
+        playerTurn = false
         val move = attacker.moves[moveId - 1]!!
         val attackerName = firstLetterUpperCase(attacker.pokemon.name)
         val moveName = firstLetterUpperCase(move.name)
@@ -410,6 +417,7 @@ class BattleFragment : PokeAPIServiceFragment() {
                 val moves : List<Move?> = getPokemonMoves(pok)
                 opponentPokemon1 = PokemonInfo(pok, moves, pok.stats.find { it.stat.name == "hp" }!!.base_stat, 0, 0, null)
                 setOpponentPokemon(opponentPokemon1)
+                opponentPokemonLevel.text = Globals.POKEMON_LEVEL.toString()
                 showMessage("A wild " + opponentPokemonName.text + " has appeared!")
             }
             val opponent2Callback : Callback<Pokemon> = pokeAPICallback { response ->
@@ -426,28 +434,17 @@ class BattleFragment : PokeAPIServiceFragment() {
                 val pok = response.body()!!
                 val moves : List<Move?> = getPokemonMoves(pok)
                 pokemon1 = PokemonInfo(pok, moves, pok.stats.find { it.stat.name == "hp" }!!.base_stat, 0, 0, null)
-                battlingPokemon = pokemon1
-                val battlingSprite =
-                    if (pokemon1.pokemon.sprites.back_default.isNullOrBlank())
-                        pokemon1.pokemon.sprites.front_default
-                    else
-                        pokemon1.pokemon.sprites.back_default
-                Glide
-                    .with(this@BattleFragment)
-                    .load(battlingSprite)
-                    .into(battlingPokemonImageView)
+                setBattlingPokemon(pokemon1)
+                battlingPokemonLevel.text = Globals.POKEMON_LEVEL.toString()
                 Glide
                     .with(this@BattleFragment)
                     .load(pokemon1.pokemon.sprites.front_default)
                     .into(pokemon1ImageView)
-                battlingPokemonHealth.max = pokemon1.hp
-                battlingPokemonHealth.progress = pokemon1.hp
-                battlingPokemonName.text = firstLetterUpperCase(pok.name)
                 pokemon1Name.text = battlingPokemonName.text
                 pokemon1ImageView.setOnClickListener {
-                    if (battlingPokemon != pokemon1) {
+                    if (battlingPokemon != pokemon1 && playerTurn) {
                         setBattlingPokemon(pokemon1)
-                        opponentTurn{}
+                        opponentTurn { playerTurn = true }
                     }
                 }
             }
@@ -461,9 +458,9 @@ class BattleFragment : PokeAPIServiceFragment() {
                     .into(pokemon2ImageView)
                 pokemon2Name.text = firstLetterUpperCase(pok.name)
                 pokemon2ImageView.setOnClickListener {
-                    if (battlingPokemon != pokemon2) {
+                    if (battlingPokemon != pokemon2 && playerTurn) {
                         setBattlingPokemon(pokemon2)
-                        opponentTurn{}
+                        opponentTurn { playerTurn = true }
                     }
                 }
             }
@@ -477,9 +474,9 @@ class BattleFragment : PokeAPIServiceFragment() {
                     .into(pokemon3ImageView)
                 pokemon3Name.text = firstLetterUpperCase(pok.name)
                 pokemon3ImageView.setOnClickListener {
-                    if (battlingPokemon != pokemon3) {
+                    if (battlingPokemon != pokemon3 && playerTurn) {
                         setBattlingPokemon(pokemon3)
-                        opponentTurn{}
+                        opponentTurn { playerTurn = true }
                     }
                 }
             }
@@ -520,10 +517,10 @@ class BattleFragment : PokeAPIServiceFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         MessageTextView.setOnClickListener {
-            setBattlingMove(1, if (battlingPokemon.moves.isNotEmpty()) battlingPokemon.moves[0] else null)
-            setBattlingMove(2, if (battlingPokemon.moves.size > 1) battlingPokemon.moves[1] else null)
-            setBattlingMove(3, if (battlingPokemon.moves.size > 2) battlingPokemon.moves[2] else null)
-            setBattlingMove(4, if (battlingPokemon.moves.size > 3) battlingPokemon.moves[3] else null)
+            setBattlingMove(1, if (this::battlingPokemon.isInitialized && battlingPokemon.moves.isNotEmpty()) battlingPokemon.moves[0] else null)
+            setBattlingMove(2, if (this::battlingPokemon.isInitialized && battlingPokemon.moves.size > 1) battlingPokemon.moves[1] else null)
+            setBattlingMove(3, if (this::battlingPokemon.isInitialized && battlingPokemon.moves.size > 2) battlingPokemon.moves[2] else null)
+            setBattlingMove(4, if (this::battlingPokemon.isInitialized && battlingPokemon.moves.size > 3) battlingPokemon.moves[3] else null)
             nextAction()
             if (allMovesTypesDamageRelations.isEmpty())
                 getTypesDamageRelations()
