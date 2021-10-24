@@ -115,6 +115,8 @@
             android:id="@+id/MessageTextView"
             android:layout_width="0dp"
             android:layout_height="0dp"
+            android:gravity="center"
+            android:textAlignment="center"
             android:textSize="18sp"
             android:textStyle="bold"
             android:visibility="invisible"

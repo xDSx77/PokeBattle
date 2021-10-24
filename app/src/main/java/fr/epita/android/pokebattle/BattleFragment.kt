@@ -18,15 +18,15 @@ import fr.epita.android.pokebattle.webservices.pokeapi.PokeAPIServiceFragment
 import fr.epita.android.pokebattle.webservices.pokeapi.moves.Move
 import fr.epita.android.pokebattle.webservices.pokeapi.moves.MoveCategory
 import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.Pokemon
+import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.PokemonStat
 import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.PokemonType
-import fr.epita.android.pokebattle.webservices.pokeapi.resourcelist.NamedAPIResourceList
-import fr.epita.android.pokebattle.webservices.pokeapi.utils.NamedAPIResource
 import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.type.Type
 import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.type.TypeRelations
+import fr.epita.android.pokebattle.webservices.pokeapi.resourcelist.NamedAPIResourceList
+import fr.epita.android.pokebattle.webservices.pokeapi.utils.NamedAPIResource
 import kotlinx.android.synthetic.main.fragment_battle.*
 import retrofit2.Callback
 import java.util.*
-import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.PokemonStat
 import kotlin.math.max
 import kotlin.math.min
 
@@ -527,9 +527,17 @@ class BattleFragment : PokeAPIServiceFragment() {
             MessageTextView.setOnClickListener { nextAction() }
         }
         move1.setOnClickListener { playerTurn(1); }
+        move1Type.setOnClickListener { playerTurn(1); }
+        move1Description.setOnClickListener { playerTurn(1); }
         move2.setOnClickListener { playerTurn(2); }
+        move2Type.setOnClickListener { playerTurn(2); }
+        move2Description.setOnClickListener { playerTurn(2); }
         move3.setOnClickListener { playerTurn(3); }
+        move3Type.setOnClickListener { playerTurn(3); }
+        move3Description.setOnClickListener { playerTurn(3); }
         move4.setOnClickListener { playerTurn(4); }
+        move4Type.setOnClickListener { playerTurn(4); }
+        move4Description.setOnClickListener { playerTurn(4); }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
