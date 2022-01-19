@@ -8,11 +8,14 @@ import retrofit2.Response
 import java.util.*
 
 object Utils {
+
+    @JvmStatic
     fun firstLetterUpperCase(string : String) : String {
         return string.substring(0, 1).uppercase()
             .plus(string.substring(1))
     }
 
+    @JvmStatic
     fun typeToRDrawable(typeName : String) : Int {
         when (typeName) {
             "bug" -> return R.drawable.bug
@@ -36,7 +39,8 @@ object Utils {
             else -> return -1
         }
     }
-    
+
+    @JvmStatic
     fun filterPokedexEntriesByGeneration(pokedexEntries : List<PokedexEntry>, filteredPokedexEntries : ArrayList<PokedexEntry>) {
         when (Globals.GENERATION) {
             1 -> filteredPokedexEntries.addAll(pokedexEntries.filter { p -> p.id < 152 })
@@ -51,6 +55,7 @@ object Utils {
         }
     }
 
+    @JvmStatic
     fun <T> pokeAPICallback(onResponse : (Response<T>) -> Unit) : Callback<T> {
         return object : Callback<T> {
             override fun onFailure(call: Call<T>, t: Throwable) {
@@ -65,6 +70,7 @@ object Utils {
         }
     }
 
+    @JvmStatic
     fun <T> surLeWebAPICallback(onResponse : (Response<T>) -> Unit) : Callback<T> {
         return object : Callback<T> {
             override fun onFailure(call: Call<T>, t: Throwable) {

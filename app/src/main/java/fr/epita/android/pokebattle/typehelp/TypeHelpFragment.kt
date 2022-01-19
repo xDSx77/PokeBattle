@@ -1,12 +1,12 @@
-package fr.epita.android.pokebattle
+package fr.epita.android.pokebattle.typehelp
 
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import fr.epita.android.pokebattle.Utils.pokeAPICallback
-import fr.epita.android.pokebattle.Utils.typeToRDrawable
+import fr.epita.android.pokebattle.R
+import fr.epita.android.pokebattle.Utils
 import fr.epita.android.pokebattle.webservices.pokeapi.PokeAPIServiceFragment
 import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.type.Type
 import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.type.TypeRelations
@@ -29,11 +29,11 @@ class TypeHelpFragment : PokeAPIServiceFragment() {
 
     override fun onViewCreated(view : View, savedInstanceState : Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val typeName : String = arguments!!.getString("typeName") ?: return
+        val typeName : String = requireArguments().getString("typeName") ?: return
 
-        val typeCallback : Callback<Type> = pokeAPICallback { response ->
+        val typeCallback : Callback<Type> = Utils.pokeAPICallback { response ->
             val type : Type = response.body()!!
-            TypeImageView.setImageResource(typeToRDrawable(typeName))
+            TypeImageView.setImageResource(Utils.typeToRDrawable(typeName))
             clearTypesList()
             setTypesList(type.damage_relations)
             setGridView()

@@ -1,4 +1,4 @@
-package fr.epita.android.pokebattle
+package fr.epita.android.pokebattle.typehelp
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -6,7 +6,9 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.ImageView
 import com.bumptech.glide.Glide
-import fr.epita.android.pokebattle.Utils.typeToRDrawable
+import fr.epita.android.pokebattle.R
+import fr.epita.android.pokebattle.Utils
+import fr.epita.android.pokebattle.main.MainActivity
 
 class TypeEntryAdapter(private var context: Context, private var typesList : List<String>) : BaseAdapter() {
 
@@ -35,7 +37,7 @@ class TypeEntryAdapter(private var context: Context, private var typesList : Lis
         }
 
         Glide.with(context)
-             .load(typeToRDrawable(type))
+             .load(Utils.typeToRDrawable(type))
              .into(typeIllustration)
         return cvView
     }

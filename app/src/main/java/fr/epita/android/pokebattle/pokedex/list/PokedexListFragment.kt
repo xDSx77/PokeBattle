@@ -1,4 +1,4 @@
-package fr.epita.android.pokebattle
+package fr.epita.android.pokebattle.pokedex.list
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -6,8 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import fr.epita.android.pokebattle.Utils.filterPokedexEntriesByGeneration
-import fr.epita.android.pokebattle.Utils.surLeWebAPICallback
+import fr.epita.android.pokebattle.pokedex.PokedexEntryAdapter
+import fr.epita.android.pokebattle.R
+import fr.epita.android.pokebattle.Utils
+import fr.epita.android.pokebattle.main.MainActivity
 import fr.epita.android.pokebattle.webservices.surleweb.api.PokedexEntry
 import fr.epita.android.pokebattle.webservices.surleweb.api.SurLeWebServiceFragment
 import kotlinx.android.synthetic.main.fragment_pokedex_list.*
@@ -22,12 +24,12 @@ class PokedexListFragment : SurLeWebServiceFragment() {
     private val pokedexEntries : ArrayList<PokedexEntry> = ArrayList()
 
     private val pokemonListCallback : Callback<List<PokedexEntry>> =
-        surLeWebAPICallback { response ->
+        Utils.surLeWebAPICallback { response ->
             val pokedexEntriesResponse : List<PokedexEntry> = response.body()!!
 
             pokedexEntries.clear()
 
-            filterPokedexEntriesByGeneration(pokedexEntriesResponse, pokedexEntries)
+            Utils.filterPokedexEntriesByGeneration(pokedexEntriesResponse, pokedexEntries)
 
             val entryClickListener = View.OnClickListener {
                 val position = it.tag as Int

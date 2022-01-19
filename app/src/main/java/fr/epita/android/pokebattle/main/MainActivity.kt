@@ -1,7 +1,13 @@
-package fr.epita.android.pokebattle
+package fr.epita.android.pokebattle.main
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import fr.epita.android.pokebattle.*
+import fr.epita.android.pokebattle.battle.BattleFragment
+import fr.epita.android.pokebattle.battle.lobby.BattleLobbyFragment
+import fr.epita.android.pokebattle.pokedex.details.PokedexDetailsFragment
+import fr.epita.android.pokebattle.pokedex.list.PokedexListFragment
+import fr.epita.android.pokebattle.typehelp.TypeHelpFragment
 import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.Pokemon
 
 class MainActivity : AppCompatActivity() {

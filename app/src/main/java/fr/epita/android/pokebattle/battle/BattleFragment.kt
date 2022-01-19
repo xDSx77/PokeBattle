@@ -1,4 +1,4 @@
-package fr.epita.android.pokebattle
+package fr.epita.android.pokebattle.battle
 
 import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
@@ -10,10 +10,11 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.ProgressBar
 import com.bumptech.glide.Glide
-import fr.epita.android.pokebattle.Utils.firstLetterUpperCase
-import fr.epita.android.pokebattle.Utils.pokeAPICallback
-import fr.epita.android.pokebattle.Utils.typeToRDrawable
+import fr.epita.android.pokebattle.Globals
+import fr.epita.android.pokebattle.R
+import fr.epita.android.pokebattle.Utils
 import fr.epita.android.pokebattle.enums.NonVolatileStatusEffect
+import fr.epita.android.pokebattle.main.MainActivity
 import fr.epita.android.pokebattle.webservices.pokeapi.PokeAPIServiceFragment
 import fr.epita.android.pokebattle.webservices.pokeapi.moves.Move
 import fr.epita.android.pokebattle.webservices.pokeapi.moves.MoveCategory
@@ -78,7 +79,7 @@ class BattleFragment : PokeAPIServiceFragment() {
         val moves = mutableListOf<Move?>()
         val allPokemonMoves = pok.moves.shuffled()
         var movesCount = 0
-        val moveCallback : Callback<Move> = pokeAPICallback { response ->
+        val moveCallback : Callback<Move> = Utils.pokeAPICallback { response ->
             moves.add(response.body()!!)
         }
         for (pokemonMove in allPokemonMoves){
@@ -152,7 +153,7 @@ class BattleFragment : PokeAPIServiceFragment() {
             .into(opponentPokemonImageView)
         opponentPokemonHealth.max = pok.pokemon.stats.find { it.stat.name == "hp" }!!.base_stat
         opponentPokemonHealth.progress = pok.hp
-        opponentPokemonName.text = firstLetterUpperCase(pok.pokemon.name)
+        opponentPokemonName.text = Utils.firstLetterUpperCase(pok.pokemon.name)
     }
 
     private fun setBattlingPokemon(pok : PokemonInfo) {
@@ -168,7 +169,7 @@ class BattleFragment : PokeAPIServiceFragment() {
             .into(battlingPokemonImageView)
         battlingPokemonHealth.max = pok.pokemon.stats.find { it.stat.name == "hp" }!!.base_stat
         battlingPokemonHealth.progress = pok.hp
-        battlingPokemonName.text = firstLetterUpperCase(pok.pokemon.name)
+        battlingPokemonName.text = Utils.firstLetterUpperCase(pok.pokemon.name)
         setBattlingMove(1, if (pok.moves.isNotEmpty()) pok.moves[0] else null)
         setBattlingMove(2, if (pok.moves.size > 1) pok.moves[1] else null)
         setBattlingMove(3, if (pok.moves.size > 2) pok.moves[2] else null)
@@ -194,7 +195,7 @@ class BattleFragment : PokeAPIServiceFragment() {
     }
 
     private fun handlePokemonKO(pok : PokemonInfo) {
-        val pokemonName = firstLetterUpperCase(pok.pokemon.name)
+        val pokemonName = Utils.firstLetterUpperCase(pok.pokemon.name)
         doOrAddAction { showMessage("$pokemonName fainted!"); }
         if (pok == battlingPokemon) {
             when (pok) {
@@ -257,7 +258,7 @@ class BattleFragment : PokeAPIServiceFragment() {
     }
 
     private fun dealDamage(move : Move, attacker : PokemonInfo, defender: PokemonInfo, health: ProgressBar) : Boolean {
-        val moveName = firstLetterUpperCase(move.name)
+        val moveName = Utils.firstLetterUpperCase(move.name)
         if (!moveHit(move, attacker, defender)) {
             doOrAddAction { showMessage("$moveName missed!"); }
             return true
@@ -288,8 +289,8 @@ class BattleFragment : PokeAPIServiceFragment() {
     private fun attack(moveId : Int, attacker : PokemonInfo, defender : PokemonInfo, health : ProgressBar, next : () -> Unit = { nextAction(); }) {
         playerTurn = false
         val move = attacker.moves[moveId - 1]!!
-        val attackerName = firstLetterUpperCase(attacker.pokemon.name)
-        val moveName = firstLetterUpperCase(move.name)
+        val attackerName = Utils.firstLetterUpperCase(attacker.pokemon.name)
+        val moveName = Utils.firstLetterUpperCase(move.name)
         doOrAddAction { showMessage("$attackerName used $moveName") }
         actions.add {
             val message = dealDamage(move, attacker, defender, health)
@@ -318,7 +319,7 @@ class BattleFragment : PokeAPIServiceFragment() {
             else -> Pair(null, null)
         }
         if (move != null) {
-            txt!!.text = firstLetterUpperCase(move.name)
+            txt!!.text = Utils.firstLetterUpperCase(move.name)
             when (id) {
                 1 -> move1Description.text = move.flavor_text_entries[2].flavor_text
                 2 -> move2Description.text = move.flavor_text_entries[2].flavor_text
@@ -327,14 +328,14 @@ class BattleFragment : PokeAPIServiceFragment() {
             }
             Glide
                 .with(this@BattleFragment)
-                .load(typeToRDrawable(move.type.name))
+                .load(Utils.typeToRDrawable(move.type.name))
                 .into(img!!)
         }
     }
 
     private fun getTypesDamageRelations() {
         for (typeName in allTypes) {
-            val typeCallback: Callback<Type> = pokeAPICallback { response ->
+            val typeCallback: Callback<Type> = Utils.pokeAPICallback { response ->
                 val type: Type = response.body()!!
                 allMovesTypesDamageRelations[typeName] = type.damage_relations
             }
@@ -412,7 +413,7 @@ class BattleFragment : PokeAPIServiceFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            val opponent1Callback : Callback<Pokemon> = pokeAPICallback { response ->
+            val opponent1Callback : Callback<Pokemon> = Utils.pokeAPICallback { response ->
                 val pok = response.body()!!
                 val moves : List<Move?> = getPokemonMoves(pok)
                 opponentPokemon1 = PokemonInfo(pok, moves, pok.stats.find { it.stat.name == "hp" }!!.base_stat, 0, 0, null)
@@ -420,17 +421,17 @@ class BattleFragment : PokeAPIServiceFragment() {
                 opponentPokemonLevel.text = Globals.POKEMON_LEVEL.toString()
                 showMessage("A wild " + opponentPokemonName.text + " has appeared!")
             }
-            val opponent2Callback : Callback<Pokemon> = pokeAPICallback { response ->
+            val opponent2Callback : Callback<Pokemon> = Utils.pokeAPICallback { response ->
                 val pok = response.body()!!
                 val moves : List<Move?> = getPokemonMoves(pok)
                 opponentPokemon2 = PokemonInfo(pok, moves, pok.stats.find { it.stat.name == "hp" }!!.base_stat, 0, 0, null)
             }
-            val opponent3Callback : Callback<Pokemon> = pokeAPICallback { response ->
+            val opponent3Callback : Callback<Pokemon> = Utils.pokeAPICallback { response ->
                 val pok = response.body()!!
                 val moves : List<Move?> = getPokemonMoves(pok)
                 opponentPokemon3 = PokemonInfo(pok, moves, pok.stats.find { it.stat.name == "hp" }!!.base_stat, 0, 0, null)
             }
-            val pokemon1Callback : Callback<Pokemon> = pokeAPICallback { response ->
+            val pokemon1Callback : Callback<Pokemon> = Utils.pokeAPICallback { response ->
                 val pok = response.body()!!
                 val moves : List<Move?> = getPokemonMoves(pok)
                 pokemon1 = PokemonInfo(pok, moves, pok.stats.find { it.stat.name == "hp" }!!.base_stat, 0, 0, null)
@@ -448,7 +449,7 @@ class BattleFragment : PokeAPIServiceFragment() {
                     }
                 }
             }
-            val pokemon2Callback : Callback<Pokemon> = pokeAPICallback { response ->
+            val pokemon2Callback : Callback<Pokemon> = Utils.pokeAPICallback { response ->
                 val pok = response.body()!!
                 val moves : List<Move?> = getPokemonMoves(pok)
                 pokemon2 = PokemonInfo(pok, moves, pok.stats.find { it.stat.name == "hp" }!!.base_stat, 0, 0, null)
@@ -456,7 +457,7 @@ class BattleFragment : PokeAPIServiceFragment() {
                     .with(this@BattleFragment)
                     .load(pokemon2.pokemon.sprites.front_default)
                     .into(pokemon2ImageView)
-                pokemon2Name.text = firstLetterUpperCase(pok.name)
+                pokemon2Name.text = Utils.firstLetterUpperCase(pok.name)
                 pokemon2ImageView.setOnClickListener {
                     if (battlingPokemon != pokemon2 && playerTurn) {
                         setBattlingPokemon(pokemon2)
@@ -464,7 +465,7 @@ class BattleFragment : PokeAPIServiceFragment() {
                     }
                 }
             }
-            val pokemon3Callback : Callback<Pokemon> = pokeAPICallback { response ->
+            val pokemon3Callback : Callback<Pokemon> = Utils.pokeAPICallback { response ->
                 val pok = response.body()!!
                 val moves : List<Move?> = getPokemonMoves(pok)
                 pokemon3 = PokemonInfo(pok, moves, pok.stats.find { it.stat.name == "hp" }!!.base_stat, 0, 0, null)
@@ -472,7 +473,7 @@ class BattleFragment : PokeAPIServiceFragment() {
                     .with(this@BattleFragment)
                     .load(pokemon3.pokemon.sprites.front_default)
                     .into(pokemon3ImageView)
-                pokemon3Name.text = firstLetterUpperCase(pok.name)
+                pokemon3Name.text = Utils.firstLetterUpperCase(pok.name)
                 pokemon3ImageView.setOnClickListener {
                     if (battlingPokemon != pokemon3 && playerTurn) {
                         setBattlingPokemon(pokemon3)
@@ -480,7 +481,7 @@ class BattleFragment : PokeAPIServiceFragment() {
                     }
                 }
             }
-            val movesCallback : Callback<MoveCategory> = pokeAPICallback { response ->
+            val movesCallback : Callback<MoveCategory> = Utils.pokeAPICallback { response ->
                 val allDamageMovesGenerationsList : MoveCategory = response.body()!!
                 allDamageMovesList.addAll(allDamageMovesGenerationsList.moves.filterIndexed { index, _ ->
                     index <= when (Globals.GENERATION) {
@@ -502,7 +503,7 @@ class BattleFragment : PokeAPIServiceFragment() {
                 pokeAPIService.getPokemon(it.getInt("pokemon1")).enqueue(pokemon2Callback)
                 pokeAPIService.getPokemon(it.getInt("pokemon2")).enqueue(pokemon3Callback)
             }
-            val typesCallback : Callback<NamedAPIResourceList> = pokeAPICallback { response ->
+            val typesCallback : Callback<NamedAPIResourceList> = Utils.pokeAPICallback { response ->
                 val types = response.body()!!
                 for (type in types.results){
                     allTypes.add(type.name)

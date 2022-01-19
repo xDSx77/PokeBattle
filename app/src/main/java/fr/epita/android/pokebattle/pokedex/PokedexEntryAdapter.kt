@@ -1,12 +1,13 @@
-package fr.epita.android.pokebattle
+package fr.epita.android.pokebattle.pokedex
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import fr.epita.android.pokebattle.Utils.firstLetterUpperCase
-import fr.epita.android.pokebattle.Utils.typeToRDrawable
+import fr.epita.android.pokebattle.R
+import fr.epita.android.pokebattle.Utils
+import fr.epita.android.pokebattle.main.MainActivity
 import fr.epita.android.pokebattle.webservices.surleweb.api.PokedexEntry
 import kotlinx.android.synthetic.main.pokedex_entry.view.*
 
@@ -41,10 +42,10 @@ class PokedexEntryAdapter(private val pokedexEntries : List<PokedexEntry>,
             .with(holder.view)
             .load(pokedexEntry.sprite)
             .into(holder.view.pokemon_imageView)
-        holder.view.name_textView.text = firstLetterUpperCase(pokedexEntry.name)
+        holder.view.name_textView.text = Utils.firstLetterUpperCase(pokedexEntry.name)
 
         if (pokedexEntry.types.size == 1) {
-            holder.view.type1_imageView.setImageResource(typeToRDrawable(pokedexEntry.types[0].name))
+            holder.view.type1_imageView.setImageResource(Utils.typeToRDrawable(pokedexEntry.types[0].name))
             holder.view.type1_imageView.setOnClickListener {
                 (holder.view.context as MainActivity).TypeHelp(pokedexEntry.types[0].name)
             }
@@ -52,11 +53,11 @@ class PokedexEntryAdapter(private val pokedexEntries : List<PokedexEntry>,
         }
         else if (pokedexEntry.types.size == 2) {
             holder.view.type2_imageView.visibility = View.VISIBLE
-            holder.view.type1_imageView.setImageResource(typeToRDrawable(pokedexEntry.types[1].name))
+            holder.view.type1_imageView.setImageResource(Utils.typeToRDrawable(pokedexEntry.types[1].name))
             holder.view.type1_imageView.setOnClickListener {
                 (holder.view.context as MainActivity).TypeHelp(pokedexEntry.types[1].name)
             }
-            holder.view.type2_imageView.setImageResource(typeToRDrawable(pokedexEntry.types[0].name))
+            holder.view.type2_imageView.setImageResource(Utils.typeToRDrawable(pokedexEntry.types[0].name))
             holder.view.type2_imageView.setOnClickListener {
                 (holder.view.context as MainActivity).TypeHelp(pokedexEntry.types[0].name)
             }

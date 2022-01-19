@@ -1,4 +1,4 @@
-package fr.epita.android.pokebattle
+package fr.epita.android.pokebattle.battle.lobby
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,11 +8,10 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
-import fr.epita.android.pokebattle.Utils.filterPokedexEntriesByGeneration
-import fr.epita.android.pokebattle.Utils.firstLetterUpperCase
-import fr.epita.android.pokebattle.Utils.pokeAPICallback
-import fr.epita.android.pokebattle.Utils.surLeWebAPICallback
-import fr.epita.android.pokebattle.Utils.typeToRDrawable
+import fr.epita.android.pokebattle.R
+import fr.epita.android.pokebattle.Utils
+import fr.epita.android.pokebattle.main.MainActivity
+import fr.epita.android.pokebattle.pokedex.PokedexEntryAdapter
 import fr.epita.android.pokebattle.webservices.pokeapi.PokeAPIInterface
 import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.Pokemon
 import fr.epita.android.pokebattle.webservices.surleweb.api.PokedexEntry
@@ -33,12 +32,12 @@ class BattleLobbyFragment : SurLeWebServiceFragment() {
     private val pokedexEntries : ArrayList<PokedexEntry> = ArrayList()
 
     private val pokemonListCallback : Callback<List<PokedexEntry>> =
-        surLeWebAPICallback { surLeWebAPIResponse ->
+        Utils.surLeWebAPICallback { surLeWebAPIResponse ->
             val pokedexEntriesResponse : List<PokedexEntry> = surLeWebAPIResponse.body()!!
 
             pokedexEntries.clear()
 
-            filterPokedexEntriesByGeneration(pokedexEntriesResponse, pokedexEntries)
+            Utils.filterPokedexEntriesByGeneration(pokedexEntriesResponse, pokedexEntries)
 
             val opponentEntry = pokedexEntries.random()
 
@@ -51,10 +50,10 @@ class BattleLobbyFragment : SurLeWebServiceFragment() {
                 pokeAPIRetrofit.create(PokeAPIInterface::class.java)
 
             val opponentPokemonCallback : Callback<Pokemon> =
-                pokeAPICallback { pokeAPIResponse ->
+                Utils.pokeAPICallback { pokeAPIResponse ->
                     opponentPokemon = pokeAPIResponse.body()!!
 
-                    NextOpponentNameTextView.text = firstLetterUpperCase(opponentEntry.name)
+                    NextOpponentNameTextView.text = Utils.firstLetterUpperCase(opponentEntry.name)
                     NextOpponentImageView.visibility = View.VISIBLE
                     Glide
                         .with(this@BattleLobbyFragment)
@@ -64,18 +63,18 @@ class BattleLobbyFragment : SurLeWebServiceFragment() {
                     if (opponentEntry.types.size == 1) {
                         NextOpponentType1ImageView.visibility = View.VISIBLE
                         NextOpponentType2ImageView.visibility = View.INVISIBLE
-                        NextOpponentType1ImageView.setImageResource(typeToRDrawable(opponentEntry.types[0].name))
+                        NextOpponentType1ImageView.setImageResource(Utils.typeToRDrawable(opponentEntry.types[0].name))
                         NextOpponentType1ImageView.setOnClickListener {
                             (activity as MainActivity).TypeHelp(opponentEntry.types[0].name)
                         }
                     } else if (opponentEntry.types.size == 2) {
                         NextOpponentType1ImageView.visibility = View.VISIBLE
                         NextOpponentType2ImageView.visibility = View.VISIBLE
-                        NextOpponentType1ImageView.setImageResource(typeToRDrawable(opponentEntry.types[1].name))
+                        NextOpponentType1ImageView.setImageResource(Utils.typeToRDrawable(opponentEntry.types[1].name))
                         NextOpponentType1ImageView.setOnClickListener {
                             (activity as MainActivity).TypeHelp(opponentEntry.types[1].name)
                         }
-                        NextOpponentType2ImageView.setImageResource(typeToRDrawable(opponentEntry.types[0].name))
+                        NextOpponentType2ImageView.setImageResource(Utils.typeToRDrawable(opponentEntry.types[0].name))
                         NextOpponentType2ImageView.setOnClickListener {
                             (activity as MainActivity).TypeHelp(opponentEntry.types[0].name)
                         }
@@ -88,7 +87,7 @@ class BattleLobbyFragment : SurLeWebServiceFragment() {
 
                 val entry = pokedexEntries[position]
 
-                SelectedPokemonTextView.text = firstLetterUpperCase(entry.name)
+                SelectedPokemonTextView.text = Utils.firstLetterUpperCase(entry.name)
                 SelectedPokemonImageView.visibility = View.VISIBLE
                 Glide
                     .with(this@BattleLobbyFragment)
@@ -97,25 +96,25 @@ class BattleLobbyFragment : SurLeWebServiceFragment() {
                 if (entry.types.size == 1) {
                     SelectedPokemonType1ImageView.visibility = View.VISIBLE
                     SelectedPokemonType2ImageView.visibility = View.INVISIBLE
-                    SelectedPokemonType1ImageView.setImageResource(typeToRDrawable(entry.types[0].name))
+                    SelectedPokemonType1ImageView.setImageResource(Utils.typeToRDrawable(entry.types[0].name))
                     SelectedPokemonType1ImageView.setOnClickListener {
                         (activity as MainActivity).TypeHelp(entry.types[0].name)
                     }
                 } else if (entry.types.size == 2) {
                     SelectedPokemonType1ImageView.visibility = View.VISIBLE
                     SelectedPokemonType2ImageView.visibility = View.VISIBLE
-                    SelectedPokemonType1ImageView.setImageResource(typeToRDrawable(entry.types[1].name))
+                    SelectedPokemonType1ImageView.setImageResource(Utils.typeToRDrawable(entry.types[1].name))
                     SelectedPokemonType1ImageView.setOnClickListener {
                         (activity as MainActivity).TypeHelp(entry.types[1].name)
                     }
-                    SelectedPokemonType2ImageView.setImageResource(typeToRDrawable(entry.types[0].name))
+                    SelectedPokemonType2ImageView.setImageResource(Utils.typeToRDrawable(entry.types[0].name))
                     SelectedPokemonType2ImageView.setOnClickListener {
                         (activity as MainActivity).TypeHelp(entry.types[0].name)
                     }
                 }
 
                 val selectedPokemonCallback : Callback<Pokemon> =
-                    pokeAPICallback { response ->
+                    Utils.pokeAPICallback { response ->
                         selectedPokemon = response.body()!!
                     }
 
@@ -133,7 +132,7 @@ class BattleLobbyFragment : SurLeWebServiceFragment() {
         return View.OnClickListener {
             if (selectedPokemon != null) {
                 pokemonSlots[slotIndex] = selectedPokemon
-                pokemonSlotNameTextView.text = firstLetterUpperCase(selectedPokemon!!.name)
+                pokemonSlotNameTextView.text = Utils.firstLetterUpperCase(selectedPokemon!!.name)
                 Glide
                     .with(this@BattleLobbyFragment)
                     .load(selectedPokemon!!.sprites.front_default)

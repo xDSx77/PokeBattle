@@ -1,4 +1,4 @@
-package fr.epita.android.pokebattle
+package fr.epita.android.pokebattle.pokedex.details
 
 import android.os.Bundle
 import android.util.Log
@@ -6,9 +6,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.bumptech.glide.Glide
-import fr.epita.android.pokebattle.Utils.firstLetterUpperCase
-import fr.epita.android.pokebattle.Utils.pokeAPICallback
-import fr.epita.android.pokebattle.Utils.typeToRDrawable
+import fr.epita.android.pokebattle.R
+import fr.epita.android.pokebattle.Utils
+import fr.epita.android.pokebattle.main.MainActivity
 import fr.epita.android.pokebattle.webservices.pokeapi.PokeAPIServiceFragment
 import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.Pokemon
 import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.PokemonStat
@@ -23,15 +23,15 @@ class PokedexDetailsFragment : PokeAPIServiceFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val id : Int = arguments!!.getInt("pokemonId")
+        val id : Int = requireArguments().getInt("pokemonId")
         if (id != 0) {
-            val pokemonCallback : Callback<Pokemon> = pokeAPICallback { response ->
+            val pokemonCallback : Callback<Pokemon> = Utils.pokeAPICallback { response ->
                 val pokemon : Pokemon = response.body()!!
                 Glide
                     .with(this@PokedexDetailsFragment)
                     .load(pokemon.sprites.front_default)
                     .into(PokemonImageView)
-                PokemonNameTextView.text = firstLetterUpperCase(pokemon.name)
+                PokemonNameTextView.text = Utils.firstLetterUpperCase(pokemon.name)
                 HeightValueTextView.text = pokemon.height.toString()
                 WeightValueTextView.text = pokemon.weight.toString()
                 for (stat : PokemonStat in pokemon.stats) {
@@ -48,12 +48,12 @@ class PokedexDetailsFragment : PokeAPIServiceFragment() {
                     2 -> {
                         TypeImageView.visibility = View.INVISIBLE
                         Type1ImageView.visibility = View.VISIBLE
-                        Type1ImageView.setImageResource(typeToRDrawable(pokemon.types[0].type.name))
+                        Type1ImageView.setImageResource(Utils.typeToRDrawable(pokemon.types[0].type.name))
                         Type1ImageView.setOnClickListener {
                             (view.context as MainActivity).TypeHelp(pokemon.types[0].type.name)
                         }
                         Type2ImageView.visibility = View.VISIBLE
-                        Type2ImageView.setImageResource(typeToRDrawable(pokemon.types[1].type.name))
+                        Type2ImageView.setImageResource(Utils.typeToRDrawable(pokemon.types[1].type.name))
                         Type2ImageView.setOnClickListener {
                             (view.context as MainActivity).TypeHelp(pokemon.types[1].type.name)
                         }
@@ -62,7 +62,7 @@ class PokedexDetailsFragment : PokeAPIServiceFragment() {
                         Type1ImageView.visibility = View.INVISIBLE
                         Type2ImageView.visibility = View.INVISIBLE
                         TypeImageView.visibility = View.VISIBLE
-                        TypeImageView.setImageResource(typeToRDrawable(pokemon.types[0].type.name))
+                        TypeImageView.setImageResource(Utils.typeToRDrawable(pokemon.types[0].type.name))
                         TypeImageView.setOnClickListener {
                             (view.context as MainActivity).TypeHelp(pokemon.types[0].type.name)
                         }
