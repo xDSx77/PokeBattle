@@ -1,11 +1,13 @@
 package fr.epita.android.pokebattle
 
+import fr.epita.android.pokebattle.enums.Generation
+
 object Globals {
 
     // A set of global variables used across PokeBattle
 
     // The targeted generation
-    const val GENERATION = 1
+    val GENERATION = Generation.ONE
 
     // The pokémon level during battle
     const val POKEMON_LEVEL = 50
