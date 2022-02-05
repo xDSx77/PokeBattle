@@ -5,17 +5,18 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import fr.epita.android.pokebattle.R
 import fr.epita.android.pokebattle.Utils
 import fr.epita.android.pokebattle.main.MainActivity
-import fr.epita.android.pokebattle.webservices.pokeapi.PokeAPIServiceFragment
+import fr.epita.android.pokebattle.webservices.pokeapi.PokeAPIServiceHelper.pokeAPIService
 import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.Pokemon
 import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.PokemonStat
 import kotlinx.android.synthetic.main.fragment_pokedex_details.*
 import retrofit2.Callback
 
-class PokedexDetailsFragment : PokeAPIServiceFragment() {
+class PokedexDetailsFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) : View? {
         // Inflate the layout for this fragment

@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import fr.epita.android.pokebattle.R
@@ -15,15 +16,13 @@ import fr.epita.android.pokebattle.pokedex.PokedexEntryAdapter
 import fr.epita.android.pokebattle.webservices.pokeapi.PokeAPIInterface
 import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.Pokemon
 import fr.epita.android.pokebattle.webservices.surleweb.api.PokedexEntry
-import fr.epita.android.pokebattle.webservices.surleweb.api.SurLeWebServiceFragment
+import fr.epita.android.pokebattle.webservices.surleweb.api.SurLeWebServiceHelper.surLeWebService
 import kotlinx.android.synthetic.main.fragment_battle_lobby.*
 import retrofit2.Callback
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import java.util.*
-import kotlin.collections.ArrayList
 
-class BattleLobbyFragment : SurLeWebServiceFragment() {
+class BattleLobbyFragment : Fragment() {
 
     private lateinit var opponentPokemon : Pokemon
     private var selectedPokemon : Pokemon? = null

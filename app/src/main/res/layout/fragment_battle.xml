@@ -127,6 +127,16 @@
             tools:text="Message"
             tools:visibility="invisible" />
 
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/movesGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:constraint_referenced_ids="move1,move1Type,move1Description,move2,move2Type,move2Description,move3,move3Type,move3Description,move4,move4Type,move4Description"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"></androidx.constraintlayout.widget.Group>
+
         <TextView
             android:id="@+id/move1"
             android:layout_width="wrap_content"

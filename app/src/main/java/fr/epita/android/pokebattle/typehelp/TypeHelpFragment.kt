@@ -5,15 +5,16 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import fr.epita.android.pokebattle.R
 import fr.epita.android.pokebattle.Utils
-import fr.epita.android.pokebattle.webservices.pokeapi.PokeAPIServiceFragment
+import fr.epita.android.pokebattle.webservices.pokeapi.PokeAPIServiceHelper.pokeAPIService
 import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.type.Type
 import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.type.TypeRelations
 import kotlinx.android.synthetic.main.fragment_type_help.*
 import retrofit2.Callback
 
-class TypeHelpFragment : PokeAPIServiceFragment() {
+class TypeHelpFragment : Fragment() {
 
     private val doubleDamageToTypes : ArrayList<String> = ArrayList()
     private val doubleDamageFromTypes : ArrayList<String> = ArrayList()

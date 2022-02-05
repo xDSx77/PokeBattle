@@ -1,6 +1,9 @@
 package fr.epita.android.pokebattle
 
+import android.graphics.ColorMatrix
+import android.graphics.ColorMatrixColorFilter
 import android.util.Log
+import android.widget.ImageView
 import fr.epita.android.pokebattle.webservices.surleweb.api.PokedexEntry
 import retrofit2.Call
 import retrofit2.Callback
@@ -38,6 +41,15 @@ object Utils {
             "water" -> return R.drawable.water
             else -> return -1
         }
+    }
+
+    @JvmStatic
+    fun greyImage(img : ImageView) {
+        val matrix = ColorMatrix()
+        matrix.setSaturation(0f) // 0 means grayscale
+        val cf = ColorMatrixColorFilter(matrix)
+        img.colorFilter = cf
+        img.imageAlpha = 128 // 128 = 0.5
     }
 
     @JvmStatic

@@ -1,38 +1,28 @@
 package fr.epita.android.pokebattle.battle
 
-import android.graphics.ColorMatrix
-import android.graphics.ColorMatrixColorFilter
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.ProgressBar
+import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import fr.epita.android.pokebattle.Globals
 import fr.epita.android.pokebattle.R
 import fr.epita.android.pokebattle.Utils
 import fr.epita.android.pokebattle.main.MainActivity
-import fr.epita.android.pokebattle.webservices.pokeapi.PokeAPIServiceFragment
+import fr.epita.android.pokebattle.webservices.pokeapi.PokeAPIServiceHelper.pokeAPIService
 import fr.epita.android.pokebattle.webservices.pokeapi.moves.Move
 import fr.epita.android.pokebattle.webservices.pokeapi.moves.MoveCategory
 import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.Pokemon
-import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.PokemonType
-import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.type.Type
-import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.type.TypeRelations
 import fr.epita.android.pokebattle.webservices.pokeapi.resourcelist.NamedAPIResourceList
-import fr.epita.android.pokebattle.webservices.pokeapi.utils.NamedAPIResource
 import kotlinx.android.synthetic.main.fragment_battle.*
 import retrofit2.Callback
 import java.util.*
 import kotlin.math.max
 
 
-class BattleFragment : PokeAPIServiceFragment() {
-
-    private var allTypes : MutableList<String> = mutableListOf()
-    private var allMovesTypesDamageRelations = mutableMapOf<String, TypeRelations>()
-    private var allDamageMovesList : MutableList<NamedAPIResource> = mutableListOf()
+class BattleFragment : Fragment() {
 
     private var playerTurn = true
 
@@ -72,7 +62,7 @@ class BattleFragment : PokeAPIServiceFragment() {
         for (pokemonMove in allPokemonMoves){
             if (movesCount == 4)
                 break
-            if (allDamageMovesList.any { it.name == pokemonMove.move.name }) {
+            if (DamageHelper.allDamageMovesList.any { it.name == pokemonMove.move.name }) {
                 pokeAPIService.getMove(pokemonMove.move.name).enqueue(moveCallback)
                 movesCount++
             }
@@ -86,7 +76,7 @@ class BattleFragment : PokeAPIServiceFragment() {
         var maxDamage = 0
         for (i in 0 until opponentBattlingPokemon.moves.count()) {
             val move = opponentBattlingPokemon.moves[i]!!
-            val efficiency = getEfficiency(move.type, battlingPokemon.pokemon.types)
+            val efficiency = DamageHelper.getEfficiency(move.type, battlingPokemon.pokemon.types)
             if (move.power == null)
                 move.power = 0
 
@@ -99,37 +89,15 @@ class BattleFragment : PokeAPIServiceFragment() {
         attack(moveId, opponentBattlingPokemon, battlingPokemon, battlingPokemonHealth, next)
     }
 
-    private fun showMessage(m : String) {
-        MessageTextView.text = m
+    private fun showMessage(message : String) {
+        MessageTextView.text = message
         MessageTextView.visibility = View.VISIBLE
-        move1.visibility = View.INVISIBLE
-        move1Type.visibility = View.INVISIBLE
-        move1Description.visibility = View.INVISIBLE
-        move2.visibility = View.INVISIBLE
-        move2Type.visibility = View.INVISIBLE
-        move2Description.visibility = View.INVISIBLE
-        move3.visibility = View.INVISIBLE
-        move3Type.visibility = View.INVISIBLE
-        move3Description.visibility = View.INVISIBLE
-        move4.visibility = View.INVISIBLE
-        move4Type.visibility = View.INVISIBLE
-        move4Description.visibility = View.INVISIBLE
+        movesGroup.visibility = View.INVISIBLE
     }
 
     private fun showMoves() {
         MessageTextView.visibility = View.INVISIBLE
-        move1.visibility = View.VISIBLE
-        move1Type.visibility = View.VISIBLE
-        move1Description.visibility = View.VISIBLE
-        move2.visibility = View.VISIBLE
-        move2Type.visibility = View.VISIBLE
-        move2Description.visibility = View.VISIBLE
-        move3.visibility = View.VISIBLE
-        move3Type.visibility = View.VISIBLE
-        move3Description.visibility = View.VISIBLE
-        move4.visibility = View.VISIBLE
-        move4Type.visibility = View.VISIBLE
-        move4Description.visibility = View.VISIBLE
+        movesGroup.visibility = View.VISIBLE
     }
 
     private fun setOpponentPokemon(pok : PokemonInfo) {
@@ -173,29 +141,21 @@ class BattleFragment : PokeAPIServiceFragment() {
             attack(moveId, battlingPokemon, opponentBattlingPokemon, opponentPokemonHealth) { opponentTurn { playerTurn = true } }
     }
 
-    private fun greyImage(img : ImageView) {
-        val matrix = ColorMatrix()
-        matrix.setSaturation(0f) // 0 means grayscale
-        val cf = ColorMatrixColorFilter(matrix)
-        img.colorFilter = cf
-        img.imageAlpha = 128 // 128 = 0.5
-    }
-
     private fun handlePokemonKO(pok : PokemonInfo) {
         val pokemonName = Utils.firstLetterUpperCase(pok.pokemon.name)
         doOrAddAction { showMessage("$pokemonName fainted!"); }
         if (pok == battlingPokemon) {
             when (pok) {
                 pokemon1 -> {
-                    greyImage(pokemon1ImageView)
+                    Utils.greyImage(pokemon1ImageView)
                     pokemon1ImageView.setOnClickListener(null)
                 }
                 pokemon2 -> {
-                    greyImage(pokemon2ImageView)
+                    Utils.greyImage(pokemon2ImageView)
                     pokemon2ImageView.setOnClickListener(null)
                 }
                 pokemon3 -> {
-                    greyImage(pokemon3ImageView)
+                    Utils.greyImage(pokemon3ImageView)
                     pokemon3ImageView.setOnClickListener(null)
                 }
             }
@@ -206,7 +166,7 @@ class BattleFragment : PokeAPIServiceFragment() {
                 actions.add {
                     showMessage("You lost !")
                     MessageTextView.setOnClickListener { (activity as MainActivity).Home(); }
-                    greyImage(battlingPokemonImageView)
+                    Utils.greyImage(battlingPokemonImageView)
                 }
             }
             else
@@ -222,26 +182,12 @@ class BattleFragment : PokeAPIServiceFragment() {
                     pokemon1ImageView.setOnClickListener(null)
                     pokemon2ImageView.setOnClickListener(null)
                     pokemon3ImageView.setOnClickListener(null)
-                    greyImage(opponentPokemonImageView)
+                    Utils.greyImage(opponentPokemonImageView)
                 }
             }
             else
                 setOpponentPokemon(newOpponent)
         }
-    }
-
-    private fun getEfficiency(moveType : NamedAPIResource, pokemonTypes : List<PokemonType>) : Double {
-        var efficiency = 1.0
-        val moveTypesDamageRelations = allMovesTypesDamageRelations[moveType.name]!!
-        for (pokemonType in pokemonTypes) {
-            if (moveTypesDamageRelations.no_damage_to.any { it.name == pokemonType.type.name })
-                efficiency *= 0.0
-            if (moveTypesDamageRelations.double_damage_to.any { it.name == pokemonType.type.name })
-                efficiency *= 2.0
-            if (moveTypesDamageRelations.half_damage_to.any { it.name == pokemonType.type.name })
-                efficiency *= 0.5
-        }
-        return efficiency
     }
 
     private fun dealDamage(move : Move, attacker : PokemonInfo, defender: PokemonInfo, health: ProgressBar) : Boolean {
@@ -250,7 +196,7 @@ class BattleFragment : PokeAPIServiceFragment() {
             doOrAddAction { showMessage("$moveName missed!"); }
             return true
         }
-        val efficiency = getEfficiency(move.type, defender.pokemon.types)
+        val efficiency = DamageHelper.getEfficiency(move.type, defender.pokemon.types)
         when {
             efficiency == 0.0 -> doOrAddAction { showMessage("$moveName has no effect..."); }
             efficiency < 1 -> doOrAddAction { showMessage("$moveName is not very effective..."); }
@@ -317,16 +263,6 @@ class BattleFragment : PokeAPIServiceFragment() {
                 .with(this@BattleFragment)
                 .load(Utils.typeToRDrawable(move.type.name))
                 .into(img!!)
-        }
-    }
-
-    private fun getTypesDamageRelations() {
-        for (typeName in allTypes) {
-            val typeCallback: Callback<Type> = Utils.pokeAPICallback { response ->
-                val type: Type = response.body()!!
-                allMovesTypesDamageRelations[typeName] = type.damage_relations
-            }
-            pokeAPIService.getTypeByName(typeName).enqueue(typeCallback)
         }
     }
 
@@ -403,7 +339,7 @@ class BattleFragment : PokeAPIServiceFragment() {
             }
             val movesCallback : Callback<MoveCategory> = Utils.pokeAPICallback { response ->
                 val allDamageMovesGenerationsList : MoveCategory = response.body()!!
-                allDamageMovesList.addAll(allDamageMovesGenerationsList.moves.filterIndexed { index, _ ->
+                DamageHelper.allDamageMovesList.addAll(allDamageMovesGenerationsList.moves.filterIndexed { index, _ ->
                     index <= Globals.GENERATION.maxIdMove })
                 pokeAPIService.getPokemon(it.getInt("opponentPokemon0")).enqueue(opponent1Callback)
                 pokeAPIService.getPokemon(it.getInt("opponentPokemon1")).enqueue(opponent2Callback)
@@ -415,7 +351,7 @@ class BattleFragment : PokeAPIServiceFragment() {
             val typesCallback : Callback<NamedAPIResourceList> = Utils.pokeAPICallback { response ->
                 val types = response.body()!!
                 for (type in types.results){
-                    allTypes.add(type.name)
+                    DamageHelper.allTypes.add(type.name)
                 }
             }
             pokeAPIService.getAllDamageMoves().enqueue(movesCallback)
@@ -432,8 +368,8 @@ class BattleFragment : PokeAPIServiceFragment() {
             setBattlingMove(3, if (this::battlingPokemon.isInitialized && battlingPokemon.moves.size > 2) battlingPokemon.moves[2] else null)
             setBattlingMove(4, if (this::battlingPokemon.isInitialized && battlingPokemon.moves.size > 3) battlingPokemon.moves[3] else null)
             nextAction()
-            if (allMovesTypesDamageRelations.isEmpty())
-                getTypesDamageRelations()
+            if (DamageHelper.allMovesTypesDamageRelations.isEmpty())
+                DamageHelper.getTypesDamageRelations()
             MessageTextView.setOnClickListener { nextAction() }
         }
         move1.setOnClickListener { playerTurn(1); }

@@ -1,13 +1,39 @@
 package fr.epita.android.pokebattle.battle
 
 import fr.epita.android.pokebattle.Globals
+import fr.epita.android.pokebattle.Utils
 import fr.epita.android.pokebattle.enums.NonVolatileStatusEffect
+import fr.epita.android.pokebattle.webservices.pokeapi.PokeAPIServiceHelper
 import fr.epita.android.pokebattle.webservices.pokeapi.moves.Move
 import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.PokemonStat
+import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.PokemonType
+import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.type.Type
+import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.type.TypeRelations
+import fr.epita.android.pokebattle.webservices.pokeapi.utils.NamedAPIResource
+import retrofit2.Callback
 import kotlin.math.max
 import kotlin.math.min
 
 object DamageHelper {
+
+    var allTypes : MutableList<String> = mutableListOf()
+    var allMovesTypesDamageRelations = mutableMapOf<String, TypeRelations>()
+    var allDamageMovesList : MutableList<NamedAPIResource> = mutableListOf()
+
+    @JvmStatic
+    fun getEfficiency(moveType : NamedAPIResource, pokemonTypes : List<PokemonType>) : Double {
+        var efficiency = 1.0
+        val moveTypesDamageRelations = allMovesTypesDamageRelations[moveType.name]!!
+        for (pokemonType in pokemonTypes) {
+            if (moveTypesDamageRelations.no_damage_to.any { it.name == pokemonType.type.name })
+                efficiency *= 0.0
+            if (moveTypesDamageRelations.double_damage_to.any { it.name == pokemonType.type.name })
+                efficiency *= 2.0
+            if (moveTypesDamageRelations.half_damage_to.any { it.name == pokemonType.type.name })
+                efficiency *= 0.5
+        }
+        return efficiency
+    }
 
     @JvmStatic
     fun moveHit(move: Move, attacker: PokemonInfo, defender: PokemonInfo): Boolean {
@@ -80,5 +106,16 @@ object DamageHelper {
 
         val level = if (generation == 1 && critical) Globals.POKEMON_LEVEL * 2 else Globals.POKEMON_LEVEL
         return (((((2 * level) / 5) + 2 * move.power!! * (att / def)) / 50) + 2) * modifier
+    }
+
+    @JvmStatic
+    fun getTypesDamageRelations() {
+        for (typeName in allTypes) {
+            val typeCallback: Callback<Type> = Utils.pokeAPICallback { response ->
+                val type: Type = response.body()!!
+                allMovesTypesDamageRelations[typeName] = type.damage_relations
+            }
+            PokeAPIServiceHelper.pokeAPIService.getTypeByName(typeName).enqueue(typeCallback)
+        }
     }
 }
