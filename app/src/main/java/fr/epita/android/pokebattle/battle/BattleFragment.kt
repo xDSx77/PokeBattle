@@ -105,10 +105,10 @@ class BattleFragment : Fragment() {
         battlingPokemonHealth.max = pok.pokemon!!.stats.find { it.stat.name == "hp" }!!.base_stat
         battlingPokemonHealth.progress = pok.hp
         battlingPokemonName.text = Utils.firstLetterUpperCase(pok.pokemon!!.name)
-        setBattlingMove(1, if (pok.moves.isNotEmpty()) pok.moves[0] else null)
-        setBattlingMove(2, if (pok.moves.size > 1) pok.moves[1] else null)
-        setBattlingMove(3, if (pok.moves.size > 2) pok.moves[2] else null)
-        setBattlingMove(4, if (pok.moves.size > 3) pok.moves[3] else null)
+        setBattlingMove(1, pok.moves[0]!!)
+        setBattlingMove(2, pok.moves[1]!!)
+        setBattlingMove(3, pok.moves[2]!!)
+        setBattlingMove(4, pok.moves[3]!!)
     }
 
     private fun playerTurn(moveId : Int) {
@@ -225,7 +225,7 @@ class BattleFragment : Fragment() {
         }
     }
 
-    private fun setBattlingMove(id : Int, move : Move?) {
+    private fun setBattlingMove(id : Int, move : Move) {
         val (txt, img) = when (id) {
             1 -> Pair(move1, move1Type)
             2 -> Pair(move2, move2Type)
@@ -233,18 +233,20 @@ class BattleFragment : Fragment() {
             4 -> Pair(move4, move4Type)
             else -> Pair(null, null)
         }
-        if (move != null) {
-            txt!!.text = Utils.firstLetterUpperCase(move.name)
-            when (id) {
-                1 -> move1Description.text = move.flavor_text_entries[2].flavor_text
-                2 -> move2Description.text = move.flavor_text_entries[2].flavor_text
-                3 -> move3Description.text = move.flavor_text_entries[2].flavor_text
-                4 -> move4Description.text = move.flavor_text_entries[2].flavor_text
-            }
+        txt?.let {
+            it.text = Utils.firstLetterUpperCase(move.name)
+        }
+        when (id) {
+            1 -> move1Description.text = move.flavor_text_entries[2].flavor_text
+            2 -> move2Description.text = move.flavor_text_entries[2].flavor_text
+            3 -> move3Description.text = move.flavor_text_entries[2].flavor_text
+            4 -> move4Description.text = move.flavor_text_entries[2].flavor_text
+        }
+        img?.let {
             Glide
                 .with(this@BattleFragment)
                 .load(Utils.typeToRDrawable(move.type.name))
-                .into(img!!)
+                .into(it)
         }
     }
 
@@ -276,10 +278,10 @@ class BattleFragment : Fragment() {
         loadPokemon(pokemon3, pokemon3ImageView, pokemon3Name)
 
         MessageTextView.setOnClickListener {
-            setBattlingMove(1, if (this::battlingPokemon.isInitialized && battlingPokemon.moves.isNotEmpty()) battlingPokemon.moves[0] else null)
-            setBattlingMove(2, if (this::battlingPokemon.isInitialized && battlingPokemon.moves.size > 1) battlingPokemon.moves[1] else null)
-            setBattlingMove(3, if (this::battlingPokemon.isInitialized && battlingPokemon.moves.size > 2) battlingPokemon.moves[2] else null)
-            setBattlingMove(4, if (this::battlingPokemon.isInitialized && battlingPokemon.moves.size > 3) battlingPokemon.moves[3] else null)
+            setBattlingMove(1, battlingPokemon.moves[0]!!)
+            setBattlingMove(2, battlingPokemon.moves[1]!!)
+            setBattlingMove(3, battlingPokemon.moves[2]!!)
+            setBattlingMove(4, battlingPokemon.moves[3]!!)
             nextAction()
             playerTurn = true
             MessageTextView.setOnClickListener { nextAction() }
