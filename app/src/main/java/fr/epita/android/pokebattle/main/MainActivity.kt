@@ -1,9 +1,11 @@
 package fr.epita.android.pokebattle.main
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import fr.epita.android.pokebattle.*
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import fr.epita.android.pokebattle.R
 import fr.epita.android.pokebattle.battle.BattleFragment
+import fr.epita.android.pokebattle.battle.BattleLoadingScreenFragment
 import fr.epita.android.pokebattle.battle.lobby.BattleLobbyFragment
 import fr.epita.android.pokebattle.pokedex.details.PokedexDetailsFragment
 import fr.epita.android.pokebattle.pokedex.list.PokedexListFragment
@@ -12,7 +14,7 @@ import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.Pokemon
 
 class MainActivity : AppCompatActivity() {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+    override fun onCreate(savedInstanceState : Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
@@ -22,23 +24,23 @@ class MainActivity : AppCompatActivity() {
             .commit()
     }
 
-    fun BattleLobby() {
+    fun battleLobby() {
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.mainContainer, BattleLobbyFragment())
-            .addToBackStack(null)
+            .addToBackStack("battleLobby")
             .commit()
     }
 
-    fun PokedexList() {
+    fun pokedexList() {
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.mainContainer, PokedexListFragment())
-            .addToBackStack(null)
+            .addToBackStack("pokedexList")
             .commit()
     }
 
-    fun PokedexDetails(pokemonId: Int?) {
+    fun pokedexDetails(pokemonId : Int?) {
         val bundle = Bundle()
         if (pokemonId != null)
             bundle.putInt("pokemonId", pokemonId)
@@ -47,11 +49,11 @@ class MainActivity : AppCompatActivity() {
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.mainContainer, pokedexDetailsFragment)
-            .addToBackStack(null)
+            .addToBackStack("pokedexDetails")
             .commit()
     }
 
-    fun TypeHelp(typeName : String?) {
+    fun typeHelp(typeName : String?) {
         val bundle = Bundle()
         if (typeName != null)
             bundle.putString("typeName", typeName)
@@ -59,34 +61,53 @@ class MainActivity : AppCompatActivity() {
         typeHelpFragment.arguments = bundle
         supportFragmentManager
             .beginTransaction()
-            .hide(supportFragmentManager.findFragmentById(R.id.mainContainer)!!)
-            .add(R.id.mainContainer, typeHelpFragment)
-            .addToBackStack(null)
+            .replace(R.id.mainContainer, typeHelpFragment)
+            .addToBackStack("typeHelp")
             .commit()
     }
 
-    fun Battle(opponentPokemon : ArrayList<Int>?, pokemonSlots : ArrayList<Pokemon?>?) {
-        val bundle = Bundle()
-        opponentPokemon?.forEachIndexed{ index, id ->
-            bundle.putInt("opponentPokemon$index", id)
-        }
-        pokemonSlots?.forEachIndexed{ index, pok ->
-            bundle.putInt("pokemon$index", pok!!.id)
-        }
+    fun battle() {
         val battleFragment = BattleFragment()
-        battleFragment.arguments = bundle
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.mainContainer, battleFragment)
-            .addToBackStack(null)
+            .addToBackStack("battle")
             .commit()
     }
 
-    fun Home() {
+    fun loadBattle(opponentPokemon : ArrayList<Int>?, pokemonSlots : ArrayList<Pokemon?>?) {
+        val bundle = Bundle()
+        opponentPokemon?.forEachIndexed { index, id ->
+            bundle.putInt("opponentPokemon$index", id)
+        }
+        pokemonSlots?.forEachIndexed { index, pok ->
+            bundle.putInt("pokemon$index", pok!!.id)
+        }
+        val battleLoadingScreenFragment = BattleLoadingScreenFragment()
+        battleLoadingScreenFragment.arguments = bundle
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.mainContainer, battleLoadingScreenFragment)
+            .addToBackStack("loading")
+            .commit()
+    }
+
+    fun home() {
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.mainContainer, MainFragment())
-            .addToBackStack(null)
+            .addToBackStack("start")
             .commit()
+    }
+
+    override fun onBackPressed() {
+        val backStackEntryCount = supportFragmentManager.backStackEntryCount
+        val lastBackStackEntryName =
+            (if (backStackEntryCount == 0) null else supportFragmentManager.getBackStackEntryAt(backStackEntryCount - 1))?.name
+        if (lastBackStackEntryName != null && (lastBackStackEntryName == "loading" || lastBackStackEntryName == "battle")) {
+            Toast.makeText(this, "Could not go back now", Toast.LENGTH_SHORT).show()
+        } else {
+            super.onBackPressed()
+        }
     }
 }

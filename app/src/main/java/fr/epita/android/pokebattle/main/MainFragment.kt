@@ -21,10 +21,10 @@ class MainFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         BattleButton.setOnClickListener {
-            (activity as MainActivity).BattleLobby()
+            (activity as MainActivity).battleLobby()
         }
         PokedexButton.setOnClickListener {
-            (activity as MainActivity).PokedexList()
+            (activity as MainActivity).pokedexList()
         }
     }
 }

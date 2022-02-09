@@ -4,34 +4,32 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.ProgressBar
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import fr.epita.android.pokebattle.Globals
 import fr.epita.android.pokebattle.R
 import fr.epita.android.pokebattle.Utils
 import fr.epita.android.pokebattle.main.MainActivity
-import fr.epita.android.pokebattle.webservices.pokeapi.PokeAPIServiceHelper.pokeAPIService
 import fr.epita.android.pokebattle.webservices.pokeapi.moves.Move
-import fr.epita.android.pokebattle.webservices.pokeapi.moves.MoveCategory
-import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.Pokemon
-import fr.epita.android.pokebattle.webservices.pokeapi.resourcelist.NamedAPIResourceList
 import kotlinx.android.synthetic.main.fragment_battle.*
-import retrofit2.Callback
 import java.util.*
 import kotlin.math.max
 
-
 class BattleFragment : Fragment() {
 
-    private var playerTurn = true
+    private var playerTurn = false
 
-    private lateinit var opponentPokemon1 : PokemonInfo
-    private lateinit var opponentPokemon2 : PokemonInfo
-    private lateinit var opponentPokemon3 : PokemonInfo
-    private lateinit var pokemon1 : PokemonInfo
-    private lateinit var pokemon2 : PokemonInfo
-    private lateinit var pokemon3 : PokemonInfo
+    companion object {
+        var opponentPokemon1 : PokemonInfo = PokemonInfo(null, mutableListOf(), 0, 0, 0, null)
+        var opponentPokemon2 : PokemonInfo = PokemonInfo(null, mutableListOf(), 0, 0, 0, null)
+        var opponentPokemon3 : PokemonInfo = PokemonInfo(null, mutableListOf(), 0, 0, 0, null)
+        var pokemon1 : PokemonInfo = PokemonInfo(null, mutableListOf(), 0, 0, 0, null)
+        var pokemon2 : PokemonInfo = PokemonInfo(null, mutableListOf(), 0, 0, 0, null)
+        var pokemon3 : PokemonInfo = PokemonInfo(null, mutableListOf(), 0, 0, 0, null)
+    }
 
     private lateinit var battlingPokemon : PokemonInfo
     private lateinit var opponentBattlingPokemon : PokemonInfo
@@ -52,31 +50,13 @@ class BattleFragment : Fragment() {
             actions.remove()()
     }
 
-    private fun getPokemonMoves(pok : Pokemon) : List<Move?> {
-        val moves = mutableListOf<Move?>()
-        val allPokemonMoves = pok.moves.shuffled()
-        var movesCount = 0
-        val moveCallback : Callback<Move> = Utils.pokeAPICallback { response ->
-            moves.add(response.body()!!)
-        }
-        for (pokemonMove in allPokemonMoves){
-            if (movesCount == 4)
-                break
-            if (DamageHelper.allDamageMovesList.any { it.name == pokemonMove.move.name }) {
-                pokeAPIService.getMove(pokemonMove.move.name).enqueue(moveCallback)
-                movesCount++
-            }
-        }
-        return moves
-    }
-
     private fun opponentTurn(next : () -> Unit = { nextAction(); }) {
         playerTurn = false
         var moveId = 1
         var maxDamage = 0
         for (i in 0 until opponentBattlingPokemon.moves.count()) {
             val move = opponentBattlingPokemon.moves[i]!!
-            val efficiency = DamageHelper.getEfficiency(move.type, battlingPokemon.pokemon.types)
+            val efficiency = DamageHelper.getEfficiency(move.type, battlingPokemon.pokemon!!.types)
             if (move.power == null)
                 move.power = 0
 
@@ -104,27 +84,27 @@ class BattleFragment : Fragment() {
         opponentBattlingPokemon = pok
         Glide
             .with(this@BattleFragment)
-            .load(pok.pokemon.sprites.front_default)
+            .load(pok.pokemon!!.sprites.front_default)
             .into(opponentPokemonImageView)
-        opponentPokemonHealth.max = pok.pokemon.stats.find { it.stat.name == "hp" }!!.base_stat
+        opponentPokemonHealth.max = pok.pokemon!!.stats.find { it.stat.name == "hp" }!!.base_stat
         opponentPokemonHealth.progress = pok.hp
-        opponentPokemonName.text = Utils.firstLetterUpperCase(pok.pokemon.name)
+        opponentPokemonName.text = Utils.firstLetterUpperCase(pok.pokemon!!.name)
     }
 
     private fun setBattlingPokemon(pok : PokemonInfo) {
         battlingPokemon = pok
         val battlingSprite =
-            if (pok.pokemon.sprites.back_default.isNullOrBlank())
-                pok.pokemon.sprites.front_default
+            if (pok.pokemon!!.sprites.back_default.isNullOrBlank())
+                pok.pokemon!!.sprites.front_default
             else
-                pok.pokemon.sprites.back_default
+                pok.pokemon!!.sprites.back_default
         Glide
             .with(this@BattleFragment)
             .load(battlingSprite)
             .into(battlingPokemonImageView)
-        battlingPokemonHealth.max = pok.pokemon.stats.find { it.stat.name == "hp" }!!.base_stat
+        battlingPokemonHealth.max = pok.pokemon!!.stats.find { it.stat.name == "hp" }!!.base_stat
         battlingPokemonHealth.progress = pok.hp
-        battlingPokemonName.text = Utils.firstLetterUpperCase(pok.pokemon.name)
+        battlingPokemonName.text = Utils.firstLetterUpperCase(pok.pokemon!!.name)
         setBattlingMove(1, if (pok.moves.isNotEmpty()) pok.moves[0] else null)
         setBattlingMove(2, if (pok.moves.size > 1) pok.moves[1] else null)
         setBattlingMove(3, if (pok.moves.size > 2) pok.moves[2] else null)
@@ -132,17 +112,23 @@ class BattleFragment : Fragment() {
     }
 
     private fun playerTurn(moveId : Int) {
-        if (opponentBattlingPokemon.pokemon.stats.find { it.stat.name == "speed" }!!.base_stat > battlingPokemon.pokemon.stats.find { it.stat.name == "speed" }!!.base_stat)
+        val opponentPokemonSpeed = opponentBattlingPokemon.pokemon!!.stats.find { it.stat.name == "speed" }!!.base_stat
+        val battlingPokemonSpeed = battlingPokemon.pokemon!!.stats.find { it.stat.name == "speed" }!!.base_stat
+        if (opponentPokemonSpeed > battlingPokemonSpeed)
             opponentTurn {
                 playerTurn = true
                 attack(moveId, battlingPokemon, opponentBattlingPokemon, opponentPokemonHealth) { playerTurn = true }
             }
         else
-            attack(moveId, battlingPokemon, opponentBattlingPokemon, opponentPokemonHealth) { opponentTurn { playerTurn = true } }
+            attack(moveId, battlingPokemon, opponentBattlingPokemon, opponentPokemonHealth) {
+                opponentTurn {
+                    playerTurn = true
+                }
+            }
     }
 
     private fun handlePokemonKO(pok : PokemonInfo) {
-        val pokemonName = Utils.firstLetterUpperCase(pok.pokemon.name)
+        val pokemonName = Utils.firstLetterUpperCase(pok.pokemon!!.name)
         doOrAddAction { showMessage("$pokemonName fainted!"); }
         if (pok == battlingPokemon) {
             when (pok) {
@@ -165,38 +151,35 @@ class BattleFragment : Fragment() {
             if (newPokemon == null) {
                 actions.add {
                     showMessage("You lost !")
-                    MessageTextView.setOnClickListener { (activity as MainActivity).Home(); }
+                    MessageTextView.setOnClickListener { (activity as MainActivity).home(); }
                     Utils.greyImage(battlingPokemonImageView)
                 }
-            }
-            else
+            } else
                 setBattlingPokemon(newPokemon)
-        }
-        else {
+        } else {
             val opponents = listOf(opponentPokemon1, opponentPokemon2, opponentPokemon3)
             val newOpponent = opponents.find { it.hp > 0 }
             if (newOpponent == null) {
                 actions.add {
-                    showMessage("You won!")
-                    MessageTextView.setOnClickListener { (activity as MainActivity).Home(); }
+                    showMessage("You won !")
+                    MessageTextView.setOnClickListener { (activity as MainActivity).home(); }
                     pokemon1ImageView.setOnClickListener(null)
                     pokemon2ImageView.setOnClickListener(null)
                     pokemon3ImageView.setOnClickListener(null)
                     Utils.greyImage(opponentPokemonImageView)
                 }
-            }
-            else
+            } else
                 setOpponentPokemon(newOpponent)
         }
     }
 
-    private fun dealDamage(move : Move, attacker : PokemonInfo, defender: PokemonInfo, health: ProgressBar) : Boolean {
+    private fun dealDamage(move : Move, attacker : PokemonInfo, defender : PokemonInfo, health : ProgressBar) : Boolean {
         val moveName = Utils.firstLetterUpperCase(move.name)
         if (!DamageHelper.moveHit(move, attacker, defender)) {
             doOrAddAction { showMessage("$moveName missed!"); }
             return true
         }
-        val efficiency = DamageHelper.getEfficiency(move.type, defender.pokemon.types)
+        val efficiency = DamageHelper.getEfficiency(move.type, defender.pokemon!!.types)
         when {
             efficiency == 0.0 -> doOrAddAction { showMessage("$moveName has no effect..."); }
             efficiency < 1 -> doOrAddAction { showMessage("$moveName is not very effective..."); }
@@ -208,7 +191,8 @@ class BattleFragment : Fragment() {
         if (move.power == null)
             move.power = 0
 
-        val critical = if (Globals.GENERATION.generation == 1) DamageHelper.criticalGen1(attacker.pokemon.stats.find { t -> t.stat.name == "speed" }!!) else DamageHelper.critical()
+        val attackerSpeed = attacker.pokemon!!.stats.find { t -> t.stat.name == "speed" }!!
+        val critical = if (Globals.GENERATION.generation == 1) DamageHelper.criticalGen1(attackerSpeed) else DamageHelper.critical()
         if (critical)
             showMessage("A critical hit!")
         val damage = DamageHelper.computeDamage(attacker, defender, move, critical, efficiency)
@@ -222,7 +206,7 @@ class BattleFragment : Fragment() {
     private fun attack(moveId : Int, attacker : PokemonInfo, defender : PokemonInfo, health : ProgressBar, next : () -> Unit = { nextAction(); }) {
         playerTurn = false
         val move = attacker.moves[moveId - 1]!!
-        val attackerName = Utils.firstLetterUpperCase(attacker.pokemon.name)
+        val attackerName = Utils.firstLetterUpperCase(attacker.pokemon!!.name)
         val moveName = Utils.firstLetterUpperCase(move.name)
         doOrAddAction { showMessage("$attackerName used $moveName") }
         actions.add {
@@ -232,8 +216,7 @@ class BattleFragment : Fragment() {
                     next()
                 else
                     actions.add { next(); }
-            }
-            else {
+            } else {
                 if (!message)
                     handlePokemonKO(defender)
                 else
@@ -241,7 +224,6 @@ class BattleFragment : Fragment() {
             }
         }
     }
-
 
     private fun setBattlingMove(id : Int, move : Move?) {
         val (txt, img) = when (id) {
@@ -266,101 +248,32 @@ class BattleFragment : Fragment() {
         }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            val opponent1Callback : Callback<Pokemon> = Utils.pokeAPICallback { response ->
-                val pok = response.body()!!
-                val moves : List<Move?> = getPokemonMoves(pok)
-                opponentPokemon1 = PokemonInfo(pok, moves, pok.stats.find { it.stat.name == "hp" }!!.base_stat, 0, 0, null)
-                setOpponentPokemon(opponentPokemon1)
-                opponentPokemonLevel.text = Globals.POKEMON_LEVEL.toString()
-                showMessage("A wild " + opponentPokemonName.text + " has appeared!")
+    private fun loadPokemon(pokemonInfo : PokemonInfo, pokemonImageView : ImageView, pokemonNameTextView : TextView) {
+        Glide
+            .with(this@BattleFragment)
+            .load(pokemonInfo.pokemon!!.sprites.front_default)
+            .into(pokemonImageView)
+        pokemonNameTextView.text = Utils.firstLetterUpperCase(pokemonInfo.pokemon!!.name)
+        pokemonImageView.setOnClickListener {
+            if (battlingPokemon != pokemonInfo && playerTurn) {
+                setBattlingPokemon(pokemonInfo)
+                opponentTurn { playerTurn = true }
             }
-            val opponent2Callback : Callback<Pokemon> = Utils.pokeAPICallback { response ->
-                val pok = response.body()!!
-                val moves : List<Move?> = getPokemonMoves(pok)
-                opponentPokemon2 = PokemonInfo(pok, moves, pok.stats.find { it.stat.name == "hp" }!!.base_stat, 0, 0, null)
-            }
-            val opponent3Callback : Callback<Pokemon> = Utils.pokeAPICallback { response ->
-                val pok = response.body()!!
-                val moves : List<Move?> = getPokemonMoves(pok)
-                opponentPokemon3 = PokemonInfo(pok, moves, pok.stats.find { it.stat.name == "hp" }!!.base_stat, 0, 0, null)
-            }
-            val pokemon1Callback : Callback<Pokemon> = Utils.pokeAPICallback { response ->
-                val pok = response.body()!!
-                val moves : List<Move?> = getPokemonMoves(pok)
-                pokemon1 = PokemonInfo(pok, moves, pok.stats.find { it.stat.name == "hp" }!!.base_stat, 0, 0, null)
-                setBattlingPokemon(pokemon1)
-                battlingPokemonLevel.text = Globals.POKEMON_LEVEL.toString()
-                Glide
-                    .with(this@BattleFragment)
-                    .load(pokemon1.pokemon.sprites.front_default)
-                    .into(pokemon1ImageView)
-                pokemon1Name.text = battlingPokemonName.text
-                pokemon1ImageView.setOnClickListener {
-                    if (battlingPokemon != pokemon1 && playerTurn) {
-                        setBattlingPokemon(pokemon1)
-                        opponentTurn { playerTurn = true }
-                    }
-                }
-            }
-            val pokemon2Callback : Callback<Pokemon> = Utils.pokeAPICallback { response ->
-                val pok = response.body()!!
-                val moves : List<Move?> = getPokemonMoves(pok)
-                pokemon2 = PokemonInfo(pok, moves, pok.stats.find { it.stat.name == "hp" }!!.base_stat, 0, 0, null)
-                Glide
-                    .with(this@BattleFragment)
-                    .load(pokemon2.pokemon.sprites.front_default)
-                    .into(pokemon2ImageView)
-                pokemon2Name.text = Utils.firstLetterUpperCase(pok.name)
-                pokemon2ImageView.setOnClickListener {
-                    if (battlingPokemon != pokemon2 && playerTurn) {
-                        setBattlingPokemon(pokemon2)
-                        opponentTurn { playerTurn = true }
-                    }
-                }
-            }
-            val pokemon3Callback : Callback<Pokemon> = Utils.pokeAPICallback { response ->
-                val pok = response.body()!!
-                val moves : List<Move?> = getPokemonMoves(pok)
-                pokemon3 = PokemonInfo(pok, moves, pok.stats.find { it.stat.name == "hp" }!!.base_stat, 0, 0, null)
-                Glide
-                    .with(this@BattleFragment)
-                    .load(pokemon3.pokemon.sprites.front_default)
-                    .into(pokemon3ImageView)
-                pokemon3Name.text = Utils.firstLetterUpperCase(pok.name)
-                pokemon3ImageView.setOnClickListener {
-                    if (battlingPokemon != pokemon3 && playerTurn) {
-                        setBattlingPokemon(pokemon3)
-                        opponentTurn { playerTurn = true }
-                    }
-                }
-            }
-            val movesCallback : Callback<MoveCategory> = Utils.pokeAPICallback { response ->
-                val allDamageMovesGenerationsList : MoveCategory = response.body()!!
-                DamageHelper.allDamageMovesList.addAll(allDamageMovesGenerationsList.moves.filterIndexed { index, _ ->
-                    index <= Globals.GENERATION.maxIdMove })
-                pokeAPIService.getPokemon(it.getInt("opponentPokemon0")).enqueue(opponent1Callback)
-                pokeAPIService.getPokemon(it.getInt("opponentPokemon1")).enqueue(opponent2Callback)
-                pokeAPIService.getPokemon(it.getInt("opponentPokemon2")).enqueue(opponent3Callback)
-                pokeAPIService.getPokemon(it.getInt("pokemon0")).enqueue(pokemon1Callback)
-                pokeAPIService.getPokemon(it.getInt("pokemon1")).enqueue(pokemon2Callback)
-                pokeAPIService.getPokemon(it.getInt("pokemon2")).enqueue(pokemon3Callback)
-            }
-            val typesCallback : Callback<NamedAPIResourceList> = Utils.pokeAPICallback { response ->
-                val types = response.body()!!
-                for (type in types.results){
-                    DamageHelper.allTypes.add(type.name)
-                }
-            }
-            pokeAPIService.getAllDamageMoves().enqueue(movesCallback)
-            pokeAPIService.getTypes().enqueue(typesCallback)
         }
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view : View, savedInstanceState : Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        setBattlingPokemon(pokemon1)
+        battlingPokemonLevel.text = Globals.POKEMON_LEVEL.toString()
+        setOpponentPokemon(opponentPokemon1)
+        opponentPokemonLevel.text = Globals.POKEMON_LEVEL.toString()
+        showMessage("A wild " + opponentPokemonName.text + " has appeared!")
+
+        loadPokemon(pokemon1, pokemon1ImageView, pokemon1Name)
+        loadPokemon(pokemon2, pokemon2ImageView, pokemon2Name)
+        loadPokemon(pokemon3, pokemon3ImageView, pokemon3Name)
 
         MessageTextView.setOnClickListener {
             setBattlingMove(1, if (this::battlingPokemon.isInitialized && battlingPokemon.moves.isNotEmpty()) battlingPokemon.moves[0] else null)
@@ -368,8 +281,7 @@ class BattleFragment : Fragment() {
             setBattlingMove(3, if (this::battlingPokemon.isInitialized && battlingPokemon.moves.size > 2) battlingPokemon.moves[2] else null)
             setBattlingMove(4, if (this::battlingPokemon.isInitialized && battlingPokemon.moves.size > 3) battlingPokemon.moves[3] else null)
             nextAction()
-            if (DamageHelper.allMovesTypesDamageRelations.isEmpty())
-                DamageHelper.getTypesDamageRelations()
+            playerTurn = true
             MessageTextView.setOnClickListener { nextAction() }
         }
         move1.setOnClickListener { playerTurn(1); }
@@ -386,7 +298,7 @@ class BattleFragment : Fragment() {
         move4Description.setOnClickListener { playerTurn(4); }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater : LayoutInflater, container : ViewGroup?, savedInstanceState : Bundle?) : View? {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_battle, container, false)
     }

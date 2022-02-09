@@ -1,4 +1,5 @@
 package fr.epita.android.pokebattle.typehelp
+
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -33,7 +34,7 @@ class TypeEntryAdapter(private var context: Context, private var typesList : Lis
         }
         val typeIllustration: ImageView = cvView!!.findViewById(R.id.TypeEntryImageView)
         typeIllustration.setOnClickListener {
-            (cvView.context as MainActivity).TypeHelp(type)
+            (cvView.context as MainActivity).typeHelp(type)
         }
 
         Glide.with(context)

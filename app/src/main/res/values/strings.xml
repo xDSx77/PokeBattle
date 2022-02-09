@@ -31,4 +31,5 @@
     <string name="hashtag">#</string>
     <string name="pokemonNumber10_99">0%1$d</string>
     <string name="pokemonNumber0_9">00%1$d</string>
+    <string name="loadingText">Loading all Pokémon data…</string>
 </resources>

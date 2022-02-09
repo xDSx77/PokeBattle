@@ -47,7 +47,7 @@ class PokedexEntryAdapter(private val pokedexEntries : List<PokedexEntry>,
         if (pokedexEntry.types.size == 1) {
             holder.view.type1_imageView.setImageResource(Utils.typeToRDrawable(pokedexEntry.types[0].name))
             holder.view.type1_imageView.setOnClickListener {
-                (holder.view.context as MainActivity).TypeHelp(pokedexEntry.types[0].name)
+                (holder.view.context as MainActivity).typeHelp(pokedexEntry.types[0].name)
             }
             holder.view.type2_imageView.visibility = View.INVISIBLE
         }
@@ -55,11 +55,11 @@ class PokedexEntryAdapter(private val pokedexEntries : List<PokedexEntry>,
             holder.view.type2_imageView.visibility = View.VISIBLE
             holder.view.type1_imageView.setImageResource(Utils.typeToRDrawable(pokedexEntry.types[1].name))
             holder.view.type1_imageView.setOnClickListener {
-                (holder.view.context as MainActivity).TypeHelp(pokedexEntry.types[1].name)
+                (holder.view.context as MainActivity).typeHelp(pokedexEntry.types[1].name)
             }
             holder.view.type2_imageView.setImageResource(Utils.typeToRDrawable(pokedexEntry.types[0].name))
             holder.view.type2_imageView.setOnClickListener {
-                (holder.view.context as MainActivity).TypeHelp(pokedexEntry.types[0].name)
+                (holder.view.context as MainActivity).typeHelp(pokedexEntry.types[0].name)
             }
         }
     }

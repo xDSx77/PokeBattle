@@ -34,7 +34,7 @@ class PokedexListFragment : Fragment() {
 
             val entryClickListener = View.OnClickListener {
                 val position = it.tag as Int
-                (activity as MainActivity).PokedexDetails(pokedexEntries[position].id)
+                (activity as MainActivity).pokedexDetails(pokedexEntries[position].id)
             }
 
             viewManager = LinearLayoutManager(context)

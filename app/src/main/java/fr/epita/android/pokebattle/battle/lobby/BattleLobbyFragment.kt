@@ -64,18 +64,18 @@ class BattleLobbyFragment : Fragment() {
                         NextOpponentType2ImageView.visibility = View.INVISIBLE
                         NextOpponentType1ImageView.setImageResource(Utils.typeToRDrawable(opponentEntry.types[0].name))
                         NextOpponentType1ImageView.setOnClickListener {
-                            (activity as MainActivity).TypeHelp(opponentEntry.types[0].name)
+                            (activity as MainActivity).typeHelp(opponentEntry.types[0].name)
                         }
                     } else if (opponentEntry.types.size == 2) {
                         NextOpponentType1ImageView.visibility = View.VISIBLE
                         NextOpponentType2ImageView.visibility = View.VISIBLE
                         NextOpponentType1ImageView.setImageResource(Utils.typeToRDrawable(opponentEntry.types[1].name))
                         NextOpponentType1ImageView.setOnClickListener {
-                            (activity as MainActivity).TypeHelp(opponentEntry.types[1].name)
+                            (activity as MainActivity).typeHelp(opponentEntry.types[1].name)
                         }
                         NextOpponentType2ImageView.setImageResource(Utils.typeToRDrawable(opponentEntry.types[0].name))
                         NextOpponentType2ImageView.setOnClickListener {
-                            (activity as MainActivity).TypeHelp(opponentEntry.types[0].name)
+                            (activity as MainActivity).typeHelp(opponentEntry.types[0].name)
                         }
                     }
                 }
@@ -97,18 +97,18 @@ class BattleLobbyFragment : Fragment() {
                     SelectedPokemonType2ImageView.visibility = View.INVISIBLE
                     SelectedPokemonType1ImageView.setImageResource(Utils.typeToRDrawable(entry.types[0].name))
                     SelectedPokemonType1ImageView.setOnClickListener {
-                        (activity as MainActivity).TypeHelp(entry.types[0].name)
+                        (activity as MainActivity).typeHelp(entry.types[0].name)
                     }
                 } else if (entry.types.size == 2) {
                     SelectedPokemonType1ImageView.visibility = View.VISIBLE
                     SelectedPokemonType2ImageView.visibility = View.VISIBLE
                     SelectedPokemonType1ImageView.setImageResource(Utils.typeToRDrawable(entry.types[1].name))
                     SelectedPokemonType1ImageView.setOnClickListener {
-                        (activity as MainActivity).TypeHelp(entry.types[1].name)
+                        (activity as MainActivity).typeHelp(entry.types[1].name)
                     }
                     SelectedPokemonType2ImageView.setImageResource(Utils.typeToRDrawable(entry.types[0].name))
                     SelectedPokemonType2ImageView.setOnClickListener {
-                        (activity as MainActivity).TypeHelp(entry.types[0].name)
+                        (activity as MainActivity).typeHelp(entry.types[0].name)
                     }
                 }
 
@@ -154,7 +154,7 @@ class BattleLobbyFragment : Fragment() {
         surLeWebService.pokemonList().enqueue(pokemonListCallback)
 
         FightButton.setOnClickListener {
-            (activity as MainActivity).Battle(arrayListOf(opponentPokemon.id, pokedexEntries.random().id, pokedexEntries.random().id), pokemonSlots)
+            (activity as MainActivity).loadBattle(arrayListOf(opponentPokemon.id, pokedexEntries.random().id, pokedexEntries.random().id), pokemonSlots)
         }
 
         val slot1ClickListener = pokemonSlotClickListener(0, pokemonSlotNameTextView, pokemonSlotImageView)
