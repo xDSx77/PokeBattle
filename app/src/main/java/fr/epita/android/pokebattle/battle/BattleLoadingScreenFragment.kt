@@ -77,9 +77,9 @@ class BattleLoadingScreenFragment : Fragment() {
             opponentPokemonInfo.pokemon = opponentPokemon
             opponentPokemonInfo.moves = mutableListOf()
             opponentPokemonInfo.nature = allNaturesList.random()
+            setPokemonModifiedStats(opponentPokemonInfo)
             val opponentHp = opponentPokemon.stats.find { it.stat.name == "hp" }!!.modified_stat
             opponentPokemonInfo.hp = opponentHp.toInt()
-            setPokemonModifiedStats(opponentPokemonInfo)
             buildPokemonMoves(opponentPokemonInfo, false)
         }
         PokeAPIServiceHelper.pokeAPIService.getPokemon(pokemonId).enqueue(opponentCallback)
@@ -92,9 +92,9 @@ class BattleLoadingScreenFragment : Fragment() {
             pokemonInfo.pokemon = pokemon
             pokemonInfo.moves = mutableListOf()
             pokemonInfo.nature = allNaturesList.random()
+            setPokemonModifiedStats(pokemonInfo)
             val pokemonHp = pokemon.stats.find { it.stat.name == "hp" }!!.modified_stat
             pokemonInfo.hp = pokemonHp.toInt()
-            setPokemonModifiedStats(pokemonInfo)
             buildPokemonMoves(pokemonInfo, isLast)
         }
         PokeAPIServiceHelper.pokeAPIService.getPokemon(pokemonId).enqueue(pokemonCallback)
