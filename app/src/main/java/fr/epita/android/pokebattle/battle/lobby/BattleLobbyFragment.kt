@@ -11,16 +11,17 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import fr.epita.android.pokebattle.R
 import fr.epita.android.pokebattle.Utils
+import fr.epita.android.pokebattle.battle.BattleLoadingScreenFragment
 import fr.epita.android.pokebattle.main.MainActivity
 import fr.epita.android.pokebattle.pokedex.PokedexEntryAdapter
-import fr.epita.android.pokebattle.webservices.pokeapi.PokeAPIInterface
+import fr.epita.android.pokebattle.webservices.pokeapi.PokeAPIServiceHelper.pokeAPIService
 import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.Pokemon
+import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.nature.Nature
+import fr.epita.android.pokebattle.webservices.pokeapi.resourcelist.NamedAPIResourceList
 import fr.epita.android.pokebattle.webservices.surleweb.api.PokedexEntry
 import fr.epita.android.pokebattle.webservices.surleweb.api.SurLeWebServiceHelper.surLeWebService
 import kotlinx.android.synthetic.main.fragment_battle_lobby.*
 import retrofit2.Callback
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
 class BattleLobbyFragment : Fragment() {
 
@@ -39,14 +40,6 @@ class BattleLobbyFragment : Fragment() {
             Utils.filterPokedexEntriesByGeneration(pokedexEntriesResponse, pokedexEntries)
 
             val opponentEntry = pokedexEntries.random()
-
-            val pokeAPIRetrofit = Retrofit.Builder()
-                .baseUrl(PokeAPIInterface.Constants.url)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build()
-
-            val pokeAPIService : PokeAPIInterface =
-                pokeAPIRetrofit.create(PokeAPIInterface::class.java)
 
             val opponentPokemonCallback : Callback<Pokemon> =
                 Utils.pokeAPICallback { pokeAPIResponse ->
@@ -143,6 +136,20 @@ class BattleLobbyFragment : Fragment() {
         }
     }
 
+    private fun buildAllNatures() {
+        val naturesCallback : Callback<NamedAPIResourceList> = Utils.pokeAPICallback { naturesResponse ->
+            val naturesResourceList : NamedAPIResourceList = naturesResponse.body()!!
+            for (natureResource in naturesResourceList.results) {
+                val natureCallback : Callback<Nature> = Utils.pokeAPICallback { natureResponse ->
+                    val nature : Nature = natureResponse.body()!!
+                    BattleLoadingScreenFragment.allNaturesList.add(nature)
+                }
+                pokeAPIService.getNatureByName(natureResource.name).enqueue(natureCallback)
+            }
+        }
+        pokeAPIService.getNatures().enqueue(naturesCallback)
+    }
+
     override fun onCreateView(inflater : LayoutInflater, container : ViewGroup?, savedInstanceState : Bundle?) : View? {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_battle_lobby, container, false)
@@ -150,7 +157,7 @@ class BattleLobbyFragment : Fragment() {
 
     override fun onViewCreated(view : View, savedInstanceState : Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        buildAllNatures()
         surLeWebService.pokemonList().enqueue(pokemonListCallback)
 
         FightButton.setOnClickListener {

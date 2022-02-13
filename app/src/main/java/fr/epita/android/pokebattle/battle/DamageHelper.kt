@@ -58,7 +58,7 @@ object DamageHelper {
     @JvmStatic
     fun criticalGen1(speed : PokemonStat) : Boolean {
         // see https://bulbapedia.bulbagarden.net/wiki/Critical_hit in generation 1
-        val threshold = speed.base_stat / 2
+        val threshold : Int = speed.modified_stat.toInt() / 2
         val random = (0..255).random()
         return random < threshold
     }
@@ -88,14 +88,14 @@ object DamageHelper {
 
         val (att, def) = when (move.damage_class.name) {
             "physical" -> Pair(
-                attacker.pokemon!!.stats.find { it.stat.name == "attack" }!!.base_stat,
-                defender.pokemon!!.stats.find { it.stat.name == "defense" }!!.base_stat
+                attacker.pokemon!!.stats.find { it.stat.name == "attack" }!!.modified_stat,
+                defender.pokemon!!.stats.find { it.stat.name == "defense" }!!.modified_stat
             )
             "special" -> Pair(
-                attacker.pokemon!!.stats.find { it.stat.name == "special-attack" }!!.base_stat,
-                defender.pokemon!!.stats.find { it.stat.name == "special-defense" }!!.base_stat
+                attacker.pokemon!!.stats.find { it.stat.name == "special-attack" }!!.modified_stat,
+                defender.pokemon!!.stats.find { it.stat.name == "special-defense" }!!.modified_stat
             )
-            else -> Pair(0, 0)
+            else -> Pair(0.0, 0.0)
         }
 
         val level = if (generation == 1 && critical) Globals.POKEMON_LEVEL * 2 else Globals.POKEMON_LEVEL

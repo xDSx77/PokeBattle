@@ -48,11 +48,19 @@
             tools:text="Pokemon Name" />
 
         <TextView
+            android:id="@+id/opponentPokemonLevelText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/level"
+            app:layout_constraintBottom_toTopOf="@+id/opponentPokemonImageView"
+            app:layout_constraintStart_toStartOf="@+id/opponentPokemonImageView" />
+
+        <TextView
             android:id="@+id/opponentPokemonLevel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toTopOf="@+id/opponentPokemonImageView"
-            app:layout_constraintStart_toStartOf="@+id/opponentPokemonImageView"
+            app:layout_constraintStart_toEndOf="@+id/opponentPokemonLevelText"
             tools:text="Pokemon Level" />
 
         <ImageView
@@ -76,6 +84,31 @@
             app:layout_constraintTop_toBottomOf="@+id/opponentPokemonImageView" />
 
         <TextView
+            android:id="@+id/opponentPokemonCurrentPV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="@+id/opponentPokemonImageView"
+            app:layout_constraintTop_toBottomOf="@+id/opponentPokemonHealth"
+            tools:text="0" />
+
+        <TextView
+            android:id="@+id/opponentPokemonSlash"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/slash"
+            app:layout_constraintEnd_toEndOf="@+id/opponentPokemonImageView"
+            app:layout_constraintStart_toStartOf="@+id/opponentPokemonImageView"
+            app:layout_constraintTop_toBottomOf="@+id/opponentPokemonHealth" />
+
+        <TextView
+            android:id="@+id/opponentPokemonMaxPV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="@+id/opponentPokemonImageView"
+            app:layout_constraintTop_toBottomOf="@+id/opponentPokemonHealth"
+            tools:text="0" />
+
+        <TextView
             android:id="@+id/battlingPokemonName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -85,11 +118,19 @@
             tools:text="Pokemon Name" />
 
         <TextView
+            android:id="@+id/battlingPokemonLevelText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/level"
+            app:layout_constraintBottom_toTopOf="@+id/battlingPokemonImageView"
+            app:layout_constraintStart_toStartOf="@+id/battlingPokemonImageView" />
+
+        <TextView
             android:id="@+id/battlingPokemonLevel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toTopOf="@+id/battlingPokemonImageView"
-            app:layout_constraintStart_toStartOf="@+id/battlingPokemonImageView"
+            app:layout_constraintStart_toEndOf="@+id/battlingPokemonLevelText"
             tools:text="Pokemon Level" />
 
         <ImageView
@@ -110,6 +151,31 @@
             app:layout_constraintEnd_toEndOf="@+id/battlingPokemonImageView"
             app:layout_constraintStart_toStartOf="@+id/battlingPokemonImageView"
             app:layout_constraintTop_toBottomOf="@+id/battlingPokemonImageView" />
+
+        <TextView
+            android:id="@+id/battlingPokemonCurrentPV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="@+id/battlingPokemonImageView"
+            app:layout_constraintTop_toBottomOf="@+id/battlingPokemonHealth"
+            tools:text="0" />
+
+        <TextView
+            android:id="@+id/battlingPokemonSlash"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/slash"
+            app:layout_constraintEnd_toEndOf="@+id/battlingPokemonImageView"
+            app:layout_constraintStart_toStartOf="@+id/battlingPokemonImageView"
+            app:layout_constraintTop_toBottomOf="@+id/battlingPokemonHealth" />
+
+        <TextView
+            android:id="@+id/battlingPokemonMaxPV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="@+id/battlingPokemonImageView"
+            app:layout_constraintTop_toBottomOf="@+id/battlingPokemonHealth"
+            tools:text="0" />
 
         <TextView
             android:id="@+id/MessageTextView"

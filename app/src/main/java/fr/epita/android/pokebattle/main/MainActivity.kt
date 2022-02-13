@@ -11,6 +11,7 @@ import fr.epita.android.pokebattle.pokedex.details.PokedexDetailsFragment
 import fr.epita.android.pokebattle.pokedex.list.PokedexListFragment
 import fr.epita.android.pokebattle.typehelp.TypeHelpFragment
 import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.Pokemon
+import kotlin.system.exitProcess
 
 class MainActivity : AppCompatActivity() {
 
@@ -106,6 +107,8 @@ class MainActivity : AppCompatActivity() {
             (if (backStackEntryCount == 0) null else supportFragmentManager.getBackStackEntryAt(backStackEntryCount - 1))?.name
         if (lastBackStackEntryName != null && (lastBackStackEntryName == "loading" || lastBackStackEntryName == "battle")) {
             Toast.makeText(this, "Could not go back now", Toast.LENGTH_SHORT).show()
+        } else if (lastBackStackEntryName != null && lastBackStackEntryName == "start") {
+            exitProcess(0)
         } else {
             super.onBackPressed()
         }

@@ -19,6 +19,8 @@ import fr.epita.android.pokebattle.webservices.pokeapi.PokeAPIServiceHelper
 import fr.epita.android.pokebattle.webservices.pokeapi.moves.Move
 import fr.epita.android.pokebattle.webservices.pokeapi.moves.MoveCategory
 import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.Pokemon
+import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.PokemonStat
+import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.nature.Nature
 import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.type.Type
 import fr.epita.android.pokebattle.webservices.pokeapi.resourcelist.NamedAPIResourceList
 import fr.epita.android.pokebattle.webservices.pokeapi.utils.NamedAPIResource
@@ -26,6 +28,9 @@ import retrofit2.Callback
 
 class BattleLoadingScreenFragment : Fragment() {
 
+    companion object {
+        val allNaturesList : MutableList<Nature> = mutableListOf()
+    }
     private val allDamageMovesList : MutableList<NamedAPIResource> = mutableListOf()
 
     override fun onCreateView(inflater : LayoutInflater, container : ViewGroup?, savedInstanceState : Bundle?) : View? {
@@ -39,7 +44,6 @@ class BattleLoadingScreenFragment : Fragment() {
         val moveCallback : Callback<Move> = Utils.pokeAPICallback { response ->
             pokemonInfo.moves.add(response.body()!!)
             if (pokemonInfo.moves.size == 4 && isLast) {
-                //loadingGroup.visibility = View.GONE
                 (activity as MainActivity).battle()
             }
         }
@@ -53,13 +57,29 @@ class BattleLoadingScreenFragment : Fragment() {
         }
     }
 
+    private fun setPokemonModifiedStats(pokemonInfo : PokemonInfo) {
+        val decreasedStat = pokemonInfo.pokemon!!.stats.find { it.stat == pokemonInfo.nature!!.decreased_stat }
+        val increasedStat = pokemonInfo.pokemon!!.stats.find { it.stat == pokemonInfo.nature!!.increased_stat }
+        for (stat : PokemonStat in pokemonInfo.pokemon!!.stats) {
+            if (decreasedStat != null && stat.stat.name == decreasedStat.stat.name) {
+                stat.modified_stat = stat.base_stat * 0.9
+            } else if (increasedStat != null && stat.stat.name == increasedStat.stat.name) {
+                stat.modified_stat = stat.base_stat * 1.1
+            } else {
+                stat.modified_stat = stat.base_stat.toDouble()
+            }
+        }
+    }
+
     private fun buildOpponentPokemon(pokemonId : Int, opponentPokemonInfo : PokemonInfo) {
         val opponentCallback : Callback<Pokemon> = Utils.pokeAPICallback { opponentResponse ->
             val opponentPokemon = opponentResponse.body()!!
-            val opponentHp = opponentPokemon.stats.find { it.stat.name == "hp" }!!.base_stat
             opponentPokemonInfo.pokemon = opponentPokemon
-            opponentPokemonInfo.hp = opponentHp
             opponentPokemonInfo.moves = mutableListOf()
+            opponentPokemonInfo.nature = allNaturesList.random()
+            val opponentHp = opponentPokemon.stats.find { it.stat.name == "hp" }!!.modified_stat
+            opponentPokemonInfo.hp = opponentHp.toInt()
+            setPokemonModifiedStats(opponentPokemonInfo)
             buildPokemonMoves(opponentPokemonInfo, false)
         }
         PokeAPIServiceHelper.pokeAPIService.getPokemon(pokemonId).enqueue(opponentCallback)
@@ -69,10 +89,12 @@ class BattleLoadingScreenFragment : Fragment() {
     private fun buildPlayerPokemon(pokemonId : Int, pokemonInfo : PokemonInfo, isLast : Boolean) {
         val pokemonCallback : Callback<Pokemon> = Utils.pokeAPICallback { pokemonResponse ->
             val pokemon = pokemonResponse.body()!!
-            val pokemonHp = pokemon.stats.find { it.stat.name == "hp" }!!.base_stat
             pokemonInfo.pokemon = pokemon
-            pokemonInfo.hp = pokemonHp
             pokemonInfo.moves = mutableListOf()
+            pokemonInfo.nature = allNaturesList.random()
+            val pokemonHp = pokemon.stats.find { it.stat.name == "hp" }!!.modified_stat
+            pokemonInfo.hp = pokemonHp.toInt()
+            setPokemonModifiedStats(pokemonInfo)
             buildPokemonMoves(pokemonInfo, isLast)
         }
         PokeAPIServiceHelper.pokeAPIService.getPokemon(pokemonId).enqueue(pokemonCallback)

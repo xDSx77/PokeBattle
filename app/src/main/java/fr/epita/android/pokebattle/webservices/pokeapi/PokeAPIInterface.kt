@@ -3,6 +3,7 @@ package fr.epita.android.pokebattle.webservices.pokeapi
 import fr.epita.android.pokebattle.webservices.pokeapi.moves.Move
 import fr.epita.android.pokebattle.webservices.pokeapi.moves.MoveCategory
 import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.Pokemon
+import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.nature.Nature
 import fr.epita.android.pokebattle.webservices.pokeapi.resourcelist.NamedAPIResourceList
 import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.type.Type
 import retrofit2.Call
@@ -28,4 +29,10 @@ interface PokeAPIInterface {
 
     @GET("move/{name}")
     fun getMove(@Path("name") name : String) : Call<Move>
+
+    @GET("nature")
+    fun getNatures() : Call<NamedAPIResourceList>
+
+    @GET("nature/{name}/?limit=30")
+    fun getNatureByName(@Path("name") name : String) : Call<Nature>
 }
