@@ -1,7 +1,9 @@
 package fr.epita.android.pokebattle.battle
 
 import fr.epita.android.pokebattle.Globals
+import fr.epita.android.pokebattle.Utils
 import fr.epita.android.pokebattle.enums.NonVolatileStatusEffect
+import fr.epita.android.pokebattle.enums.Stat
 import fr.epita.android.pokebattle.webservices.pokeapi.moves.Move
 import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.PokemonStat
 import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.PokemonType
@@ -58,7 +60,7 @@ object DamageHelper {
     @JvmStatic
     fun criticalGen1(speed : PokemonStat) : Boolean {
         // see https://bulbapedia.bulbagarden.net/wiki/Critical_hit in generation 1
-        val threshold : Int = speed.modified_stat.toInt() / 2
+        val threshold : Int = speed.modified_stat / 2
         val random = (0..255).random()
         return random < threshold
     }
@@ -78,27 +80,27 @@ object DamageHelper {
         val weather = 1
         val badge = 1
         val generation = Globals.GENERATION.generation
-        val criticalValue = if (critical && generation in (2..5)) 2.0 else if (critical && generation >= 6) 1.5 else 1.0
-        val random = if (generation in (1..2)) ((217..255).random()/255).toDouble() else (85..101).random().toDouble() / 100
-        val stab = if (move.type in attacker.pokemon!!.types.map { t -> t.type }) 1.5 else 1.0
-        val burn = if (generation >= 3 && attacker.currentNonVolatileStatus == NonVolatileStatusEffect.BURN && move.damage_class.name == "physical") 0.5 else 1.0
+        val criticalValue : Double = if (critical && generation in (2..5)) 2.0 else if (critical && generation >= 6) 1.5 else 1.0
+        val random : Double = if (generation in (1..2)) ((217..255).random()/255).toDouble() else (85..101).random().toDouble() / 100
+        val stab : Double = if (move.type in attacker.pokemon!!.types.map { t -> t.type }) 1.5 else 1.0
+        val burn : Double = if (generation >= 3 && attacker.currentNonVolatileStatus == NonVolatileStatusEffect.BURN && move.damage_class.name == "physical") 0.5 else 1.0
         val other = 1
 
-        val modifier = targets * weather * badge * criticalValue * random * stab * efficiency * burn * other
+        val modifier : Double = targets * weather * badge * criticalValue * random * stab * efficiency * burn * other
 
-        val (att, def) = when (move.damage_class.name) {
+        val (att : Int, def : Int) = when (move.damage_class.name) {
             "physical" -> Pair(
-                attacker.pokemon!!.stats.find { it.stat.name == "attack" }!!.modified_stat,
-                defender.pokemon!!.stats.find { it.stat.name == "defense" }!!.modified_stat
+                Utils.getPokemonStat(attacker.pokemon!!, Stat.ATTACK).modified_stat,
+                Utils.getPokemonStat(defender.pokemon!!, Stat.DEFENSE).modified_stat
             )
             "special" -> Pair(
-                attacker.pokemon!!.stats.find { it.stat.name == "special-attack" }!!.modified_stat,
-                defender.pokemon!!.stats.find { it.stat.name == "special-defense" }!!.modified_stat
+                Utils.getPokemonStat(attacker.pokemon!!, Stat.SPECIAL_ATTACK).modified_stat,
+                Utils.getPokemonStat(defender.pokemon!!, Stat.SPECIAL_DEFENSE).modified_stat
             )
-            else -> Pair(0.0, 0.0)
+            else -> Pair(0, 0)
         }
 
-        val level = if (generation == 1 && critical) Globals.POKEMON_LEVEL * 2 else Globals.POKEMON_LEVEL
+        val level = if (generation == 1 && critical) attacker.level * 2 else attacker.level
         return (((((2 * level) / 5) + 2 * move.power!! * (att / def)) / 50) + 2) * modifier
     }
 

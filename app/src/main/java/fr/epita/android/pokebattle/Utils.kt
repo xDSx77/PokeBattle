@@ -4,6 +4,9 @@ import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
 import android.util.Log
 import android.widget.ImageView
+import fr.epita.android.pokebattle.enums.Stat
+import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.Pokemon
+import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.PokemonStat
 import fr.epita.android.pokebattle.webservices.surleweb.api.PokedexEntry
 import retrofit2.Call
 import retrofit2.Callback
@@ -85,5 +88,10 @@ object Utils {
                     onResponse(response)
             }
         }
+    }
+
+    @JvmStatic
+    fun getPokemonStat(pokemon : Pokemon, stat : Stat) : PokemonStat {
+        return pokemon.stats.find { it.stat.name == stat.statName }!!
     }
 }

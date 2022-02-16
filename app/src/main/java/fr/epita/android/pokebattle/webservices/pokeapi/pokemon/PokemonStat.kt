@@ -7,5 +7,5 @@ data class PokemonStat(
     var effort : Int, // The effort points (EV) the Pokemon has in the stat.
     var iv: Int, // The individual value (IV) the Pokemon has in the stat.
     var base_stat : Int, // The base value of the stat.
-    var modified_stat : Double // The value of the state, modified with the nature.
+    var modified_stat : Int // The value of the state, modified with the nature.
 )

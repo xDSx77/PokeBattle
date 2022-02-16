@@ -14,23 +14,27 @@ import fr.epita.android.pokebattle.battle.BattleFragment.Companion.opponentPokem
 import fr.epita.android.pokebattle.battle.BattleFragment.Companion.pokemon1
 import fr.epita.android.pokebattle.battle.BattleFragment.Companion.pokemon2
 import fr.epita.android.pokebattle.battle.BattleFragment.Companion.pokemon3
+import fr.epita.android.pokebattle.enums.Stat
 import fr.epita.android.pokebattle.main.MainActivity
 import fr.epita.android.pokebattle.webservices.pokeapi.PokeAPIServiceHelper
 import fr.epita.android.pokebattle.webservices.pokeapi.moves.Move
 import fr.epita.android.pokebattle.webservices.pokeapi.moves.MoveCategory
 import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.Pokemon
+import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.PokemonMove
 import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.PokemonStat
 import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.nature.Nature
 import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.type.Type
 import fr.epita.android.pokebattle.webservices.pokeapi.resourcelist.NamedAPIResourceList
 import fr.epita.android.pokebattle.webservices.pokeapi.utils.NamedAPIResource
 import retrofit2.Callback
+import kotlin.math.min
 
 class BattleLoadingScreenFragment : Fragment() {
 
     companion object {
         val allNaturesList : MutableList<Nature> = mutableListOf()
     }
+
     private val allDamageMovesList : MutableList<NamedAPIResource> = mutableListOf()
 
     override fun onCreateView(inflater : LayoutInflater, container : ViewGroup?, savedInstanceState : Bundle?) : View? {
@@ -39,34 +43,47 @@ class BattleLoadingScreenFragment : Fragment() {
     }
 
     private fun buildPokemonMoves(pokemonInfo : PokemonInfo, isLast : Boolean) {
-        val allPokemonMoves = pokemonInfo.pokemon!!.moves.shuffled()
-        var movesCount = 0
+        val pokemonDamageMoves : List<NamedAPIResource> = pokemonInfo.pokemon!!.moves
+            .shuffled()
+            .map(PokemonMove::move)
+            .intersect(allDamageMovesList)
+            .toList()
         val moveCallback : Callback<Move> = Utils.pokeAPICallback { response ->
             pokemonInfo.moves.add(response.body()!!)
             if (pokemonInfo.moves.size == 4 && isLast) {
                 (activity as MainActivity).battle()
             }
         }
-        for (pokemonMove in allPokemonMoves) {
-            if (movesCount == 4)
-                break
-            if (allDamageMovesList.any { it.name == pokemonMove.move.name }) {
-                PokeAPIServiceHelper.pokeAPIService.getMove(pokemonMove.move.name).enqueue(moveCallback)
-                movesCount++
-            }
-        }
+        PokeAPIServiceHelper.pokeAPIService.getMove(pokemonDamageMoves[0].name).enqueue(moveCallback)
+        PokeAPIServiceHelper.pokeAPIService.getMove(pokemonDamageMoves[1].name).enqueue(moveCallback)
+        PokeAPIServiceHelper.pokeAPIService.getMove(pokemonDamageMoves[2].name).enqueue(moveCallback)
+        PokeAPIServiceHelper.pokeAPIService.getMove(pokemonDamageMoves[3].name).enqueue(moveCallback)
     }
 
     private fun setPokemonModifiedStats(pokemonInfo : PokemonInfo) {
-        val decreasedStat = pokemonInfo.pokemon!!.stats.find { it.stat == pokemonInfo.nature!!.decreased_stat }
-        val increasedStat = pokemonInfo.pokemon!!.stats.find { it.stat == pokemonInfo.nature!!.increased_stat }
-        for (stat : PokemonStat in pokemonInfo.pokemon!!.stats) {
-            if (decreasedStat != null && stat.stat.name == decreasedStat.stat.name) {
-                stat.modified_stat = stat.base_stat * 0.9
-            } else if (increasedStat != null && stat.stat.name == increasedStat.stat.name) {
-                stat.modified_stat = stat.base_stat * 1.1
+        val pokemon : Pokemon = pokemonInfo.pokemon!!
+        val decreasedStat = pokemon.stats.find { it.stat == pokemonInfo.nature!!.decreased_stat }
+        val increasedStat = pokemon.stats.find { it.stat == pokemonInfo.nature!!.increased_stat }
+        // https://bulbapedia.bulbagarden.net/wiki/Effort_values#Generation_III
+        var maxEv = Globals.GENERATION.maxEvPerStat
+        for (stat : PokemonStat in pokemon.stats.shuffled()) {
+            // https://bulbapedia.bulbagarden.net/wiki/Individual_values#Generation_III_onward
+            stat.iv = (0..31).random()
+            val ev = min((0..maxEv).random(), 255)
+            stat.effort = ev
+            maxEv -= ev
+            // https://bulbapedia.bulbagarden.net/wiki/Stat#Generation_III_onward
+            val commonPart : Int = (((2 * stat.base_stat + stat.iv + stat.effort / 4) * pokemonInfo.level) / 100)
+            if (stat.stat.name == Stat.HP.statName) {
+                stat.modified_stat = commonPart + pokemonInfo.level + 10
             } else {
-                stat.modified_stat = stat.base_stat.toDouble()
+                stat.modified_stat = commonPart + 5
+                // https://bulbapedia.bulbagarden.net/wiki/Nature
+                if (decreasedStat != null && stat.stat.name == decreasedStat.stat.name) {
+                    stat.modified_stat = (stat.modified_stat * 0.9).toInt()
+                } else if (increasedStat != null && stat.stat.name == increasedStat.stat.name) {
+                    stat.modified_stat = (stat.modified_stat * 1.1).toInt()
+                }
             }
         }
     }
@@ -78,8 +95,8 @@ class BattleLoadingScreenFragment : Fragment() {
             opponentPokemonInfo.moves = mutableListOf()
             opponentPokemonInfo.nature = allNaturesList.random()
             setPokemonModifiedStats(opponentPokemonInfo)
-            val opponentHp = opponentPokemon.stats.find { it.stat.name == "hp" }!!.modified_stat
-            opponentPokemonInfo.hp = opponentHp.toInt()
+            val opponentHp = Utils.getPokemonStat(opponentPokemon, Stat.HP).modified_stat
+            opponentPokemonInfo.hp = opponentHp
             buildPokemonMoves(opponentPokemonInfo, false)
         }
         PokeAPIServiceHelper.pokeAPIService.getPokemon(pokemonId).enqueue(opponentCallback)
@@ -93,8 +110,8 @@ class BattleLoadingScreenFragment : Fragment() {
             pokemonInfo.moves = mutableListOf()
             pokemonInfo.nature = allNaturesList.random()
             setPokemonModifiedStats(pokemonInfo)
-            val pokemonHp = pokemon.stats.find { it.stat.name == "hp" }!!.modified_stat
-            pokemonInfo.hp = pokemonHp.toInt()
+            val pokemonHp = Utils.getPokemonStat(pokemon, Stat.HP).modified_stat
+            pokemonInfo.hp = pokemonHp
             buildPokemonMoves(pokemonInfo, isLast)
         }
         PokeAPIServiceHelper.pokeAPIService.getPokemon(pokemonId).enqueue(pokemonCallback)

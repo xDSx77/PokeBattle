@@ -12,6 +12,7 @@ import com.bumptech.glide.Glide
 import fr.epita.android.pokebattle.Globals
 import fr.epita.android.pokebattle.R
 import fr.epita.android.pokebattle.Utils
+import fr.epita.android.pokebattle.enums.Stat
 import fr.epita.android.pokebattle.main.MainActivity
 import fr.epita.android.pokebattle.webservices.pokeapi.moves.Move
 import kotlinx.android.synthetic.main.fragment_battle.*
@@ -23,12 +24,12 @@ class BattleFragment : Fragment() {
     private var playerTurn = false
 
     companion object {
-        var opponentPokemon1 : PokemonInfo = PokemonInfo(null, null, mutableListOf(), 0, 0, 0, null)
-        var opponentPokemon2 : PokemonInfo = PokemonInfo(null, null, mutableListOf(), 0, 0, 0, null)
-        var opponentPokemon3 : PokemonInfo = PokemonInfo(null, null, mutableListOf(), 0, 0, 0, null)
-        var pokemon1 : PokemonInfo = PokemonInfo(null, null, mutableListOf(), 0, 0, 0, null)
-        var pokemon2 : PokemonInfo = PokemonInfo(null, null, mutableListOf(), 0, 0, 0, null)
-        var pokemon3 : PokemonInfo = PokemonInfo(null, null, mutableListOf(), 0, 0, 0, null)
+        var opponentPokemon1 : PokemonInfo = PokemonInfo()
+        var opponentPokemon2 : PokemonInfo = PokemonInfo()
+        var opponentPokemon3 : PokemonInfo = PokemonInfo()
+        var pokemon1 : PokemonInfo = PokemonInfo()
+        var pokemon2 : PokemonInfo = PokemonInfo()
+        var pokemon3 : PokemonInfo = PokemonInfo()
     }
 
     private lateinit var battlingPokemon : PokemonInfo
@@ -86,7 +87,7 @@ class BattleFragment : Fragment() {
             .with(this@BattleFragment)
             .load(pok.pokemon!!.sprites.front_default)
             .into(opponentPokemonImageView)
-        opponentPokemonHealth.max = pok.pokemon!!.stats.find { it.stat.name == "hp" }!!.modified_stat.toInt()
+        opponentPokemonHealth.max = Utils.getPokemonStat(pok.pokemon!!, Stat.HP).modified_stat
         opponentPokemonHealth.progress = pok.hp
         opponentPokemonMaxPV.text = opponentPokemonHealth.max.toString()
         opponentPokemonCurrentPV.text = pok.hp.toString()
@@ -104,7 +105,7 @@ class BattleFragment : Fragment() {
             .with(this@BattleFragment)
             .load(battlingSprite)
             .into(battlingPokemonImageView)
-        battlingPokemonHealth.max = pok.pokemon!!.stats.find { it.stat.name == "hp" }!!.modified_stat.toInt()
+        battlingPokemonHealth.max = Utils.getPokemonStat(pok.pokemon!!, Stat.HP).modified_stat
         battlingPokemonHealth.progress = pok.hp
         battlingPokemonMaxPV.text = battlingPokemonHealth.max.toString()
         battlingPokemonCurrentPV.text = pok.hp.toString()
@@ -116,8 +117,8 @@ class BattleFragment : Fragment() {
     }
 
     private fun playerTurn(moveId : Int) {
-        val opponentPokemonSpeed = opponentBattlingPokemon.pokemon!!.stats.find { it.stat.name == "speed" }!!.modified_stat
-        val battlingPokemonSpeed = battlingPokemon.pokemon!!.stats.find { it.stat.name == "speed" }!!.modified_stat
+        val opponentPokemonSpeed = Utils.getPokemonStat(opponentBattlingPokemon.pokemon!!, Stat.SPEED).modified_stat
+        val battlingPokemonSpeed = Utils.getPokemonStat(battlingPokemon.pokemon!!, Stat.SPEED).modified_stat
         if (opponentPokemonSpeed > battlingPokemonSpeed)
             opponentTurn {
                 playerTurn = true
@@ -195,7 +196,7 @@ class BattleFragment : Fragment() {
         if (move.power == null)
             move.power = 0
 
-        val attackerSpeed = attacker.pokemon!!.stats.find { t -> t.stat.name == "speed" }!!
+        val attackerSpeed = Utils.getPokemonStat(attacker.pokemon!!, Stat.SPEED)
         val critical = if (Globals.GENERATION.generation == 1) DamageHelper.criticalGen1(attackerSpeed) else DamageHelper.critical()
         if (critical)
             showMessage("A critical hit!")
@@ -277,10 +278,10 @@ class BattleFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setBattlingPokemon(pokemon1)
-        battlingPokemonLevel.text = Globals.POKEMON_LEVEL.toString()
+        battlingPokemonLevel.text = pokemon1.level.toString()
 
         setOpponentPokemon(opponentPokemon1)
-        opponentPokemonLevel.text = Globals.POKEMON_LEVEL.toString()
+        opponentPokemonLevel.text = opponentPokemon1.level.toString()
         showMessage("A wild " + opponentPokemonName.text + " has appeared!")
 
         loadPokemon(pokemon1, pokemon1ImageView, pokemon1Name)
