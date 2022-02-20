@@ -50,7 +50,12 @@ dependencies {
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     // Also add a retrofit plugin to handle json responses
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    implementation 'com.squareup.retrofit2:adapter-rxjava3:2.9.0'
     // Include the dependency in your app module build.gradle file
     implementation 'com.github.bumptech.glide:glide:4.12.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.12.0'
+    // RxJava for async call
+    implementation 'io.reactivex.rxjava3:rxkotlin:3.0.1'
+    implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
+    implementation 'io.reactivex.rxjava3:rxjava:3.1.3'
 }

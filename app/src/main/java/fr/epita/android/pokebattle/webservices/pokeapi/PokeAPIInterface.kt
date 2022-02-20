@@ -4,35 +4,36 @@ import fr.epita.android.pokebattle.webservices.pokeapi.moves.Move
 import fr.epita.android.pokebattle.webservices.pokeapi.moves.MoveCategory
 import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.Pokemon
 import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.nature.Nature
-import fr.epita.android.pokebattle.webservices.pokeapi.resourcelist.NamedAPIResourceList
 import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.type.Type
-import retrofit2.Call
+import fr.epita.android.pokebattle.webservices.pokeapi.resourcelist.NamedAPIResourceList
+import io.reactivex.rxjava3.core.Observable
 import retrofit2.http.GET
 import retrofit2.http.Path
 
 interface PokeAPIInterface {
     object Constants {
-        const val url : String = "https://pokeapi.co/api/v2/"
+        const val url : String = "https://pokeapi.co/"
+        const val baseEndpoint : String = "/api/v2"
     }
 
-    @GET("pokemon/{id}")
-    fun getPokemon(@Path("id") id : Int) : Call<Pokemon>
+    @GET("${Constants.baseEndpoint}/pokemon/{id}")
+    fun getPokemon(@Path("id") id : Int) : Observable<Pokemon>
 
-    @GET("type")
-    fun getTypes() : Call<NamedAPIResourceList>
+    @GET("${Constants.baseEndpoint}/type")
+    fun getTypes() : Observable<NamedAPIResourceList>
 
-    @GET("type/{name}")
-    fun getTypeByName(@Path("name") name : String) : Call<Type>
+    @GET("${Constants.baseEndpoint}/type/{name}")
+    fun getTypeByName(@Path("name") name : String) : Observable<Type>
 
-    @GET("move-category/damage")
-    fun getAllDamageMoves() : Call<MoveCategory>
+    @GET("${Constants.baseEndpoint}/move-category/damage")
+    fun getAllDamageMoves() : Observable<MoveCategory>
 
-    @GET("move/{name}")
-    fun getMove(@Path("name") name : String) : Call<Move>
+    @GET("${Constants.baseEndpoint}/move/{name}")
+    fun getMove(@Path("name") name : String) : Observable<Move>
 
-    @GET("nature")
-    fun getNatures() : Call<NamedAPIResourceList>
+    @GET("${Constants.baseEndpoint}/nature")
+    fun getNatures() : Observable<NamedAPIResourceList>
 
-    @GET("nature/{name}/?limit=30")
-    fun getNatureByName(@Path("name") name : String) : Call<Nature>
+    @GET("${Constants.baseEndpoint}/nature/{name}/?limit=30")
+    fun getNatureByName(@Path("name") name : String) : Observable<Nature>
 }

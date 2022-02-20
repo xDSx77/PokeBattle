@@ -8,11 +8,12 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import fr.epita.android.pokebattle.R
 import fr.epita.android.pokebattle.Utils
+import fr.epita.android.pokebattle.webservices.pokeapi.PokeAPIServiceHelper
 import fr.epita.android.pokebattle.webservices.pokeapi.PokeAPIServiceHelper.pokeAPIService
-import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.type.Type
 import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.type.TypeRelations
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_type_help.*
-import retrofit2.Callback
 
 class TypeHelpFragment : Fragment() {
 
@@ -32,14 +33,15 @@ class TypeHelpFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val typeName : String = requireArguments().getString("typeName") ?: return
 
-        val typeCallback : Callback<Type> = Utils.pokeAPICallback { response ->
-            val type : Type = response.body()!!
-            TypeImageView.setImageResource(Utils.typeToRDrawable(typeName))
-            clearTypesList()
-            setTypesList(type.damage_relations)
-            setGridView()
-        }
-        pokeAPIService.getTypeByName(typeName).enqueue(typeCallback)
+        pokeAPIService.getTypeByName(typeName)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(PokeAPIServiceHelper.pokeApiObserver { type ->
+                TypeImageView.setImageResource(Utils.typeToRDrawable(typeName))
+                clearTypesList()
+                setTypesList(type.damage_relations)
+                setGridView()
+            })
     }
 
     private fun clearTypesList() {

@@ -106,7 +106,7 @@ class MainActivity : AppCompatActivity() {
         val lastBackStackEntryName =
             (if (backStackEntryCount == 0) null else supportFragmentManager.getBackStackEntryAt(backStackEntryCount - 1))?.name
         if (lastBackStackEntryName != null && (lastBackStackEntryName == "loading" || lastBackStackEntryName == "battle")) {
-            Toast.makeText(this, "Could not go back now", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Cannot go back now", Toast.LENGTH_SHORT).show()
         } else if (lastBackStackEntryName != null && lastBackStackEntryName == "start") {
             exitProcess(0)
         } else {

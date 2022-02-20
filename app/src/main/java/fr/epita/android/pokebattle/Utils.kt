@@ -2,16 +2,11 @@ package fr.epita.android.pokebattle
 
 import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
-import android.util.Log
 import android.widget.ImageView
 import fr.epita.android.pokebattle.enums.Stat
 import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.Pokemon
 import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.PokemonStat
 import fr.epita.android.pokebattle.webservices.surleweb.api.PokedexEntry
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import java.util.*
 
 object Utils {
 
@@ -58,36 +53,6 @@ object Utils {
     @JvmStatic
     fun filterPokedexEntriesByGeneration(pokedexEntries : List<PokedexEntry>, filteredPokedexEntries : ArrayList<PokedexEntry>) {
         filteredPokedexEntries.addAll(pokedexEntries.filter { p -> p.id <= Globals.GENERATION.maxIdPokedex })
-    }
-
-    @JvmStatic
-    fun <T> pokeAPICallback(onResponse : (Response<T>) -> Unit) : Callback<T> {
-        return object : Callback<T> {
-            override fun onFailure(call: Call<T>, t: Throwable) {
-                Log.w("WebServices", "Poke API call failed" + t.message)
-            }
-
-            override fun onResponse(call: Call<T>, response: Response<T>) {
-                Log.w("WebServices", "Poke API call success")
-                if (response.code() == 200)
-                    onResponse(response)
-            }
-        }
-    }
-
-    @JvmStatic
-    fun <T> surLeWebAPICallback(onResponse : (Response<T>) -> Unit) : Callback<T> {
-        return object : Callback<T> {
-            override fun onFailure(call: Call<T>, t: Throwable) {
-                Log.w("WebServices", "SurLeWeb API call failed" + t.message)
-            }
-
-            override fun onResponse(call: Call<T>, response: Response<T>) {
-                Log.w("WebServices", "SurLeWeb API call success")
-                if (response.code() == 200)
-                    onResponse(response)
-            }
-        }
     }
 
     @JvmStatic
