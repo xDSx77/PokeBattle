@@ -122,12 +122,16 @@ class BattleFragment : Fragment() {
         if (opponentPokemonSpeed > battlingPokemonSpeed)
             opponentTurn {
                 playerTurn = true
-                attack(moveId, battlingPokemon, opponentBattlingPokemon, opponentPokemonHealth) { playerTurn = true }
+                attack(moveId, battlingPokemon, opponentBattlingPokemon, opponentPokemonHealth) {
+                    playerTurn = true
+                    showMoves()
+                }
             }
         else
             attack(moveId, battlingPokemon, opponentBattlingPokemon, opponentPokemonHealth) {
                 opponentTurn {
                     playerTurn = true
+                    showMoves()
                 }
             }
     }
@@ -181,7 +185,7 @@ class BattleFragment : Fragment() {
     private fun dealDamage(move : Move, attacker : PokemonInfo, defender : PokemonInfo, health : ProgressBar) : Boolean {
         val moveName = Utils.firstLetterUpperCase(move.name)
         if (!DamageHelper.moveHit(move, attacker, defender)) {
-            doOrAddAction { showMessage("$moveName missed!"); }
+            showMessage("$moveName missed!")
             return true
         }
         val efficiency = DamageHelper.getEfficiency(move.type, defender.pokemon!!.types)
@@ -269,7 +273,10 @@ class BattleFragment : Fragment() {
         pokemonImageView.setOnClickListener {
             if (battlingPokemon != pokemonInfo && playerTurn) {
                 setBattlingPokemon(pokemonInfo)
-                opponentTurn { playerTurn = true }
+                opponentTurn {
+                    playerTurn = true
+                    showMoves()
+                }
             }
         }
     }
