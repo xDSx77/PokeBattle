@@ -163,8 +163,10 @@ class BattleFragment : Fragment() {
                     MessageTextView.setOnClickListener { (activity as MainActivity).home(); }
                     Utils.greyImage(battlingPokemonImageView)
                 }
-            } else
+            } else {
                 setBattlingPokemon(newPokemon)
+                playerTurn = true
+            }
         } else {
             val opponents = listOf(opponentPokemon1, opponentPokemon2, opponentPokemon3)
             val newOpponent = opponents.find { it.hp > 0 }
@@ -177,8 +179,10 @@ class BattleFragment : Fragment() {
                     pokemon3ImageView.setOnClickListener(null)
                     Utils.greyImage(opponentPokemonImageView)
                 }
-            } else
+            } else {
                 setOpponentPokemon(newOpponent)
+                playerTurn = true
+            }
         }
     }
 
