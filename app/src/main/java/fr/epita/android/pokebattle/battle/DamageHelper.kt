@@ -97,7 +97,7 @@ object DamageHelper {
                 Utils.getPokemonStat(attacker.pokemon!!, Stat.SPECIAL_ATTACK).modified_stat,
                 Utils.getPokemonStat(defender.pokemon!!, Stat.SPECIAL_DEFENSE).modified_stat
             )
-            else -> Pair(0, 0)
+            else -> Pair(0, 1)
         }
 
         val level = if (generation == 1 && critical) attacker.level * 2 else attacker.level
