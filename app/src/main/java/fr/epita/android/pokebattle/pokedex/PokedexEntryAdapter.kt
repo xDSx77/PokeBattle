@@ -7,7 +7,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import fr.epita.android.pokebattle.R
 import fr.epita.android.pokebattle.Utils
-import fr.epita.android.pokebattle.main.MainActivity
 import fr.epita.android.pokebattle.webservices.surleweb.api.PokedexEntry
 import kotlinx.android.synthetic.main.pokedex_entry.view.*
 
@@ -28,39 +27,23 @@ class PokedexEntryAdapter(private val pokedexEntries : List<PokedexEntry>,
 
     override fun onBindViewHolder(holder: PokedexEntryViewHolder, position: Int) {
         val pokedexEntry = pokedexEntries[position]
-        holder.view.tag = position
+        val view : View = holder.view
+        view.tag = position
         val pokemonNumber = pokedexEntry.id
         when {
-            pokemonNumber >= 100 -> holder.view.pokemonNumber_textView.text = pokemonNumber.toString()
-            pokemonNumber in 10..99 -> holder.view.pokemonNumber_textView.text =
+            pokemonNumber >= 100 -> view.pokemonNumber_textView.text = pokemonNumber.toString()
+            pokemonNumber in 10..99 -> view.pokemonNumber_textView.text =
                 holder.view.context.getString(R.string.pokemonNumber10_99, pokemonNumber)
             else -> holder.view.pokemonNumber_textView.text =
                 holder.view.context.getString(R.string.pokemonNumber0_9, pokemonNumber)
         }
 
         Glide
-            .with(holder.view)
+            .with(view)
             .load(pokedexEntry.sprite)
-            .into(holder.view.pokemon_imageView)
-        holder.view.name_textView.text = Utils.firstLetterUpperCase(pokedexEntry.name)
+            .into(view.pokemon_imageView)
+        view.name_textView.text = Utils.firstLetterUpperCase(pokedexEntry.name)
 
-        if (pokedexEntry.types.size == 1) {
-            holder.view.type1_imageView.setImageResource(Utils.typeToRDrawable(pokedexEntry.types[0].name))
-            holder.view.type1_imageView.setOnClickListener {
-                (holder.view.context as MainActivity).typeHelp(pokedexEntry.types[0].name)
-            }
-            holder.view.type2_imageView.visibility = View.INVISIBLE
-        }
-        else if (pokedexEntry.types.size == 2) {
-            holder.view.type2_imageView.visibility = View.VISIBLE
-            holder.view.type1_imageView.setImageResource(Utils.typeToRDrawable(pokedexEntry.types[1].name))
-            holder.view.type1_imageView.setOnClickListener {
-                (holder.view.context as MainActivity).typeHelp(pokedexEntry.types[1].name)
-            }
-            holder.view.type2_imageView.setImageResource(Utils.typeToRDrawable(pokedexEntry.types[0].name))
-            holder.view.type2_imageView.setOnClickListener {
-                (holder.view.context as MainActivity).typeHelp(pokedexEntry.types[0].name)
-            }
-        }
+        Utils.loadTypeIntoRightImageView(pokedexEntry, view.context, view.type1_imageView, view.type2_imageView)
     }
 }

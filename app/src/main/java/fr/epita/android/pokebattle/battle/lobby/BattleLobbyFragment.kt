@@ -1,5 +1,6 @@
 package fr.epita.android.pokebattle.battle.lobby
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -45,25 +46,7 @@ class BattleLobbyFragment : Fragment() {
             .load(pokemon?.sprites?.front_default ?: pokedexEntry.sprite)
             .into(pokemonImageView)
 
-        if (pokedexEntry.types.size == 1) {
-            pokemonType1ImageView.visibility = View.VISIBLE
-            pokemonType2ImageView.visibility = View.INVISIBLE
-            pokemonType1ImageView.setImageResource(Utils.typeToRDrawable(pokedexEntry.types[0].name))
-            pokemonType1ImageView.setOnClickListener {
-                (activity as MainActivity).typeHelp(pokedexEntry.types[0].name)
-            }
-        } else if (pokedexEntry.types.size == 2) {
-            pokemonType1ImageView.visibility = View.VISIBLE
-            pokemonType2ImageView.visibility = View.VISIBLE
-            pokemonType1ImageView.setImageResource(Utils.typeToRDrawable(pokedexEntry.types[1].name))
-            pokemonType1ImageView.setOnClickListener {
-                (activity as MainActivity).typeHelp(pokedexEntry.types[1].name)
-            }
-            pokemonType2ImageView.setImageResource(Utils.typeToRDrawable(pokedexEntry.types[0].name))
-            pokemonType2ImageView.setOnClickListener {
-                (activity as MainActivity).typeHelp(pokedexEntry.types[0].name)
-            }
-        }
+        Utils.loadTypeIntoRightImageView(pokedexEntry, activity as Context, pokemonType1ImageView, pokemonType2ImageView)
     }
 
     private fun showPokemonEntries(pokedexEntriesResponse : List<PokedexEntry>) {

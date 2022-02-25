@@ -14,5 +14,6 @@ data class PokemonInfo(
     var hp : Int = 0,
     var accuracy : Int = 0,
     var evasion : Int = 0,
-    var currentNonVolatileStatus : NonVolatileStatusEffect? = null
+    var currentNonVolatileStatus : NonVolatileStatusEffect? = null,
+    var numberTurnStatusRemaining : Int = 0
 )

@@ -1,7 +1,6 @@
 package fr.epita.android.pokebattle.pokedex.details
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,7 +8,6 @@ import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import fr.epita.android.pokebattle.R
 import fr.epita.android.pokebattle.Utils
-import fr.epita.android.pokebattle.main.MainActivity
 import fr.epita.android.pokebattle.webservices.pokeapi.PokeAPIServiceHelper
 import fr.epita.android.pokebattle.webservices.pokeapi.PokeAPIServiceHelper.pokeAPIService
 import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.Pokemon
@@ -43,31 +41,7 @@ class PokedexDetailsFragment : Fragment() {
                 "special-defense" -> SpecialDefenseValueTextView.text = stat.base_stat.toString()
             }
         }
-        when (pokemon.types.size) {
-            2 -> {
-                TypeImageView.visibility = View.INVISIBLE
-                Type1ImageView.visibility = View.VISIBLE
-                Type1ImageView.setImageResource(Utils.typeToRDrawable(pokemon.types[0].type.name))
-                Type1ImageView.setOnClickListener {
-                    (view?.context as MainActivity).typeHelp(pokemon.types[0].type.name)
-                }
-                Type2ImageView.visibility = View.VISIBLE
-                Type2ImageView.setImageResource(Utils.typeToRDrawable(pokemon.types[1].type.name))
-                Type2ImageView.setOnClickListener {
-                    (view?.context as MainActivity).typeHelp(pokemon.types[1].type.name)
-                }
-            }
-            1 -> {
-                Type1ImageView.visibility = View.INVISIBLE
-                Type2ImageView.visibility = View.INVISIBLE
-                TypeImageView.visibility = View.VISIBLE
-                TypeImageView.setImageResource(Utils.typeToRDrawable(pokemon.types[0].type.name))
-                TypeImageView.setOnClickListener {
-                    (view?.context as MainActivity).typeHelp(pokemon.types[0].type.name)
-                }
-            }
-            else -> Log.w("Pokemon types", "No type found for this pokemon")
-        }
+        view?.let { Utils.loadTypeIntoRightImageView(pokemon, it.context, Type1ImageView, Type2ImageView) }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
