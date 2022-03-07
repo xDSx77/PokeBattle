@@ -7,10 +7,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import fr.epita.android.pokebattle.R
 import fr.epita.android.pokebattle.Utils
-import fr.epita.android.pokebattle.webservices.surleweb.api.PokedexEntry
+import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.Pokemon
 import kotlinx.android.synthetic.main.pokedex_entry.view.*
 
-class PokedexEntryAdapter(private val pokedexEntries : List<PokedexEntry>,
+class PokedexEntryAdapter(private val pokemons : List<Pokemon>,
                           private val entryClickListener: View.OnClickListener)
     : RecyclerView.Adapter<PokedexEntryAdapter.PokedexEntryViewHolder>() {
 
@@ -23,13 +23,13 @@ class PokedexEntryAdapter(private val pokedexEntries : List<PokedexEntry>,
         return PokedexEntryViewHolder(view)
     }
 
-    override fun getItemCount() = pokedexEntries.size
+    override fun getItemCount() = pokemons.size
 
     override fun onBindViewHolder(holder: PokedexEntryViewHolder, position: Int) {
-        val pokedexEntry = pokedexEntries[position]
+        val pokemon = pokemons[position]
         val view : View = holder.view
         view.tag = position
-        val pokemonNumber = pokedexEntry.id
+        val pokemonNumber = pokemon.id
         when {
             pokemonNumber >= 100 -> view.pokemonNumber_textView.text = pokemonNumber.toString()
             pokemonNumber in 10..99 -> view.pokemonNumber_textView.text =
@@ -40,10 +40,10 @@ class PokedexEntryAdapter(private val pokedexEntries : List<PokedexEntry>,
 
         Glide
             .with(view)
-            .load(pokedexEntry.sprite)
+            .load(pokemon.sprites.front_default)
             .into(view.pokemon_imageView)
-        view.name_textView.text = Utils.firstLetterUpperCase(pokedexEntry.name)
+        view.name_textView.text = Utils.firstLetterUpperCase(pokemon.name)
 
-        Utils.loadTypeIntoRightImageView(pokedexEntry, view.context, view.type1_imageView, view.type2_imageView)
+        Utils.loadTypeIntoRightImageView(pokemon, view.context, view.type1_imageView, view.type2_imageView)
     }
 }

@@ -72,7 +72,7 @@ class BattleLoadingScreenFragment : Fragment() {
     }
 
     private fun buildPokemon(pokemonId : Int, pokemonInfo : PokemonInfo) {
-        PokeAPIServiceHelper.pokeAPIService.getPokemon(pokemonId)
+        PokeAPIServiceHelper.pokeAPIService.getPokemonById(pokemonId)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(PokeAPIServiceHelper.pokeApiObserver { pokemon ->

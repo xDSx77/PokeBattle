@@ -21,20 +21,20 @@ object PokeAPIServiceHelper {
     fun <T : Any> pokeApiObserver(onComplete : () -> Unit = {}, onNext : (T) -> Unit) : Observer<T> {
         return object : Observer<T> {
             override fun onSubscribe(d : Disposable) {
-                Log.w("WebServices", "PokeAPI Observer correctly subscribed to Observable : $d")
+                Log.d("WebServices", "PokeAPI Observer correctly subscribed to Observable : $d")
             }
 
             override fun onError(e : Throwable) {
-                Log.w("WebServices", "Error with PokeAPI call: $e")
+                Log.e("WebServices", "Error with PokeAPI call: $e")
             }
 
             override fun onNext(t : T) {
-                Log.w("WebServices", "PokeAPI call success, response is: $t")
+                Log.v("WebServices", "PokeAPI call success, response is: $t")
                 onNext(t)
             }
 
             override fun onComplete() {
-                Log.w("WebServices", "PokeAPI all calls complete")
+                Log.d("WebServices", "PokeAPI all calls complete")
                 onComplete()
             }
 
