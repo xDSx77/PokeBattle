@@ -29,12 +29,12 @@ class BattleLobbyFragment : Fragment() {
 
     private val pokemonSlots : ArrayList<Pokemon?> = arrayListOf(null, null, null)
 
-    private fun loadPokemonInfoIntoViews(pokemon : Pokemon?,
+    private fun loadPokemonInfoIntoViews(pokemon : Pokemon,
                                          pokemonNameTextView : TextView,
                                          pokemonImageView : ImageView,
                                          pokemonType1ImageView : ImageView,
                                          pokemonType2ImageView : ImageView) {
-        pokemonNameTextView.text = Utils.firstLetterUpperCase(pokemon?.name!!)
+        pokemonNameTextView.text = Utils.firstLetterUpperCase(pokemon.name)
         pokemonImageView.visibility = View.VISIBLE
         Glide
             .with(this@BattleLobbyFragment)
