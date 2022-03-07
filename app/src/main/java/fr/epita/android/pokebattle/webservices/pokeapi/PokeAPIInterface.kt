@@ -9,6 +9,7 @@ import fr.epita.android.pokebattle.webservices.pokeapi.resourcelist.NamedAPIReso
 import io.reactivex.rxjava3.core.Observable
 import retrofit2.http.GET
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface PokeAPIInterface {
     object Constants {
@@ -16,8 +17,14 @@ interface PokeAPIInterface {
         const val baseEndpoint : String = "/api/v2"
     }
 
+    @GET("${Constants.baseEndpoint}/pokemon-species/?")
+    fun getAllPokemonSpecies(@Query("limit") limit : Int) : Observable<NamedAPIResourceList>
+
     @GET("${Constants.baseEndpoint}/pokemon/{id}")
-    fun getPokemon(@Path("id") id : Int) : Observable<Pokemon>
+    fun getPokemonById(@Path("id") id : Int) : Observable<Pokemon>
+
+    @GET("${Constants.baseEndpoint}/pokemon/{name}")
+    fun getPokemonByName(@Path("name") name : String) : Observable<Pokemon>
 
     @GET("${Constants.baseEndpoint}/type")
     fun getTypes() : Observable<NamedAPIResourceList>

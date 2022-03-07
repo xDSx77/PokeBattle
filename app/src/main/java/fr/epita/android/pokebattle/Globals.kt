@@ -12,4 +12,7 @@ object Globals {
     // The pokémon level during battle
     const val POKEMON_LEVEL = 50
 
+    // The language of the app
+    const val LANGUAGE = "en"
+
 }

@@ -11,11 +11,7 @@ import fr.epita.android.pokebattle.R
 import fr.epita.android.pokebattle.Utils
 import fr.epita.android.pokebattle.main.MainActivity
 import fr.epita.android.pokebattle.pokedex.PokedexEntryAdapter
-import fr.epita.android.pokebattle.webservices.surleweb.api.PokedexEntry
-import fr.epita.android.pokebattle.webservices.surleweb.api.SurLeWebServiceHelper
-import fr.epita.android.pokebattle.webservices.surleweb.api.SurLeWebServiceHelper.surLeWebService
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.schedulers.Schedulers
+import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.Pokemon
 import kotlinx.android.synthetic.main.fragment_pokedex_list.*
 
 class PokedexListFragment : Fragment() {
@@ -24,20 +20,14 @@ class PokedexListFragment : Fragment() {
     private lateinit var viewAdapter : RecyclerView.Adapter<*>
     private lateinit var viewManager : RecyclerView.LayoutManager
 
-    private val pokedexEntries : ArrayList<PokedexEntry> = ArrayList()
-
-    private fun showPokemonEntries(pokedexEntriesResponse : List<PokedexEntry>) {
-        pokedexEntries.clear()
-
-        Utils.filterPokedexEntriesByGeneration(pokedexEntriesResponse, pokedexEntries)
-
+    private fun showPokemons(pokemons : List<Pokemon>) {
         val entryClickListener = View.OnClickListener {
             val position = it.tag as Int
-            (activity as MainActivity).pokedexDetails(pokedexEntries[position].id)
+            (activity as MainActivity).pokedexDetails(pokemons[position].id)
         }
 
         viewManager = LinearLayoutManager(context)
-        viewAdapter = PokedexEntryAdapter(pokedexEntries, entryClickListener)
+        viewAdapter = PokedexEntryAdapter(pokemons, entryClickListener)
         recyclerView = PokedexListView.apply {
             // use this setting to improve performance if you know that changes
             // in content do not change the layout size of the RecyclerView
@@ -57,11 +47,6 @@ class PokedexListFragment : Fragment() {
     }
 
     override fun onViewCreated(view : View, savedInstanceState : Bundle?) {
-        surLeWebService.pokemonList()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(SurLeWebServiceHelper.surLeWebAPIObserver{ pokedexEntries ->
-                showPokemonEntries(pokedexEntries)
-            })
+        Utils.buildAllPokemonSpecies { pokemons -> showPokemons(pokemons) }
     }
 }

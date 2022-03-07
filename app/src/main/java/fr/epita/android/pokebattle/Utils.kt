@@ -7,9 +7,13 @@ import android.view.View
 import android.widget.ImageView
 import fr.epita.android.pokebattle.enums.Stat
 import fr.epita.android.pokebattle.main.MainActivity
+import fr.epita.android.pokebattle.webservices.pokeapi.PokeAPIServiceHelper.pokeAPIService
+import fr.epita.android.pokebattle.webservices.pokeapi.PokeAPIServiceHelper.pokeApiObserver
 import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.Pokemon
 import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.PokemonStat
-import fr.epita.android.pokebattle.webservices.surleweb.api.PokedexEntry
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.schedulers.Schedulers
 
 object Utils {
 
@@ -45,15 +49,11 @@ object Utils {
     }
 
     @JvmStatic
-    fun <T> loadTypeIntoRightImageView(pokemon : T, context : Context, type1ImageView : ImageView, type2ImageView : ImageView) {
-        val pokemonTypes : List<String> =
-            when (pokemon) {
-                is PokedexEntry -> if (pokemon.types.size == 2) listOf(pokemon.types[0].name, pokemon.types[1].name) else listOf(pokemon.types[0].name)
-                is Pokemon -> if (pokemon.types.size == 2) listOf(pokemon.types[0].type.name, pokemon.types[1].type.name) else listOf(pokemon.types[0].type.name)
-                else -> listOf()
-            }
-
+    fun loadTypeIntoRightImageView(pokemon : Pokemon, context : Context, type1ImageView : ImageView, type2ImageView : ImageView) {
+        val pokemonTypes : List<String> = if (pokemon.types.size == 2) listOf(pokemon.types[0].type.name, pokemon.types[1].type.name) else listOf(pokemon.types[0].type.name)
+        type1ImageView.visibility = View.VISIBLE
         if (pokemonTypes.size == 1) {
+
             type1ImageView.setImageResource(typeToRDrawable(pokemonTypes[0]))
             type1ImageView.setOnClickListener {
                 (context as MainActivity).typeHelp(pokemonTypes[0])
@@ -62,13 +62,13 @@ object Utils {
         }
         else if (pokemonTypes.size == 2) {
             type2ImageView.visibility = View.VISIBLE
-            type1ImageView.setImageResource(typeToRDrawable(pokemonTypes[1]))
+            type1ImageView.setImageResource(typeToRDrawable(pokemonTypes[0]))
             type1ImageView.setOnClickListener {
-                (context as MainActivity).typeHelp(pokemonTypes[1])
-            }
-            type2ImageView.setImageResource(typeToRDrawable(pokemonTypes[0]))
-            type2ImageView.setOnClickListener {
                 (context as MainActivity).typeHelp(pokemonTypes[0])
+            }
+            type2ImageView.setImageResource(typeToRDrawable(pokemonTypes[1]))
+            type2ImageView.setOnClickListener {
+                (context as MainActivity).typeHelp(pokemonTypes[1])
             }
         }
     }
@@ -83,12 +83,33 @@ object Utils {
     }
 
     @JvmStatic
-    fun filterPokedexEntriesByGeneration(pokedexEntries : List<PokedexEntry>, filteredPokedexEntries : ArrayList<PokedexEntry>) {
-        filteredPokedexEntries.addAll(pokedexEntries.filter { p -> p.id <= Globals.GENERATION.maxIdPokedex })
+    fun getPokemonStat(pokemon : Pokemon, stat : Stat) : PokemonStat {
+        return pokemon.stats.find { it.stat.name == stat.statName }!!
     }
 
     @JvmStatic
-    fun getPokemonStat(pokemon : Pokemon, stat : Stat) : PokemonStat {
-        return pokemon.stats.find { it.stat.name == stat.statName }!!
+    fun buildAllPokemonSpecies(actionWithPokemons : (List<Pokemon>) -> Unit) {
+        val pokemonsNames : MutableList<String> = mutableListOf()
+        pokeAPIService.getAllPokemonSpecies(Globals.GENERATION.maxIdPokedex)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(pokeApiObserver(
+                fun() {
+                    Observable.fromIterable(pokemonsNames)
+                        .flatMap { pokemonName -> pokeAPIService.getPokemonByName(pokemonName) }
+                        .toList()
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe { pokemons ->
+                            val pokemonsSortedById = pokemons.sortedBy { it.id }
+                            actionWithPokemons(pokemonsSortedById)
+                        }
+                },
+                fun(pokemonSpecies) {
+                    for (pokemonSpecie in pokemonSpecies.results) {
+                        pokemonsNames.add(pokemonSpecie.name)
+                    }
+                }
+            ))
     }
 }

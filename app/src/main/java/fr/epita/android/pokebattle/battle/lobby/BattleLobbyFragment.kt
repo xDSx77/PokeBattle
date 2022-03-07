@@ -15,12 +15,9 @@ import fr.epita.android.pokebattle.Utils
 import fr.epita.android.pokebattle.battle.BattleLoadingScreenFragment
 import fr.epita.android.pokebattle.main.MainActivity
 import fr.epita.android.pokebattle.pokedex.PokedexEntryAdapter
-import fr.epita.android.pokebattle.webservices.pokeapi.PokeAPIServiceHelper
 import fr.epita.android.pokebattle.webservices.pokeapi.PokeAPIServiceHelper.pokeAPIService
+import fr.epita.android.pokebattle.webservices.pokeapi.PokeAPIServiceHelper.pokeApiObserver
 import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.Pokemon
-import fr.epita.android.pokebattle.webservices.surleweb.api.PokedexEntry
-import fr.epita.android.pokebattle.webservices.surleweb.api.SurLeWebServiceHelper
-import fr.epita.android.pokebattle.webservices.surleweb.api.SurLeWebServiceHelper.surLeWebService
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_battle_lobby.*
@@ -31,57 +28,43 @@ class BattleLobbyFragment : Fragment() {
     private var selectedPokemon : Pokemon? = null
 
     private val pokemonSlots : ArrayList<Pokemon?> = arrayListOf(null, null, null)
-    private val pokedexEntries : ArrayList<PokedexEntry> = ArrayList()
 
-    private fun loadPokemonInfoIntoViews(pokedexEntry : PokedexEntry,
-                                         pokemon : Pokemon?,
+    private fun loadPokemonInfoIntoViews(pokemon : Pokemon?,
                                          pokemonNameTextView : TextView,
                                          pokemonImageView : ImageView,
                                          pokemonType1ImageView : ImageView,
                                          pokemonType2ImageView : ImageView) {
-        pokemonNameTextView.text = Utils.firstLetterUpperCase(pokedexEntry.name)
+        pokemonNameTextView.text = Utils.firstLetterUpperCase(pokemon?.name!!)
         pokemonImageView.visibility = View.VISIBLE
         Glide
             .with(this@BattleLobbyFragment)
-            .load(pokemon?.sprites?.front_default ?: pokedexEntry.sprite)
+            .load(pokemon.sprites.front_default)
             .into(pokemonImageView)
 
-        Utils.loadTypeIntoRightImageView(pokedexEntry, activity as Context, pokemonType1ImageView, pokemonType2ImageView)
+        Utils.loadTypeIntoRightImageView(pokemon, activity as Context, pokemonType1ImageView, pokemonType2ImageView)
     }
 
-    private fun showPokemonEntries(pokedexEntriesResponse : List<PokedexEntry>) {
-        pokedexEntries.clear()
+    private fun showPokemons(pokemons : List<Pokemon>) {
+        opponentPokemon = pokemons.random()
 
-        Utils.filterPokedexEntriesByGeneration(pokedexEntriesResponse, pokedexEntries)
-
-        val opponentEntry = pokedexEntries.random()
-
-        pokeAPIService.getPokemon(opponentEntry.id)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(PokeAPIServiceHelper.pokeApiObserver { pokemon ->
-                opponentPokemon = pokemon
-                loadPokemonInfoIntoViews(opponentEntry, pokemon, NextOpponentNameTextView, NextOpponentImageView, NextOpponentType1ImageView, NextOpponentType2ImageView)
-            })
+        loadPokemonInfoIntoViews(opponentPokemon, NextOpponentNameTextView, NextOpponentImageView, NextOpponentType1ImageView, NextOpponentType2ImageView)
 
         val entryClickListener = View.OnClickListener {
             val position = it.tag as Int
-            val entry = pokedexEntries[position]
+            val pokemon = pokemons[position]
 
-            loadPokemonInfoIntoViews(entry, null, SelectedPokemonTextView, SelectedPokemonImageView, SelectedPokemonType1ImageView, SelectedPokemonType2ImageView)
+            loadPokemonInfoIntoViews(pokemon, SelectedPokemonTextView, SelectedPokemonImageView, SelectedPokemonType1ImageView, SelectedPokemonType2ImageView)
+            selectedPokemon = pokemon
+        }
 
-            pokeAPIService.getPokemon(entry.id)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(PokeAPIServiceHelper.pokeApiObserver { pokemon ->
-                    selectedPokemon = pokemon
-                })
+        FightButton.setOnClickListener {
+            (activity as MainActivity).loadBattle(arrayListOf(opponentPokemon.id, pokemons.random().id, pokemons.random().id), pokemonSlots)
         }
 
         PokemonList.apply {
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(context)
-            adapter = PokedexEntryAdapter(pokedexEntries, entryClickListener)
+            adapter = PokedexEntryAdapter(pokemons, entryClickListener)
         }
     }
 
@@ -106,12 +89,12 @@ class BattleLobbyFragment : Fragment() {
         pokeAPIService.getNatures()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(PokeAPIServiceHelper.pokeApiObserver { naturesResourceList ->
+            .subscribe(pokeApiObserver { naturesResourceList ->
                 for (natureResource in naturesResourceList.results) {
                     pokeAPIService.getNatureByName(natureResource.name)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(PokeAPIServiceHelper.pokeApiObserver { nature ->
+                        .subscribe(pokeApiObserver { nature ->
                             BattleLoadingScreenFragment.allNaturesList.add(nature)
                         })
                 }
@@ -125,17 +108,10 @@ class BattleLobbyFragment : Fragment() {
 
     override fun onViewCreated(view : View, savedInstanceState : Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        buildAllNatures()
-        surLeWebService.pokemonList()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(SurLeWebServiceHelper.surLeWebAPIObserver { pokedexEntries ->
-                showPokemonEntries(pokedexEntries)
-            })
 
-        FightButton.setOnClickListener {
-            (activity as MainActivity).loadBattle(arrayListOf(opponentPokemon.id, pokedexEntries.random().id, pokedexEntries.random().id), pokemonSlots)
-        }
+        buildAllNatures()
+
+        Utils.buildAllPokemonSpecies { pokemons -> showPokemons(pokemons) }
 
         val slot1ClickListener = pokemonSlotClickListener(0, pokemonSlotNameTextView, pokemonSlotImageView)
         val slot2ClickListener = pokemonSlotClickListener(1, pokemonSlotNameTextView2, pokemonSlotImageView2)

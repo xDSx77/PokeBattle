@@ -47,7 +47,7 @@ class PokedexDetailsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val id : Int = requireArguments().getInt("pokemonId")
         if (id != 0) {
-            pokeAPIService.getPokemon(id)
+            pokeAPIService.getPokemonById(id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(PokeAPIServiceHelper.pokeApiObserver { pokemon ->
