@@ -47,6 +47,6 @@ class PokedexListFragment : Fragment() {
     }
 
     override fun onViewCreated(view : View, savedInstanceState : Bundle?) {
-        Utils.buildAllPokemonSpecies { pokemons -> showPokemons(pokemons) }
+        Utils.buildAllPokemons { pokemons -> showPokemons(pokemons) }
     }
 }

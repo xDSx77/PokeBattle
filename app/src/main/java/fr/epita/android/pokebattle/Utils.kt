@@ -3,8 +3,10 @@ package fr.epita.android.pokebattle
 import android.content.Context
 import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
+import android.util.Log
 import android.view.View
 import android.widget.ImageView
+import fr.epita.android.pokebattle.enums.Generation
 import fr.epita.android.pokebattle.enums.Stat
 import fr.epita.android.pokebattle.main.MainActivity
 import fr.epita.android.pokebattle.webservices.pokeapi.PokeAPIServiceHelper.pokeAPIService
@@ -49,8 +51,22 @@ object Utils {
     }
 
     @JvmStatic
+    fun getActualTypes(pokemon : Pokemon) : List<String> {
+        val actualGeneration : Generation = Globals.GENERATION
+        val actualTypes : List<String> = pokemon.types.map { it.type }.map { it.name }
+        if (pokemon.past_types.isNotEmpty()) {
+            for (pastTypes in pokemon.past_types) {
+                if (actualGeneration.generation <= Generation.getFromPokeApiName(pastTypes.generation.name).generation ) {
+                    return pastTypes.types.map { it.type }.map { it.name }
+                }
+            }
+        }
+        return actualTypes
+    }
+
+    @JvmStatic
     fun loadTypeIntoRightImageView(pokemon : Pokemon, context : Context, type1ImageView : ImageView, type2ImageView : ImageView) {
-        val pokemonTypes : List<String> = if (pokemon.types.size == 2) listOf(pokemon.types[0].type.name, pokemon.types[1].type.name) else listOf(pokemon.types[0].type.name)
+        val pokemonTypes : List<String> = getActualTypes(pokemon)
         type1ImageView.visibility = View.VISIBLE
         if (pokemonTypes.size == 1) {
 
@@ -88,15 +104,19 @@ object Utils {
     }
 
     @JvmStatic
-    fun buildAllPokemonSpecies(actionWithPokemons : (List<Pokemon>) -> Unit) {
-        val pokemonsNames : MutableList<String> = mutableListOf()
+    fun buildAllPokemons(actionWithPokemons : (List<Pokemon>) -> Unit) {
+        val pokemonsSpeciesNames : MutableList<String> = mutableListOf()
         pokeAPIService.getAllPokemonSpecies(Globals.GENERATION.maxIdPokedex)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(pokeApiObserver(
                 fun() {
-                    Observable.fromIterable(pokemonsNames)
-                        .flatMap { pokemonName -> pokeAPIService.getPokemonByName(pokemonName) }
+                    Observable.fromIterable(pokemonsSpeciesNames)
+                        .flatMap { pokemonSpecieName -> pokeAPIService.getPokemonSpecieByName(pokemonSpecieName) }
+                        .flatMap { pokemonSpecie -> pokeAPIService.getPokemonByName(pokemonSpecie.varieties.find { it.is_default }!!.pokemon.name) }
+                        .doOnError { error ->
+                            Log.e("WebServices", "Error with PokeAPI call: $error")
+                        }
                         .toList()
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
@@ -107,7 +127,7 @@ object Utils {
                 },
                 fun(pokemonSpecies) {
                     for (pokemonSpecie in pokemonSpecies.results) {
-                        pokemonsNames.add(pokemonSpecie.name)
+                        pokemonsSpeciesNames.add(pokemonSpecie.name)
                     }
                 }
             ))

@@ -3,6 +3,7 @@ package fr.epita.android.pokebattle.webservices.pokeapi
 import fr.epita.android.pokebattle.webservices.pokeapi.moves.Move
 import fr.epita.android.pokebattle.webservices.pokeapi.moves.MoveCategory
 import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.Pokemon
+import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.PokemonSpecies
 import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.nature.Nature
 import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.type.Type
 import fr.epita.android.pokebattle.webservices.pokeapi.resourcelist.NamedAPIResourceList
@@ -19,6 +20,9 @@ interface PokeAPIInterface {
 
     @GET("${Constants.baseEndpoint}/pokemon-species/?")
     fun getAllPokemonSpecies(@Query("limit") limit : Int) : Observable<NamedAPIResourceList>
+
+    @GET("${Constants.baseEndpoint}/pokemon-species/{name}")
+    fun getPokemonSpecieByName(@Path("name") name : String) : Observable<PokemonSpecies>
 
     @GET("${Constants.baseEndpoint}/pokemon/{id}")
     fun getPokemonById(@Path("id") id : Int) : Observable<Pokemon>

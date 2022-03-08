@@ -111,7 +111,7 @@ class BattleLobbyFragment : Fragment() {
 
         buildAllNatures()
 
-        Utils.buildAllPokemonSpecies { pokemons -> showPokemons(pokemons) }
+        Utils.buildAllPokemons { pokemons -> showPokemons(pokemons) }
 
         val slot1ClickListener = pokemonSlotClickListener(0, pokemonSlotNameTextView, pokemonSlotImageView)
         val slot2ClickListener = pokemonSlotClickListener(1, pokemonSlotNameTextView2, pokemonSlotImageView2)
