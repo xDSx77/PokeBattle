@@ -16,13 +16,13 @@ import fr.epita.android.pokebattle.battle.BattleFragment.Companion.pokemon2
 import fr.epita.android.pokebattle.battle.BattleFragment.Companion.pokemon3
 import fr.epita.android.pokebattle.enums.Stat
 import fr.epita.android.pokebattle.main.MainActivity
-import fr.epita.android.pokebattle.webservices.pokeapi.PokeAPIServiceHelper
-import fr.epita.android.pokebattle.webservices.pokeapi.moves.Move
-import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.Pokemon
-import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.PokemonMove
-import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.PokemonStat
-import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.nature.Nature
-import fr.epita.android.pokebattle.webservices.pokeapi.utils.NamedAPIResource
+import fr.epita.android.pokebattle.webservices.pokeapi.PokeAPIHelper
+import fr.epita.android.pokebattle.webservices.pokeapi.models.moves.Move
+import fr.epita.android.pokebattle.webservices.pokeapi.models.pokemon.Pokemon
+import fr.epita.android.pokebattle.webservices.pokeapi.models.pokemon.PokemonMove
+import fr.epita.android.pokebattle.webservices.pokeapi.models.pokemon.PokemonStat
+import fr.epita.android.pokebattle.webservices.pokeapi.models.pokemon.nature.Nature
+import fr.epita.android.pokebattle.webservices.pokeapi.models.utils.NamedAPIResource
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -72,10 +72,10 @@ class BattleLoadingScreenFragment : Fragment() {
     }
 
     private fun buildPokemon(pokemonId : Int, pokemonInfo : PokemonInfo) {
-        PokeAPIServiceHelper.pokeAPIService.getPokemonById(pokemonId)
+        PokeAPIHelper.pokeAPIInterface.getPokemonById(pokemonId)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(PokeAPIServiceHelper.pokeApiObserver { pokemon ->
+            .subscribe(PokeAPIHelper.pokeApiObserver { pokemon ->
                 pokemonInfo.pokemon = pokemon
                 pokemonInfo.moves = mutableListOf()
                 pokemonInfo.nature = allNaturesList.random()
@@ -88,14 +88,14 @@ class BattleLoadingScreenFragment : Fragment() {
                     .intersect(allDamageMovesList)
                     .toList()
                 Observable.merge(
-                    PokeAPIServiceHelper.pokeAPIService.getMove(pokemonDamageMoves[0].name),
-                    PokeAPIServiceHelper.pokeAPIService.getMove(pokemonDamageMoves[1].name),
-                    PokeAPIServiceHelper.pokeAPIService.getMove(pokemonDamageMoves[2].name),
-                    PokeAPIServiceHelper.pokeAPIService.getMove(pokemonDamageMoves[3].name)
+                    PokeAPIHelper.pokeAPIInterface.getMove(pokemonDamageMoves[0].name),
+                    PokeAPIHelper.pokeAPIInterface.getMove(pokemonDamageMoves[1].name),
+                    PokeAPIHelper.pokeAPIInterface.getMove(pokemonDamageMoves[2].name),
+                    PokeAPIHelper.pokeAPIInterface.getMove(pokemonDamageMoves[3].name)
                 )
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(PokeAPIServiceHelper.pokeApiObserver(
+                    .subscribe(PokeAPIHelper.pokeApiObserver(
                         fun() {
                             if (all6PokemonMovesList.size == 24) {
                                 (activity as MainActivity).battle()
@@ -111,10 +111,10 @@ class BattleLoadingScreenFragment : Fragment() {
     }
 
     private fun buildAllDamageMovesListAndPokemons(opponentPokemonIds : List<Int>, playerPokemonIds : List<Int>) {
-        PokeAPIServiceHelper.pokeAPIService.getAllDamageMoves()
+        PokeAPIHelper.pokeAPIInterface.getAllDamageMoves()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(PokeAPIServiceHelper.pokeApiObserver { damageMoveCategory ->
+            .subscribe(PokeAPIHelper.pokeApiObserver { damageMoveCategory ->
                 allDamageMovesList.addAll(damageMoveCategory.moves.filterIndexed { index, _ ->
                     index <= Globals.GENERATION.maxIdMove
                 })
@@ -136,15 +136,15 @@ class BattleLoadingScreenFragment : Fragment() {
     }
 
     private fun buildTypesDamageRelations() {
-        PokeAPIServiceHelper.pokeAPIService.getTypes()
+        PokeAPIHelper.pokeAPIInterface.getTypes()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(PokeAPIServiceHelper.pokeApiObserver { typesResponse ->
+            .subscribe(PokeAPIHelper.pokeApiObserver { typesResponse ->
                 for (typeResource in typesResponse.results) {
-                    PokeAPIServiceHelper.pokeAPIService.getTypeByName(typeResource.name)
+                    PokeAPIHelper.pokeAPIInterface.getTypeByName(typeResource.name)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(PokeAPIServiceHelper.pokeApiObserver { type ->
+                        .subscribe(PokeAPIHelper.pokeApiObserver { type ->
                             DamageHelper.allMovesTypesDamageRelations[type.name] = type.damage_relations
                         })
                 }

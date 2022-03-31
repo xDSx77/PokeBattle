@@ -14,7 +14,7 @@ import fr.epita.android.pokebattle.R
 import fr.epita.android.pokebattle.Utils
 import fr.epita.android.pokebattle.enums.Stat
 import fr.epita.android.pokebattle.main.MainActivity
-import fr.epita.android.pokebattle.webservices.pokeapi.moves.Move
+import fr.epita.android.pokebattle.webservices.pokeapi.models.moves.Move
 import kotlinx.android.synthetic.main.fragment_battle.*
 import java.util.*
 import kotlin.math.max

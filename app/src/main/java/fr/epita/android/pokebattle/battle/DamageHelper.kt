@@ -4,11 +4,11 @@ import fr.epita.android.pokebattle.Globals
 import fr.epita.android.pokebattle.Utils
 import fr.epita.android.pokebattle.enums.NonVolatileStatusEffect
 import fr.epita.android.pokebattle.enums.Stat
-import fr.epita.android.pokebattle.webservices.pokeapi.moves.Move
-import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.PokemonStat
-import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.PokemonType
-import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.type.TypeRelations
-import fr.epita.android.pokebattle.webservices.pokeapi.utils.NamedAPIResource
+import fr.epita.android.pokebattle.webservices.pokeapi.models.moves.Move
+import fr.epita.android.pokebattle.webservices.pokeapi.models.pokemon.PokemonStat
+import fr.epita.android.pokebattle.webservices.pokeapi.models.pokemon.PokemonType
+import fr.epita.android.pokebattle.webservices.pokeapi.models.pokemon.type.TypeRelations
+import fr.epita.android.pokebattle.webservices.pokeapi.models.utils.NamedAPIResource
 import kotlin.math.max
 import kotlin.math.min
 

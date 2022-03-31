@@ -2,10 +2,10 @@ package fr.epita.android.pokebattle.battle
 
 import fr.epita.android.pokebattle.Globals
 import fr.epita.android.pokebattle.enums.NonVolatileStatusEffect
-import fr.epita.android.pokebattle.webservices.pokeapi.moves.Move
-import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.Pokemon
-import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.PokemonType
-import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.nature.Nature
+import fr.epita.android.pokebattle.webservices.pokeapi.models.moves.Move
+import fr.epita.android.pokebattle.webservices.pokeapi.models.pokemon.Pokemon
+import fr.epita.android.pokebattle.webservices.pokeapi.models.pokemon.PokemonType
+import fr.epita.android.pokebattle.webservices.pokeapi.models.pokemon.nature.Nature
 
 data class PokemonInfo(
     var pokemon : Pokemon? = null,

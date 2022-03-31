@@ -7,14 +7,19 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import dagger.hilt.android.AndroidEntryPoint
 import fr.epita.android.pokebattle.R
-import fr.epita.android.pokebattle.Utils
 import fr.epita.android.pokebattle.main.MainActivity
 import fr.epita.android.pokebattle.pokedex.PokedexEntryAdapter
-import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.Pokemon
+import fr.epita.android.pokebattle.webservices.pokeapi.models.pokemon.Pokemon
+import fr.epita.android.pokebattle.webservices.pokeapi.services.PokeAPIService
 import kotlinx.android.synthetic.main.fragment_pokedex_list.*
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class PokedexListFragment : Fragment() {
+
+    @Inject lateinit var pokeAPIService : PokeAPIService
 
     private lateinit var recyclerView : RecyclerView
     private lateinit var viewAdapter : RecyclerView.Adapter<*>
@@ -42,11 +47,15 @@ class PokedexListFragment : Fragment() {
     }
 
     override fun onCreateView(inflater : LayoutInflater, container : ViewGroup?, savedInstanceState : Bundle?) : View? {
+        //namedAPIResourceListRepository = (activity as MainActivity).pokeAPIDatabase.namedAPIResourceListRepository()
+        //pokemonSpeciesRepository = (activity as MainActivity).pokeAPIDatabase.pokemonSpeciesRepository()
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_pokedex_list, container, false)
     }
 
     override fun onViewCreated(view : View, savedInstanceState : Bundle?) {
-        Utils.buildAllPokemons { pokemons -> showPokemons(pokemons) }
+        pokeAPIService.buildAllPokemons { pokemons ->
+            showPokemons(pokemons)
+        }
     }
 }

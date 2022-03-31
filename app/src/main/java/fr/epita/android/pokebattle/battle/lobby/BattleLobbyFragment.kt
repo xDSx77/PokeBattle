@@ -10,30 +10,38 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
+import dagger.hilt.android.AndroidEntryPoint
 import fr.epita.android.pokebattle.R
 import fr.epita.android.pokebattle.Utils
 import fr.epita.android.pokebattle.battle.BattleLoadingScreenFragment
 import fr.epita.android.pokebattle.main.MainActivity
 import fr.epita.android.pokebattle.pokedex.PokedexEntryAdapter
-import fr.epita.android.pokebattle.webservices.pokeapi.PokeAPIServiceHelper.pokeAPIService
-import fr.epita.android.pokebattle.webservices.pokeapi.PokeAPIServiceHelper.pokeApiObserver
-import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.Pokemon
+import fr.epita.android.pokebattle.webservices.pokeapi.PokeAPIHelper.pokeAPIInterface
+import fr.epita.android.pokebattle.webservices.pokeapi.PokeAPIHelper.pokeApiObserver
+import fr.epita.android.pokebattle.webservices.pokeapi.models.pokemon.Pokemon
+import fr.epita.android.pokebattle.webservices.pokeapi.services.PokeAPIService
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_battle_lobby.*
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class BattleLobbyFragment : Fragment() {
+
+    @Inject lateinit var pokeAPIService : PokeAPIService
 
     private lateinit var opponentPokemon : Pokemon
     private var selectedPokemon : Pokemon? = null
 
     private val pokemonSlots : ArrayList<Pokemon?> = arrayListOf(null, null, null)
 
-    private fun loadPokemonInfoIntoViews(pokemon : Pokemon,
-                                         pokemonNameTextView : TextView,
-                                         pokemonImageView : ImageView,
-                                         pokemonType1ImageView : ImageView,
-                                         pokemonType2ImageView : ImageView) {
+    private fun loadPokemonInfoIntoViews(
+        pokemon : Pokemon,
+        pokemonNameTextView : TextView,
+        pokemonImageView : ImageView,
+        pokemonType1ImageView : ImageView,
+        pokemonType2ImageView : ImageView
+    ) {
         pokemonNameTextView.text = Utils.firstLetterUpperCase(pokemon.name)
         pokemonImageView.visibility = View.VISIBLE
         Glide
@@ -86,12 +94,12 @@ class BattleLobbyFragment : Fragment() {
     }
 
     private fun buildAllNatures() {
-        pokeAPIService.getNatures()
+        pokeAPIInterface.getNatures()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(pokeApiObserver { naturesResourceList ->
                 for (natureResource in naturesResourceList.results) {
-                    pokeAPIService.getNatureByName(natureResource.name)
+                    pokeAPIInterface.getNatureByName(natureResource.name)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(pokeApiObserver { nature ->
@@ -102,6 +110,8 @@ class BattleLobbyFragment : Fragment() {
     }
 
     override fun onCreateView(inflater : LayoutInflater, container : ViewGroup?, savedInstanceState : Bundle?) : View? {
+        //namedAPIResourceListRepository = (activity as MainActivity).pokeAPIDatabase.namedAPIResourceListRepository()
+        //pokemonSpeciesRepository = (activity as MainActivity).pokeAPIDatabase.pokemonSpeciesRepository()
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_battle_lobby, container, false)
     }
@@ -111,7 +121,9 @@ class BattleLobbyFragment : Fragment() {
 
         buildAllNatures()
 
-        Utils.buildAllPokemons { pokemons -> showPokemons(pokemons) }
+        pokeAPIService.buildAllPokemons { pokemons ->
+            showPokemons(pokemons)
+        }
 
         val slot1ClickListener = pokemonSlotClickListener(0, pokemonSlotNameTextView, pokemonSlotImageView)
         val slot2ClickListener = pokemonSlotClickListener(1, pokemonSlotNameTextView2, pokemonSlotImageView2)

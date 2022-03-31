@@ -3,6 +3,14 @@ package fr.epita.android.pokebattle.main
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import dagger.hilt.android.AndroidEntryPoint
+import fr.epita.android.pokebattle.Constants.BATTLE
+import fr.epita.android.pokebattle.Constants.BATTLE_LOBBY
+import fr.epita.android.pokebattle.Constants.LOADING
+import fr.epita.android.pokebattle.Constants.POKEDEX
+import fr.epita.android.pokebattle.Constants.POKEDEX_DETAILS
+import fr.epita.android.pokebattle.Constants.START
+import fr.epita.android.pokebattle.Constants.TYPE_HELP
 import fr.epita.android.pokebattle.R
 import fr.epita.android.pokebattle.battle.BattleFragment
 import fr.epita.android.pokebattle.battle.BattleLoadingScreenFragment
@@ -10,15 +18,15 @@ import fr.epita.android.pokebattle.battle.lobby.BattleLobbyFragment
 import fr.epita.android.pokebattle.pokedex.details.PokedexDetailsFragment
 import fr.epita.android.pokebattle.pokedex.list.PokedexListFragment
 import fr.epita.android.pokebattle.typehelp.TypeHelpFragment
-import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.Pokemon
+import fr.epita.android.pokebattle.webservices.pokeapi.models.pokemon.Pokemon
 import kotlin.system.exitProcess
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState : Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.mainContainer, MainFragment())
@@ -29,7 +37,7 @@ class MainActivity : AppCompatActivity() {
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.mainContainer, BattleLobbyFragment())
-            .addToBackStack("battleLobby")
+            .addToBackStack(BATTLE_LOBBY)
             .commit()
     }
 
@@ -37,7 +45,7 @@ class MainActivity : AppCompatActivity() {
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.mainContainer, PokedexListFragment())
-            .addToBackStack("pokedexList")
+            .addToBackStack(POKEDEX)
             .commit()
     }
 
@@ -50,7 +58,7 @@ class MainActivity : AppCompatActivity() {
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.mainContainer, pokedexDetailsFragment)
-            .addToBackStack("pokedexDetails")
+            .addToBackStack(POKEDEX_DETAILS)
             .commit()
     }
 
@@ -63,7 +71,7 @@ class MainActivity : AppCompatActivity() {
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.mainContainer, typeHelpFragment)
-            .addToBackStack("typeHelp")
+            .addToBackStack(TYPE_HELP)
             .commit()
     }
 
@@ -72,7 +80,7 @@ class MainActivity : AppCompatActivity() {
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.mainContainer, battleFragment)
-            .addToBackStack("battle")
+            .addToBackStack(BATTLE)
             .commit()
     }
 
@@ -89,7 +97,7 @@ class MainActivity : AppCompatActivity() {
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.mainContainer, battleLoadingScreenFragment)
-            .addToBackStack("loading")
+            .addToBackStack(LOADING)
             .commit()
     }
 
@@ -97,7 +105,7 @@ class MainActivity : AppCompatActivity() {
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.mainContainer, MainFragment())
-            .addToBackStack("start")
+            .addToBackStack(START)
             .commit()
     }
 
@@ -105,9 +113,9 @@ class MainActivity : AppCompatActivity() {
         val backStackEntryCount = supportFragmentManager.backStackEntryCount
         val lastBackStackEntryName =
             (if (backStackEntryCount == 0) null else supportFragmentManager.getBackStackEntryAt(backStackEntryCount - 1))?.name
-        if (lastBackStackEntryName != null && (lastBackStackEntryName == "loading" || lastBackStackEntryName == "battle")) {
+        if (lastBackStackEntryName != null && (lastBackStackEntryName == LOADING || lastBackStackEntryName == BATTLE)) {
             Toast.makeText(this, "Cannot go back now", Toast.LENGTH_SHORT).show()
-        } else if (lastBackStackEntryName != null && lastBackStackEntryName == "start") {
+        } else if (lastBackStackEntryName != null && lastBackStackEntryName == START) {
             exitProcess(0)
         } else {
             super.onBackPressed()

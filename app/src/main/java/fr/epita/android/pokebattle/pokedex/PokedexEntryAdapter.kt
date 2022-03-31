@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import fr.epita.android.pokebattle.R
 import fr.epita.android.pokebattle.Utils
-import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.Pokemon
+import fr.epita.android.pokebattle.webservices.pokeapi.models.pokemon.Pokemon
 import kotlinx.android.synthetic.main.pokedex_entry.view.*
 
 class PokedexEntryAdapter(private val pokemons : List<Pokemon>,

@@ -1,12 +1,12 @@
 package fr.epita.android.pokebattle.webservices.pokeapi
 
-import fr.epita.android.pokebattle.webservices.pokeapi.moves.Move
-import fr.epita.android.pokebattle.webservices.pokeapi.moves.MoveCategory
-import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.Pokemon
-import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.PokemonSpecies
-import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.nature.Nature
-import fr.epita.android.pokebattle.webservices.pokeapi.pokemon.type.Type
-import fr.epita.android.pokebattle.webservices.pokeapi.resourcelist.NamedAPIResourceList
+import fr.epita.android.pokebattle.webservices.pokeapi.models.moves.Move
+import fr.epita.android.pokebattle.webservices.pokeapi.models.moves.MoveCategory
+import fr.epita.android.pokebattle.webservices.pokeapi.models.pokemon.Pokemon
+import fr.epita.android.pokebattle.webservices.pokeapi.models.pokemon.PokemonSpecies
+import fr.epita.android.pokebattle.webservices.pokeapi.models.pokemon.nature.Nature
+import fr.epita.android.pokebattle.webservices.pokeapi.models.pokemon.type.Type
+import fr.epita.android.pokebattle.webservices.pokeapi.models.resourcelist.NamedAPIResourceList
 import io.reactivex.rxjava3.core.Observable
 import retrofit2.http.GET
 import retrofit2.http.Path
