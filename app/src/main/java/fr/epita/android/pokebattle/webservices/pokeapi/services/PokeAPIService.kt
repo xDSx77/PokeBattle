@@ -9,6 +9,7 @@ import fr.epita.android.pokebattle.webservices.pokeapi.PokeAPIHelper
 import fr.epita.android.pokebattle.webservices.pokeapi.models.pokemon.Pokemon
 import fr.epita.android.pokebattle.webservices.pokeapi.models.pokemon.PokemonSpecies
 import fr.epita.android.pokebattle.webservices.pokeapi.models.resourcelist.NamedAPIResourceList
+import fr.epita.android.pokebattle.webservices.pokeapi.models.utils.NamedAPIResource
 import fr.epita.android.pokebattle.webservices.pokeapi.repository.pokemon.PokemonRepository
 import fr.epita.android.pokebattle.webservices.pokeapi.repository.pokemon.PokemonSpeciesRepository
 import fr.epita.android.pokebattle.webservices.pokeapi.repository.resourcelist.NamedAPIResourceListRepository
@@ -29,95 +30,88 @@ class PokeAPIService @Inject constructor(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 PokeAPIHelper.pokeApiSingleObserver(
-                    fun(throwable : Throwable) {
-                        Log.i(POKEAPI_DATABASE, "$throwable")
-                        pokemonSpeciesRepository.getAll()
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(
-                                PokeAPIHelper.pokeApiSingleObserver(
-                                    fun(throwable : Throwable) {
-                                        Log.i(POKEAPI_DATABASE, "$throwable")
-                                        namedAPIResourceListRepository.findByType(POKEMON_SPECIES)
-                                            .subscribeOn(Schedulers.io())
-                                            .observeOn(AndroidSchedulers.mainThread())
-                                            .subscribe(
-                                                PokeAPIHelper.pokeApiSingleObserver(
-                                                    pokemonSpeciesNotFoundInDb(actionWithPokemons),
-                                                    pokemonSpeciesAllInDb(actionWithPokemons)
-                                                )
-                                            )
-                                    },
-                                    fun(pokemonSpecies : List<PokemonSpecies>) {
-                                        if (pokemonSpecies.size == Globals.GENERATION.maxIdPokedex) {
-                                            pokemonSpeciesRepository.insertAll(pokemonSpecies)
-                                                .doOnError { error ->
-                                                    Log.e(POKEAPI_DATABASE, "Error while saving PokemonSpecies into the db: $error")
-                                                }
-                                                .subscribeOn(Schedulers.io())
-                                                .observeOn(AndroidSchedulers.mainThread())
-                                                .subscribe {
-                                                    Log.d(POKEAPI_DATABASE, "PokemonSpecies correctly inserted into the db")
-                                                    val pokemonList : MutableList<Pokemon> = mutableListOf()
-                                                    for (pokemonSpecie in pokemonSpecies) {
-                                                        PokeAPIHelper.pokeAPIInterface.getPokemonByName(pokemonSpecie.varieties.find { it.is_default }!!.pokemon.name)
-                                                            .subscribeOn(Schedulers.io())
-                                                            .observeOn(AndroidSchedulers.mainThread())
-                                                            .subscribe(
-                                                                PokeAPIHelper.pokeApiObserver { pokemon ->
-                                                                    pokemonRepository.insert(pokemon)
-                                                                        .doOnError { error ->
-                                                                            Log.e(POKEAPI_DATABASE, "Error while saving Pokemon into the db: $error")
-                                                                        }
-                                                                        .subscribeOn(Schedulers.io())
-                                                                        .observeOn(AndroidSchedulers.mainThread())
-                                                                        .subscribe {
-                                                                            Log.d(POKEAPI_DATABASE, "Pokemon correctly inserted into the db")
-                                                                            pokemonList.add(pokemon)
-                                                                            if (pokemonList.size == Globals.GENERATION.maxIdPokedex) {
-                                                                                val pokemonsSortedById = pokemonList.sortedBy { it.id }
-                                                                                actionWithPokemons(pokemonsSortedById)
-                                                                            }
-                                                                        }
-                                                                }
-                                                            )
-                                                    }
-                                                }
-                                        } else {
-                                            namedAPIResourceListRepository.findByType(POKEMON_SPECIES)
-                                                .subscribeOn(Schedulers.io())
-                                                .observeOn(AndroidSchedulers.mainThread())
-                                                .subscribe(
-                                                    PokeAPIHelper.pokeApiSingleObserver(
-                                                        pokemonSpeciesNotFoundInDb(actionWithPokemons),
-                                                        pokemonSpeciesAllInDb(actionWithPokemons)
-                                                    )
-                                                )
-                                        }
-                                    }
-                                )
-                            )
-                    },
-                    fun(pokemons : List<Pokemon>) {
-                        if (pokemons.size == Globals.GENERATION.maxIdPokedex) {
-                            val pokemonsSortedById = pokemons.sortedBy { it.id }
-                            actionWithPokemons(pokemonsSortedById)
-                        } else {
-                            // On a des pokémons en BDD mais on n'en a pas le bon nombre, il faut refaire toute la chaine
-                            // getAllPokemonSpecies -> on save en BDD -> pour chaque espèce -> getPokemonSpecie -> on save en BDD -> pour chaque espèce -> getPokemon -> on save en BDD
-                            Log.i(POKEAPI_DATABASE, "Not the right number of Pokemon in the DB, recall getPokemonSpecies")
-                            namedAPIResourceListRepository.findByType(POKEMON_SPECIES)
-                                .subscribeOn(Schedulers.io())
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe(
-                                    PokeAPIHelper.pokeApiSingleObserver(
-                                        pokemonSpeciesNotFoundInDb(actionWithPokemons),
-                                        pokemonSpeciesAllInDb(actionWithPokemons)
-                                    )
-                                )
-                        }
-                    }
+                    noPokemonFoundInDb(actionWithPokemons),
+                    pokemonFoundInDb(actionWithPokemons)
                 )
+            )
+    }
+
+    private fun noPokemonFoundInDb(actionWithPokemons : (List<Pokemon>) -> Unit) =
+        fun(throwable : Throwable) {
+            Log.i(POKEAPI_DATABASE, "$throwable")
+            pokemonSpeciesRepository.getAll()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                    PokeAPIHelper.pokeApiSingleObserver(
+                        fun(throwable : Throwable) {
+                            Log.i(POKEAPI_DATABASE, "$throwable")
+                            getPokemonSpeciesResourceNameAndInsertIntoDb(actionWithPokemons)
+                        },
+                        getPokemonOrGetPokemonSpeciesIfMissing(actionWithPokemons)
+                    )
+                )
+        }
+
+    private fun pokemonFoundInDb(actionWithPokemons : (List<Pokemon>) -> Unit) =
+        fun(pokemons : List<Pokemon>) {
+            if (pokemons.size == Globals.GENERATION.maxIdPokedex) {
+                val pokemonsSortedById = pokemons.sortedBy { it.id }
+                actionWithPokemons(pokemonsSortedById)
+            } else {
+                // On a des pokémons en BDD mais on n'en a pas le bon nombre, il faut refaire toute la chaine
+                // getAllPokemonSpecies -> on save en BDD -> pour chaque espèce -> getPokemonSpecie -> on save en BDD -> pour chaque espèce -> getPokemon -> on save en BDD
+                Log.i(POKEAPI_DATABASE, "Not the right number of Pokemon in the DB, recall getPokemonSpecies")
+                getPokemonSpeciesResourceNameAndInsertIntoDb(actionWithPokemons)
+            }
+        }
+
+    private fun getPokemonOrGetPokemonSpeciesIfMissing(actionWithPokemons : (List<Pokemon>) -> Unit) =
+        fun(pokemonSpecies : List<PokemonSpecies>) {
+            if (pokemonSpecies.size == Globals.GENERATION.maxIdPokedex) {
+                val pokemonList : MutableList<Pokemon> = mutableListOf()
+                for (pokemonSpecie in pokemonSpecies) {
+                    getPokemonAndInsertIntoDb(pokemonSpecie, pokemonList, actionWithPokemons)
+                }
+            } else {
+                getPokemonSpeciesResourceNameAndInsertIntoDb(actionWithPokemons)
+            }
+        }
+
+    private fun getPokemonSpeciesResourceNameAndInsertIntoDb(actionWithPokemons : (List<Pokemon>) -> Unit) {
+        namedAPIResourceListRepository.findByType(POKEMON_SPECIES)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                PokeAPIHelper.pokeApiSingleObserver(
+                    pokemonSpeciesNotFoundInDb(actionWithPokemons),
+                    pokemonSpeciesAllInDb(actionWithPokemons)
+                )
+            )
+    }
+
+    private fun getPokemonAndInsertIntoDb(pokemonSpecie : PokemonSpecies, pokemonList : MutableList<Pokemon>, actionWithPokemons : (List<Pokemon>) -> Unit) {
+        val pokemonDefaultVarietyName = pokemonSpecie.varieties.find { it.is_default }!!.pokemon.name
+        PokeAPIHelper.pokeAPIInterface.getPokemonByName(pokemonDefaultVarietyName)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                PokeAPIHelper.pokeApiObserver { pokemon ->
+                    pokemonRepository.insert(pokemon)
+                        .doOnError { error ->
+                            Log.e(POKEAPI_DATABASE, "Error while saving Pokemon into the db: $error")
+                        }
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe {
+                            Log.d(POKEAPI_DATABASE, "Pokemon correctly inserted into the db")
+                            pokemonList.add(pokemon)
+                            if (pokemonList.size == Globals.GENERATION.maxIdPokedex) {
+                                val pokemonsSortedById = pokemonList.sortedBy { it.id }
+                                actionWithPokemons(pokemonsSortedById)
+                            }
+                        }
+                }
             )
     }
 
@@ -128,11 +122,10 @@ class PokeAPIService @Inject constructor(
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                    PokeAPIHelper.pokeApiObserver (
+                    PokeAPIHelper.pokeApiObserver(
                         fun() {
                             Log.i(WEB_SERVICES, "Subscribe complete")
                         },
-                        //onAllPokemonSpeciesGetPokemon(actionWithPokemons),
                         onPokemonSpecieInsertIntoDb(actionWithPokemons)
                     )
                 )
@@ -156,71 +149,62 @@ class PokeAPIService @Inject constructor(
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(
                                 PokeAPIHelper.pokeApiSingleObserver(
-                                    fun(throwable : Throwable) {
-                                        Log.i(POKEAPI_DATABASE, "$throwable")
-                                        PokeAPIHelper.pokeAPIInterface.getPokemonSpecieByName(pokemonSpecieResource.name)
-                                            .subscribeOn(Schedulers.io())
-                                            .observeOn(AndroidSchedulers.mainThread())
-                                            .subscribe(
-                                                PokeAPIHelper.pokeApiObserver { pokemonSpecie ->
-                                                    pokemonSpeciesRepository.insert(pokemonSpecie)
-                                                        .doOnError { error ->
-                                                            Log.e(POKEAPI_DATABASE, "Error while saving PokemonSpecie into the db: $error")
-                                                        }
-                                                        .subscribeOn(Schedulers.io())
-                                                        .observeOn(AndroidSchedulers.mainThread())
-                                                        .subscribe {
-                                                            Log.d(POKEAPI_DATABASE, "PokemonSpecie correctly inserted into the db")
-                                                            val pokemonSpecieDefaultVarietyName = pokemonSpecie.varieties.find { it.is_default }!!.pokemon.name
-                                                            pokemonRepository.findByName(pokemonSpecieDefaultVarietyName)
-                                                                .subscribeOn(Schedulers.io())
-                                                                .observeOn(AndroidSchedulers.mainThread())
-                                                                .subscribe(
-                                                                    PokeAPIHelper.pokeApiSingleObserver(
-                                                                        fun(throwable : Throwable) {
-                                                                            Log.i(POKEAPI_DATABASE, "$throwable")
-                                                                            PokeAPIHelper.pokeAPIInterface.getPokemonByName(pokemonSpecieDefaultVarietyName)
-                                                                                .subscribeOn(Schedulers.io())
-                                                                                .observeOn(AndroidSchedulers.mainThread())
-                                                                                .subscribe(
-                                                                                    PokeAPIHelper.pokeApiObserver { pokemon ->
-                                                                                        pokemonRepository.insert(pokemon)
-                                                                                            .doOnError { error ->
-                                                                                                Log.e(POKEAPI_DATABASE, "Error while saving Pokemon into the db: $error")
-                                                                                            }
-                                                                                            .subscribeOn(Schedulers.io())
-                                                                                            .observeOn(AndroidSchedulers.mainThread())
-                                                                                            .subscribe {
-                                                                                                pokemons.add(pokemon)
-                                                                                                if (pokemons.size == Globals.GENERATION.maxIdPokedex) {
-                                                                                                    val pokemonsSortedById = pokemons.sortedBy { it.id }
-                                                                                                    actionWithPokemons(pokemonsSortedById)
-                                                                                                }
-                                                                                            }
-                                                                                    }
-                                                                                )
-                                                                        },
-                                                                        fun(pokemonInDb : Pokemon) {
-                                                                            pokemons.add(pokemonInDb)
-                                                                            if (pokemons.size == Globals.GENERATION.maxIdPokedex) {
-                                                                                val pokemonsSortedById = pokemons.sortedBy { it.id }
-                                                                                actionWithPokemons(pokemonsSortedById)
-                                                                            }
-                                                                        }
-                                                                    )
-                                                                )
-                                                        }
-                                                }
-                                            )
-                                    },
-                                    fun(pokemonSpecieInDb : PokemonSpecies) {
-                                        // TODO
-                                    }
+                                    pokemonSpecieNotFoundInDb(pokemonSpecieResource, pokemons, actionWithPokemons),
+                                    pokemonSpecieFoundInDb(pokemons, actionWithPokemons)
                                 )
                             )
                     }
                 }
         }
+
+    private fun pokemonSpecieNotFoundInDb(pokemonSpecieResource : NamedAPIResource, pokemons : MutableList<Pokemon>, actionWithPokemons : (List<Pokemon>) -> Unit) =
+        fun(throwable : Throwable) {
+            Log.i(POKEAPI_DATABASE, "$throwable")
+            PokeAPIHelper.pokeAPIInterface.getPokemonSpecieByName(pokemonSpecieResource.name)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                    PokeAPIHelper.pokeApiObserver { pokemonSpecie ->
+                        pokemonSpeciesRepository.insert(pokemonSpecie)
+                            .doOnError { error ->
+                                Log.e(POKEAPI_DATABASE, "Error while saving PokemonSpecie into the db: $error")
+                            }
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe {
+                                Log.d(POKEAPI_DATABASE, "PokemonSpecie correctly inserted into the db")
+                                getPokemonInDbOrDoActions(pokemonSpecie, pokemons, actionWithPokemons)
+                            }
+                    }
+                )
+        }
+
+    private fun pokemonSpecieFoundInDb(pokemons : MutableList<Pokemon>, actionWithPokemons : (List<Pokemon>) -> Unit) =
+        fun(pokemonSpecie : PokemonSpecies) {
+            getPokemonInDbOrDoActions(pokemonSpecie, pokemons, actionWithPokemons)
+        }
+
+    private fun getPokemonInDbOrDoActions(pokemonSpecie : PokemonSpecies, pokemons : MutableList<Pokemon>, actionWithPokemons : (List<Pokemon>) -> Unit) {
+        val pokemonSpecieDefaultVarietyName = pokemonSpecie.varieties.find { it.is_default }!!.pokemon.name
+        pokemonRepository.findByName(pokemonSpecieDefaultVarietyName)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                PokeAPIHelper.pokeApiSingleObserver(
+                    fun(throwable : Throwable) {
+                        Log.i(POKEAPI_DATABASE, "$throwable")
+                        getPokemonAndInsertIntoDb(pokemonSpecie, pokemons, actionWithPokemons)
+                    },
+                    fun(pokemonInDb : Pokemon) {
+                        pokemons.add(pokemonInDb)
+                        if (pokemons.size == Globals.GENERATION.maxIdPokedex) {
+                            val pokemonsSortedById = pokemons.sortedBy { it.id }
+                            actionWithPokemons(pokemonsSortedById)
+                        }
+                    }
+                )
+            )
+    }
 
     private fun getPokemonSpecieInDBOrCallApi(pokemonSpecieName : String) : Observable<PokemonSpecies> {
         lateinit var pokemonSpeciesObservable : Observable<PokemonSpecies>
