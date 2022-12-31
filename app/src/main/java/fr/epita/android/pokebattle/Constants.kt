@@ -3,11 +3,11 @@ package fr.epita.android.pokebattle
 object Constants {
 
     // Log tags
-    const val POKEAPI_DATABASE = "PokeAPIDatabase"
+    const val POKEBATTLE_DATABASE = "PokeBattleDatabase"
     const val WEB_SERVICES = "WebServices"
 
     // DB
-    const val POKEAPI_DB = "pokeApiDb"
+    const val POKEBATTLE_DB = "pokeBattleDb"
     const val POKEMON_SPECIES = "pokemonSpecies"
 
     // Fragments names

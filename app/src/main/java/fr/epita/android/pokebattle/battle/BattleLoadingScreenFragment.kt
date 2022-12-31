@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import fr.epita.android.pokebattle.Globals
+import fr.epita.android.pokebattle.ObserverHelper
 import fr.epita.android.pokebattle.R
 import fr.epita.android.pokebattle.Utils
 import fr.epita.android.pokebattle.battle.BattleFragment.Companion.opponentPokemon1
@@ -27,7 +28,6 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlin.math.min
-
 
 class BattleLoadingScreenFragment : Fragment() {
 
@@ -75,7 +75,7 @@ class BattleLoadingScreenFragment : Fragment() {
         PokeAPIHelper.pokeAPIInterface.getPokemonById(pokemonId)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(PokeAPIHelper.pokeApiObserver { pokemon ->
+            .subscribe(ObserverHelper.pokeApiObserver { pokemon ->
                 pokemonInfo.pokemon = pokemon
                 pokemonInfo.moves = mutableListOf()
                 pokemonInfo.nature = allNaturesList.random()
@@ -85,7 +85,7 @@ class BattleLoadingScreenFragment : Fragment() {
                 val pokemonDamageMoves : List<NamedAPIResource> = pokemon.moves
                     .shuffled()
                     .map(PokemonMove::move)
-                    .intersect(allDamageMovesList)
+                    .intersect(allDamageMovesList.toSet())
                     .toList()
                 Observable.merge(
                     PokeAPIHelper.pokeAPIInterface.getMove(pokemonDamageMoves[0].name),
@@ -95,7 +95,7 @@ class BattleLoadingScreenFragment : Fragment() {
                 )
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(PokeAPIHelper.pokeApiObserver(
+                    .subscribe(ObserverHelper.pokeApiObserver(
                         fun() {
                             if (all6PokemonMovesList.size == 24) {
                                 (activity as MainActivity).battle()
@@ -114,7 +114,7 @@ class BattleLoadingScreenFragment : Fragment() {
         PokeAPIHelper.pokeAPIInterface.getAllDamageMoves()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(PokeAPIHelper.pokeApiObserver { damageMoveCategory ->
+            .subscribe(ObserverHelper.pokeApiObserver { damageMoveCategory ->
                 allDamageMovesList.addAll(damageMoveCategory.moves.filterIndexed { index, _ ->
                     index <= Globals.GENERATION.maxIdMove
                 })
@@ -139,12 +139,12 @@ class BattleLoadingScreenFragment : Fragment() {
         PokeAPIHelper.pokeAPIInterface.getTypes()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(PokeAPIHelper.pokeApiObserver { typesResponse ->
+            .subscribe(ObserverHelper.pokeApiObserver { typesResponse ->
                 for (typeResource in typesResponse.results) {
                     PokeAPIHelper.pokeAPIInterface.getTypeByName(typeResource.name)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(PokeAPIHelper.pokeApiObserver { type ->
+                        .subscribe(ObserverHelper.pokeApiObserver { type ->
                             DamageHelper.allMovesTypesDamageRelations[type.name] = type.damage_relations
                         })
                 }

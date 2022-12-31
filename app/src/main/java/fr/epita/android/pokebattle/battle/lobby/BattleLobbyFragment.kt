@@ -11,13 +11,13 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import dagger.hilt.android.AndroidEntryPoint
+import fr.epita.android.pokebattle.ObserverHelper
 import fr.epita.android.pokebattle.R
 import fr.epita.android.pokebattle.Utils
 import fr.epita.android.pokebattle.battle.BattleLoadingScreenFragment
 import fr.epita.android.pokebattle.main.MainActivity
 import fr.epita.android.pokebattle.pokedex.PokedexEntryAdapter
 import fr.epita.android.pokebattle.webservices.pokeapi.PokeAPIHelper.pokeAPIInterface
-import fr.epita.android.pokebattle.webservices.pokeapi.PokeAPIHelper.pokeApiObserver
 import fr.epita.android.pokebattle.webservices.pokeapi.models.pokemon.Pokemon
 import fr.epita.android.pokebattle.webservices.pokeapi.services.PokeAPIService
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -97,12 +97,12 @@ class BattleLobbyFragment : Fragment() {
         pokeAPIInterface.getNatures()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(pokeApiObserver { naturesResourceList ->
+            .subscribe(ObserverHelper.pokeApiObserver { naturesResourceList ->
                 for (natureResource in naturesResourceList.results) {
                     pokeAPIInterface.getNatureByName(natureResource.name)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(pokeApiObserver { nature ->
+                        .subscribe(ObserverHelper.pokeApiObserver { nature ->
                             BattleLoadingScreenFragment.allNaturesList.add(nature)
                         })
                 }

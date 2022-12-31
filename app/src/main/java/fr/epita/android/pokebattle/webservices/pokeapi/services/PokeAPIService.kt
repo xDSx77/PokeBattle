@@ -1,10 +1,11 @@
 package fr.epita.android.pokebattle.webservices.pokeapi.services
 
 import android.util.Log
-import fr.epita.android.pokebattle.Constants.POKEAPI_DATABASE
+import fr.epita.android.pokebattle.Constants.POKEBATTLE_DATABASE
 import fr.epita.android.pokebattle.Constants.POKEMON_SPECIES
 import fr.epita.android.pokebattle.Constants.WEB_SERVICES
 import fr.epita.android.pokebattle.Globals
+import fr.epita.android.pokebattle.ObserverHelper
 import fr.epita.android.pokebattle.webservices.pokeapi.PokeAPIHelper
 import fr.epita.android.pokebattle.webservices.pokeapi.models.pokemon.Pokemon
 import fr.epita.android.pokebattle.webservices.pokeapi.models.pokemon.PokemonSpecies
@@ -29,7 +30,7 @@ class PokeAPIService @Inject constructor(
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
-                PokeAPIHelper.pokeApiSingleObserver(
+                ObserverHelper.pokeBattleDbSingleObserver(
                     noPokemonFoundInDb(actionWithPokemons),
                     pokemonFoundInDb(actionWithPokemons)
                 )
@@ -38,14 +39,14 @@ class PokeAPIService @Inject constructor(
 
     private fun noPokemonFoundInDb(actionWithPokemons : (List<Pokemon>) -> Unit) =
         fun(throwable : Throwable) {
-            Log.i(POKEAPI_DATABASE, "$throwable")
+            Log.i(POKEBATTLE_DATABASE, "$throwable")
             pokemonSpeciesRepository.getAll()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                    PokeAPIHelper.pokeApiSingleObserver(
+                    ObserverHelper.pokeBattleDbSingleObserver(
                         fun(throwable : Throwable) {
-                            Log.i(POKEAPI_DATABASE, "$throwable")
+                            Log.i(POKEBATTLE_DATABASE, "$throwable")
                             getPokemonSpeciesResourceNameAndInsertIntoDb(actionWithPokemons)
                         },
                         getPokemonOrGetPokemonSpeciesIfMissing(actionWithPokemons)
@@ -59,9 +60,9 @@ class PokeAPIService @Inject constructor(
                 val pokemonsSortedById = pokemons.sortedBy { it.id }
                 actionWithPokemons(pokemonsSortedById)
             } else {
-                // On a des pokémons en BDD mais on n'en a pas le bon nombre, il faut refaire toute la chaine
+                // On a des pokémons en BDD mais on n'en a pas le bon nombre, il faut refaire toute la chaîne
                 // getAllPokemonSpecies -> on save en BDD -> pour chaque espèce -> getPokemonSpecie -> on save en BDD -> pour chaque espèce -> getPokemon -> on save en BDD
-                Log.i(POKEAPI_DATABASE, "Not the right number of Pokemon in the DB, recall getPokemonSpecies")
+                Log.i(POKEBATTLE_DATABASE, "Not the right number of Pokemon in the DB, recall getPokemonSpecies")
                 getPokemonSpeciesResourceNameAndInsertIntoDb(actionWithPokemons)
             }
         }
@@ -83,7 +84,7 @@ class PokeAPIService @Inject constructor(
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
-                PokeAPIHelper.pokeApiSingleObserver(
+                ObserverHelper.pokeBattleDbSingleObserver(
                     pokemonSpeciesNotFoundInDb(actionWithPokemons),
                     pokemonSpeciesAllInDb(actionWithPokemons)
                 )
@@ -96,15 +97,15 @@ class PokeAPIService @Inject constructor(
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
-                PokeAPIHelper.pokeApiObserver { pokemon ->
+                ObserverHelper.pokeApiObserver { pokemon ->
                     pokemonRepository.insert(pokemon)
                         .doOnError { error ->
-                            Log.e(POKEAPI_DATABASE, "Error while saving Pokemon into the db: $error")
+                            Log.e(POKEBATTLE_DATABASE, "Error while saving Pokemon into the db: $error")
                         }
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe {
-                            Log.d(POKEAPI_DATABASE, "Pokemon correctly inserted into the db")
+                            Log.d(POKEBATTLE_DATABASE, "Pokemon correctly inserted into the db")
                             pokemonList.add(pokemon)
                             if (pokemonList.size == Globals.GENERATION.maxIdPokedex) {
                                 val pokemonsSortedById = pokemonList.sortedBy { it.id }
@@ -117,12 +118,12 @@ class PokeAPIService @Inject constructor(
 
     private fun pokemonSpeciesNotFoundInDb(actionWithPokemons : (List<Pokemon>) -> Unit) =
         fun(throwable : Throwable) {
-            Log.i(POKEAPI_DATABASE, "$throwable")
+            Log.i(POKEBATTLE_DATABASE, "$throwable")
             PokeAPIHelper.pokeAPIInterface.getAllPokemonSpecies(Globals.GENERATION.maxIdPokedex)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                    PokeAPIHelper.pokeApiObserver(
+                    ObserverHelper.pokeApiObserver(
                         fun() {
                             Log.i(WEB_SERVICES, "Subscribe complete")
                         },
@@ -136,19 +137,19 @@ class PokeAPIService @Inject constructor(
             pokemonSpecies.type = POKEMON_SPECIES
             namedAPIResourceListRepository.insert(pokemonSpecies)
                 .doOnError { error ->
-                    Log.e(POKEAPI_DATABASE, "Error while saving PokemonSpecies List into the db: $error")
+                    Log.e(POKEBATTLE_DATABASE, "Error while saving PokemonSpecies List into the db: $error")
                 }
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
-                    Log.d(POKEAPI_DATABASE, "PokemonSpecies List correctly inserted into the db")
+                    Log.d(POKEBATTLE_DATABASE, "PokemonSpecies List correctly inserted into the db")
                     val pokemons : MutableList<Pokemon> = mutableListOf()
                     for (pokemonSpecieResource in pokemonSpecies.results) {
                         pokemonSpeciesRepository.findByName(pokemonSpecieResource.name)
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(
-                                PokeAPIHelper.pokeApiSingleObserver(
+                                ObserverHelper.pokeBattleDbSingleObserver(
                                     pokemonSpecieNotFoundInDb(pokemonSpecieResource, pokemons, actionWithPokemons),
                                     pokemonSpecieFoundInDb(pokemons, actionWithPokemons)
                                 )
@@ -159,20 +160,20 @@ class PokeAPIService @Inject constructor(
 
     private fun pokemonSpecieNotFoundInDb(pokemonSpecieResource : NamedAPIResource, pokemons : MutableList<Pokemon>, actionWithPokemons : (List<Pokemon>) -> Unit) =
         fun(throwable : Throwable) {
-            Log.i(POKEAPI_DATABASE, "$throwable")
+            Log.i(POKEBATTLE_DATABASE, "$throwable")
             PokeAPIHelper.pokeAPIInterface.getPokemonSpecieByName(pokemonSpecieResource.name)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                    PokeAPIHelper.pokeApiObserver { pokemonSpecie ->
+                    ObserverHelper.pokeApiObserver { pokemonSpecie ->
                         pokemonSpeciesRepository.insert(pokemonSpecie)
                             .doOnError { error ->
-                                Log.e(POKEAPI_DATABASE, "Error while saving PokemonSpecie into the db: $error")
+                                Log.e(POKEBATTLE_DATABASE, "Error while saving PokemonSpecie into the db: $error")
                             }
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe {
-                                Log.d(POKEAPI_DATABASE, "PokemonSpecie correctly inserted into the db")
+                                Log.d(POKEBATTLE_DATABASE, "PokemonSpecie correctly inserted into the db")
                                 getPokemonInDbOrDoActions(pokemonSpecie, pokemons, actionWithPokemons)
                             }
                     }
@@ -190,9 +191,9 @@ class PokeAPIService @Inject constructor(
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
-                PokeAPIHelper.pokeApiSingleObserver(
+                ObserverHelper.pokeBattleDbSingleObserver(
                     fun(throwable : Throwable) {
-                        Log.i(POKEAPI_DATABASE, "$throwable")
+                        Log.i(POKEBATTLE_DATABASE, "$throwable")
                         getPokemonAndInsertIntoDb(pokemonSpecie, pokemons, actionWithPokemons)
                     },
                     fun(pokemonInDb : Pokemon) {
@@ -212,9 +213,9 @@ class PokeAPIService @Inject constructor(
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
-                PokeAPIHelper.pokeApiSingleObserver(
+                ObserverHelper.pokeBattleDbSingleObserver(
                     fun(throwable : Throwable) {
-                        Log.i(POKEAPI_DATABASE, "$throwable")
+                        Log.i(POKEBATTLE_DATABASE, "$throwable")
                         pokemonSpeciesObservable = PokeAPIHelper.pokeAPIInterface.getPokemonSpecieByName(pokemonSpecieName)
                     },
                     fun(pokemonSpecieInDb : PokemonSpecies) {
@@ -232,9 +233,9 @@ class PokeAPIService @Inject constructor(
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
-                PokeAPIHelper.pokeApiSingleObserver(
+                ObserverHelper.pokeBattleDbSingleObserver(
                     fun(throwable : Throwable) {
-                        Log.i(POKEAPI_DATABASE, "$throwable")
+                        Log.i(POKEBATTLE_DATABASE, "$throwable")
                         pokemonObservable = PokeAPIHelper.pokeAPIInterface.getPokemonByName(pokemonSpecieDefaultVarietyName)
 
                     },

@@ -6,9 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
+import fr.epita.android.pokebattle.ObserverHelper
 import fr.epita.android.pokebattle.R
 import fr.epita.android.pokebattle.Utils
-import fr.epita.android.pokebattle.webservices.pokeapi.PokeAPIHelper
 import fr.epita.android.pokebattle.webservices.pokeapi.PokeAPIHelper.pokeAPIInterface
 import fr.epita.android.pokebattle.webservices.pokeapi.models.pokemon.Pokemon
 import fr.epita.android.pokebattle.webservices.pokeapi.models.pokemon.PokemonStat
@@ -50,7 +50,7 @@ class PokedexDetailsFragment : Fragment() {
             pokeAPIInterface.getPokemonById(id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(PokeAPIHelper.pokeApiObserver { pokemon ->
+                .subscribe(ObserverHelper.pokeApiObserver { pokemon ->
                     showPokemonDetails(pokemon)
                 })
         }

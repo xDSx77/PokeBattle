@@ -6,9 +6,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import fr.epita.android.pokebattle.ObserverHelper
 import fr.epita.android.pokebattle.R
 import fr.epita.android.pokebattle.Utils
-import fr.epita.android.pokebattle.webservices.pokeapi.PokeAPIHelper
 import fr.epita.android.pokebattle.webservices.pokeapi.PokeAPIHelper.pokeAPIInterface
 import fr.epita.android.pokebattle.webservices.pokeapi.models.pokemon.type.TypeRelations
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -36,7 +36,7 @@ class TypeHelpFragment : Fragment() {
         pokeAPIInterface.getTypeByName(typeName)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(PokeAPIHelper.pokeApiObserver { type ->
+            .subscribe(ObserverHelper.pokeApiObserver { type ->
                 TypeImageView.setImageResource(Utils.typeToRDrawable(typeName))
                 clearTypesList()
                 setTypesList(type.damage_relations)

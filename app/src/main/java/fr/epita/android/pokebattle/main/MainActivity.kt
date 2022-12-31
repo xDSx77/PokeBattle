@@ -109,6 +109,7 @@ class MainActivity : AppCompatActivity() {
             .commit()
     }
 
+    @Deprecated("")
     override fun onBackPressed() {
         val backStackEntryCount = supportFragmentManager.backStackEntryCount
         val lastBackStackEntryName =
